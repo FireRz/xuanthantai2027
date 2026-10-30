@@ -35,7 +35,7 @@
 ### F01 — Nền tảng & dữ liệu ([chi tiết](features/F01-foundation-data-model.md))
 | ID | Task | Phụ thuộc | Size | TT |
 |----|------|-----------|------|----|
-| T01.1 | Khởi tạo dự án, lint, Tailwind, shadcn/ui | — | S | ⬜ |
+| T01.1 | Khởi tạo dự án, lint, Tailwind, shadcn/ui | — | S | ✅ |
 | T01.2 | docker-compose Postgres, `.env.example` | T01.1 | S | ⬜ |
 | T01.3 | Vitest + Playwright (mobile + desktop) | T01.1 | S | ⬜ |
 | T01.4 | Chốt mô hình dữ liệu | — | S | ✅ |
