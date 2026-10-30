@@ -145,8 +145,8 @@
 | ID | Task | Phụ thuộc | Size | TT |
 |----|------|-----------|------|----|
 | T10.1 | Chốt hạ tầng | — | S | ✅ |
-| T10.2 | Vercel + Neon + Blob, biến môi trường | T01.1, *tài khoản Vercel* | S | ⬜ |
-| T10.3 | Migrate khi deploy + health | T10.2, T01.5 | S | ⬜ |
+| T10.2 | Vercel + Neon + Blob, biến môi trường (code + hướng dẫn xong; chờ chủ dự án làm theo docs/deploy.md) | T01.1, *tài khoản Vercel* | S | 🟨 |
+| T10.3 | Migrate khi deploy + health (chờ deploy Preview đầu tiên để xác nhận) | T10.2, T01.5 | S | 🟨 |
 | T10.4 | Sao lưu + diễn tập khôi phục | T10.2 | M | ⬜ |
 | T10.5 | Giám sát lỗi | T10.2 | S | ⬜ |
 | T10.6 | Nhập dữ liệu thật | F06, T07.8, T08.9 | M | ⬜ |
