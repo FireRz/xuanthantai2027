@@ -40,7 +40,7 @@
 | T01.3 | Vitest + Playwright (mobile + desktop) | T01.1 | S | ✅ |
 | T01.4 | Chốt mô hình dữ liệu | — | S | ✅ |
 | T01.5 | Prisma schema + migration | T01.2 | M | ✅ |
-| T01.6 | Repository + "SP visible" + ràng buộc cùng nhãn | T01.5 | M | ⬜ |
+| T01.6 | Repository + "SP visible" + ràng buộc cùng nhãn | T01.5 | M | ✅ |
 | T01.7 | `metrics.ts` + `product_totals` | T01.5 | S | ⬜ |
 | T01.8 | Seed dữ liệu mẫu | T01.5 | S | ⬜ |
 | T01.9 | Adapter Vercel Blob | T01.2 | S | ⬜ |

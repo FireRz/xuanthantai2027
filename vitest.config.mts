@@ -23,6 +23,8 @@ export default defineConfig({
           globalSetup: ["tests/integration/global-setup.ts"],
           // Dùng chung một DB test → chạy tuần tự.
           fileParallelism: false,
+          pool: "forks",
+          poolOptions: { forks: { singleFork: true } },
           testTimeout: 30_000,
           hookTimeout: 120_000,
         },
