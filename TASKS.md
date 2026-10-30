@@ -37,7 +37,7 @@
 |----|------|-----------|------|----|
 | T01.1 | Khởi tạo dự án, lint, Tailwind, shadcn/ui | — | S | ✅ |
 | T01.2 | docker-compose Postgres, `.env.example` | T01.1 | S | ✅ |
-| T01.3 | Vitest + Playwright (mobile + desktop) | T01.1 | S | ⬜ |
+| T01.3 | Vitest + Playwright (mobile + desktop) | T01.1 | S | ✅ |
 | T01.4 | Chốt mô hình dữ liệu | — | S | ✅ |
 | T01.5 | Prisma schema + migration | T01.2 | M | ⬜ |
 | T01.6 | Repository + "SP visible" + ràng buộc cùng nhãn | T01.5 | M | ⬜ |
