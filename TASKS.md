@@ -43,8 +43,8 @@
 | T01.6 | Repository + "SP visible" + ràng buộc cùng nhãn | T01.5 | M | ✅ |
 | T01.7 | `metrics.ts` + `product_totals` | T01.5 | S | ✅ |
 | T01.8 | Seed dữ liệu mẫu | T01.5 | S | ✅ |
-| T01.9 | Adapter Vercel Blob | T01.2 | S | ✅ |
-| T01.10 | CI GitHub Actions | T01.3 | S | ⬜ |
+| T01.9 | Adapter Vercel Blob (còn chạy test upload/xóa thật khi có token store dev) | T01.2 | S | 🟨 |
+| T01.10 | CI GitHub Actions (chờ push để thấy CI xanh) | T01.3 | S | 🟨 |
 | T01.11 | Seed quy mô lớn | T01.8 | S | ✅ |
 
 ### F02 — Đăng nhập quản trị ([chi tiết](features/F02-auth-permissions.md))
