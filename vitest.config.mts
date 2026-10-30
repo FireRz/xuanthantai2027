@@ -20,6 +20,7 @@ export default defineConfig({
           include: ["tests/integration/**/*.test.ts"],
           environment: "node",
           setupFiles: ["tests/integration/setup.ts"],
+          globalSetup: ["tests/integration/global-setup.ts"],
           // Dùng chung một DB test → chạy tuần tự.
           fileParallelism: false,
           testTimeout: 30_000,

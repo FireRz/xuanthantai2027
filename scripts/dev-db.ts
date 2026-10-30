@@ -8,13 +8,14 @@
  * (thư mục repo), nên binary và dữ liệu được chép/đặt dưới ~/.xuan-than-tai.
  */
 import { spawn, spawnSync } from "node:child_process";
+import "dotenv/config";
 import { Client } from "pg";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
 const port = Number(process.env.LOCAL_PG_PORT ?? 5432);
-const home = path.join(os.homedir(), ".xuan-than-tai");
+const home = process.env.LOCAL_PG_HOME ?? path.join(os.homedir(), ".xuan-than-tai");
 const dataDir = process.env.LOCAL_PG_DATA ?? path.join(home, `pgdata-${port}`);
 const exe = process.platform === "win32" ? ".exe" : "";
 

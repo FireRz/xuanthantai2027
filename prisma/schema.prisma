@@ -1,0 +1,142 @@
+// Mô hình dữ liệu — ARCHITECTURE §4, ADR-002, ADR-003, ADR-008.
+// Ràng buộc CHECK (≥ 0), unique không phân biệt hoa/thường của mã SP và view
+// product_totals nằm trong SQL migration (Prisma không mô tả được).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+model Brand {
+  id          String        @id @default(uuid()) @db.Uuid
+  name        String        @unique
+  active      Boolean       @default(true)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  lines       ProductLine[]
+  collections Collection[]
+  products    Product[]
+
+  @@map("brand")
+}
+
+model ProductLine {
+  id        String    @id @default(uuid()) @db.Uuid
+  brandId   String    @map("brand_id") @db.Uuid
+  name      String
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  brand     Brand     @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  products  Product[]
+
+  @@unique([brandId, name])
+  // Đích của khóa ngoại kép từ Product: bảo đảm dòng cùng nhãn với SP.
+  @@unique([id, brandId])
+  @@map("product_line")
+}
+
+model Collection {
+  id        String    @id @default(uuid()) @db.Uuid
+  brandId   String    @map("brand_id") @db.Uuid
+  name      String
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  brand     Brand     @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  products  Product[]
+
+  @@unique([brandId, name])
+  // Đích của khóa ngoại kép từ Product: bảo đảm BST cùng nhãn với SP.
+  @@unique([id, brandId])
+  @@map("collection")
+}
+
+model Material {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @unique
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  products  Product[]
+
+  @@map("material")
+}
+
+model Store {
+  id         String            @id @default(uuid()) @db.Uuid
+  code       String            @unique
+  name       String
+  active     Boolean           @default(true)
+  createdAt  DateTime          @default(now()) @map("created_at")
+  updatedAt  DateTime          @updatedAt @map("updated_at")
+  quantities StoreProductQty[]
+
+  @@map("store")
+}
+
+model Product {
+  id            String            @id @default(uuid()) @db.Uuid
+  /// Không sửa sau khi tạo (ADR-008 P1).
+  sku           String            @unique
+  name          String?
+  brandId       String            @map("brand_id") @db.Uuid
+  productLineId String            @map("product_line_id") @db.Uuid
+  collectionId  String?           @map("collection_id") @db.Uuid
+  materialId    String?           @map("material_id") @db.Uuid
+  /// Giá bán lẻ VND, ≥ 0 (CHECK).
+  priceVnd      Int?              @map("price_vnd")
+  imageUrl      String?           @map("image_url")
+  thumbUrl      String?           @map("thumb_url")
+  active        Boolean           @default(true)
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+  brand         Brand             @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  // Khóa ngoại kép (product_line_id, brand_id): dòng phải cùng nhãn với SP;
+  // onUpdate Restrict chặn đổi nhãn của dòng đã có SP (ADR-008 M5).
+  productLine   ProductLine       @relation(fields: [productLineId, brandId], references: [id, brandId], onDelete: Restrict, onUpdate: Restrict)
+  // collection_id NULL → khóa ngoại không kiểm tra (MATCH SIMPLE) = SP không thuộc BST.
+  collection    Collection?       @relation(fields: [collectionId, brandId], references: [id, brandId], onDelete: Restrict, onUpdate: Restrict)
+  material      Material?         @relation(fields: [materialId], references: [id], onDelete: Restrict)
+  quantities    StoreProductQty[]
+
+  @@index([brandId])
+  @@index([productLineId])
+  @@index([collectionId])
+  @@index([materialId])
+  @@index([updatedAt])
+  @@index([priceVnd])
+  @@map("product")
+}
+
+/// SL đặt / đã về theo (SP, cửa hàng) — ADR-002. Ghi đè khi cập nhật.
+model StoreProductQty {
+  productId   String   @map("product_id") @db.Uuid
+  storeId     String   @map("store_id") @db.Uuid
+  qtyOrdered  Int      @default(0) @map("qty_ordered")
+  qtyReceived Int      @default(0) @map("qty_received")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Restrict)
+
+  @@id([productId, storeId])
+  @@index([storeId, productId])
+  @@map("store_product_qty")
+}
+
+model AdminUser {
+  id             String    @id @default(uuid()) @db.Uuid
+  username       String    @unique
+  passwordHash   String    @map("password_hash")
+  failedAttempts Int       @default(0) @map("failed_attempts")
+  lockedUntil    DateTime? @map("locked_until")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@map("admin_user")
+}
