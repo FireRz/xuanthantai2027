@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# env: chỉ commit file mẫu
+!.env.example
+
+# test
+/playwright-report/
+/test-results/
