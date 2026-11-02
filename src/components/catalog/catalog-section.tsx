@@ -1,13 +1,15 @@
-import { LayoutGrid, List } from "lucide-react";
+import { LayoutGrid, List, X } from "lucide-react";
 import Link from "next/link";
 import {
   buildCatalogQuery,
   hasActiveFilter,
+  NO_COLLECTION,
   PAGE_SIZE,
   type CatalogParams,
 } from "@/lib/catalog-params";
 import { formatInt } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { prisma } from "@/server/db";
 import { listProducts } from "@/server/services/catalog";
 import { ExportButton } from "./export-button";
 import { ProductGrid } from "./product-grid";
@@ -24,8 +26,29 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
     scope.kind === "total" ? "Tổng hệ thống" : `Cửa hàng: ${scope.name} (${scope.code})`;
   const viewHref = (view: CatalogParams["view"]) => buildCatalogQuery({ ...params, view }) || "?";
 
+  const collectionNames = await selectedCollectionNames(params.col);
+
   return (
     <>
+      {collectionNames.length > 0 && (
+        <div
+          data-testid="collection-banner"
+          className="bg-gold-soft border-gold mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-xl border px-4 py-2.5"
+        >
+          <p className="text-[15px]">
+            Đang xem bộ sưu tập: <b className="font-semibold">{collectionNames.join(", ")}</b> ·{" "}
+            {formatInt(total)} SP
+          </p>
+          <Link
+            href={`${buildCatalogQuery({ ...params, col: [], n: undefined }) || "?"}#san-pham`}
+            scroll={false}
+            className="text-brand inline-flex min-h-11 items-center gap-1 font-semibold hover:underline md:min-h-9"
+          >
+            Bỏ lọc
+            <X className="size-4" aria-hidden />
+          </Link>
+        </div>
+      )}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <p data-testid="scope-label" role="status" className="text-ink-muted text-[15px]">
           <b className="text-ink font-semibold">{scopeLabel}</b> · {formatInt(total)} SP
@@ -121,4 +144,21 @@ function EmptyState({
       )}
     </div>
   );
+}
+
+/** Tên các BST đang lọc (theo thứ tự trên URL) để hiện ở dải "Đang xem bộ sưu tập". */
+async function selectedCollectionNames(col: string[]): Promise<string[]> {
+  if (col.length === 0) return [];
+  const ids = col.filter((c) => c !== NO_COLLECTION);
+  const rows = ids.length
+    ? await prisma.collection.findMany({
+        where: { id: { in: ids } },
+        select: { id: true, name: true },
+      })
+    : [];
+  const byId = new Map(rows.map((r) => [r.id, r.name]));
+  return col.flatMap((c) => {
+    const name = c === NO_COLLECTION ? "Ngoài bộ sưu tập" : byId.get(c);
+    return name ? [name] : [];
+  });
 }

@@ -6,8 +6,8 @@ import { listCollectionCards } from "@/server/services/catalog";
 import { ProductImage } from "./product-image";
 
 /**
- * Khu "Bộ sưu tập mùa này" (ADR-009 U15): thẻ BST ảnh 4:3, bấm để lọc theo BST,
- * bấm lần nữa để bỏ lọc; thẻ cuối "Ngoài bộ sưu tập".
+ * Khu "Bộ sưu tập mùa này" (ADR-009 U15): thẻ BST ảnh 4:3, bấm để lọc theo BST và cuộn tới
+ * danh sách (có dải "Đang xem bộ sưu tập" ở đầu danh sách), bấm lần nữa để bỏ lọc; thẻ cuối "Ngoài bộ sưu tập".
  */
 export async function CollectionsSection({ params }: { params: CatalogParams }) {
   const cards = await listCollectionCards({ store: params.store, all: params.all });
@@ -28,7 +28,6 @@ export async function CollectionsSection({ params }: { params: CatalogParams }) 
             <li key={key} className="min-w-0">
               <Link
                 href={`${href}#san-pham`}
-                scroll={false}
                 data-testid="collection-card"
                 data-collection={key}
                 aria-pressed={selected}

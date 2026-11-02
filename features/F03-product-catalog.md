@@ -32,7 +32,7 @@ Cửa hàng xem danh sách sản phẩm mùa Xuân Thần Tài với ảnh, mã,
 | T03.10 | `lib/status.ts` + `StatusBadge` (4 trạng thái) | T01.7 | Unit: bảng điều kiện UI-DESIGN §4 |
 | T03.11 | Dạng Bảng (`ProductTable`) + nút chuyển Lưới/Bảng, `view` trên URL | T03.4, T03.10 | E2E: chuyển → cùng dữ liệu, giữ bộ lọc; điện thoại không cuộn ngang cả trang |
 | T03.12 | Banner Tết (ảnh trang trí do chủ dự án cung cấp, nút "Chọn cửa hàng của bạn ↓") + **thanh "Cửa hàng của bạn" dưới banner, dính khi cuộn** (ô chọn cửa hàng + tìm mã) | T03.9, T04.2, ảnh trong `docs/brand/` | E2E: thanh cửa hàng luôn thấy khi cuộn; chọn cửa hàng → số liệu theo cửa hàng |
-| T03.13 | Khu "Bộ sưu tập mùa này": service đếm SP theo BST, thẻ BST (ảnh = SP đầu tiên theo mã), thẻ "Ngoài bộ sưu tập"; bấm → lọc BST | T03.1, T04.9 | E2E: bấm thẻ BST → danh sách chỉ còn SP của BST đó |
+| T03.13 | Khu "Bộ sưu tập mùa này": service đếm SP theo BST, thẻ BST (ảnh = SP đầu tiên theo mã), thẻ "Ngoài bộ sưu tập"; bấm → lọc BST, cuộn tới danh sách, dải "Đang xem bộ sưu tập" | T03.1, T04.9 | E2E: bấm thẻ BST → danh sách chỉ còn SP của BST đó |
 | T03.14 | Chân trang (thời điểm cập nhật dữ liệu gần nhất) | T03.9 | Hiển thị đúng thời điểm import/sửa gần nhất |
 
 ## Tiêu chí nghiệm thu
