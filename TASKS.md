@@ -133,7 +133,7 @@
 | T08.2 | `quantity.set` | T01.6, T02.4 | S | ✅ |
 | T08.3 | `excel-template.ts` | T01.1 | S | ✅ |
 | T08.4 | Trang sửa nhanh SL | T08.2, T04.4 | M | ✅ |
-| T08.5 | File mẫu Excel | T08.3, T06.1, T06.2, T06.3 | M | ⬜ |
+| T08.5 | File mẫu Excel | T08.3, T06.1, T06.2, T06.3 | M | ✅ |
 | T08.6 | Upload + đọc Excel | T01.9, T08.3 | M | ⬜ |
 | T08.7 | Validate & phân loại | T08.6, T07.1, T06.1, T06.2, T06.3 | L | ⬜ |
 | T08.8 | Màn hình xem trước | T08.7 | M | ⬜ |
