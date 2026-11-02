@@ -1,7 +1,7 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/server/db";
 import { createProduct } from "@/server/repositories/product";
-import { listProducts } from "@/server/services/catalog";
+import { listCollectionCards, listProducts } from "@/server/services/catalog";
 import { makeBrandTree, resetDb } from "./helpers";
 
 beforeEach(resetDb);
@@ -128,5 +128,44 @@ describe("T03.1 — catalog.listProducts", () => {
       seen.push(...r.items.map((i) => i.sku));
     }
     expect(seen).toEqual(["P001", "P002", "P003", "P004", "P005", "P006", "P007"]);
+  });
+});
+
+describe("T03.13 — catalog.listCollectionCards", () => {
+  it("đếm SP theo BST, thẻ Ngoài BST ở cuối, ảnh = SP đầu tiên theo mã, ẩn SP/BST ẩn", async () => {
+    const { brand, line, collection } = await makeBrandTree();
+    const emptyCol = await prisma.collection.create({
+      data: { brandId: brand.id, name: "BST rỗng" },
+    });
+    const mk = (sku: string, extra = {}) =>
+      createProduct({ sku, brandId: brand.id, productLineId: line.id, ...extra });
+    await mk("B2", { collectionId: collection.id });
+    await mk("B1", { collectionId: collection.id });
+    await mk("B3", { collectionId: collection.id });
+    await mk("N1");
+    await prisma.product.update({ where: { sku: "B3" }, data: { active: false } });
+    await prisma.product.update({ where: { sku: "B1" }, data: { thumbUrl: "https://x/b1.webp" } });
+    await prisma.product.update({ where: { sku: "B2" }, data: { thumbUrl: "https://x/b2.webp" } });
+
+    const cards = await listCollectionCards({ store: null, all: false });
+    expect(cards).toEqual([
+      {
+        id: collection.id,
+        name: "BST 1",
+        brandName: "Nhãn A",
+        productCount: 2,
+        thumbUrl: "https://x/b1.webp",
+      },
+      { id: null, name: "Ngoài bộ sưu tập", brandName: null, productCount: 1, thumbUrl: null },
+    ]);
+    expect(cards.some((c) => c.id === emptyCol.id)).toBe(false); // BST không có SP → không hiện
+
+    // Chọn cửa hàng: chỉ đếm SP cửa hàng đó đặt > 0; all=1 đếm hết
+    await addQty("B1", "A", 3, 1);
+    const inStore = await listCollectionCards({ store: "A", all: false });
+    expect(inStore.map((c) => [c.name, c.productCount])).toEqual([["BST 1", 1]]);
+    expect(
+      (await listCollectionCards({ store: "A", all: true })).map((c) => c.productCount),
+    ).toEqual([2, 1]);
   });
 });

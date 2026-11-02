@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* Design tokens trang xem — UI-DESIGN §2. Trang quản trị dùng token shadcn bên dưới. */
-@theme {
+@theme inline {
   --color-cream: #fbf6ec;
   --color-brand: #b3261e;
   --color-brand-dark: #8e1b16;
