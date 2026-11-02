@@ -21,12 +21,17 @@ test.describe("T03.3–T03.4 trang danh mục", () => {
 
   test("số cột: điện thoại 2, máy tính 4", async ({ page, isMobile }) => {
     await page.goto("/");
-    const tops = await page
-      .getByTestId("product-grid")
-      .locator("> li")
-      .evaluateAll((els) => els.slice(0, 8).map((e) => Math.round(e.getBoundingClientRect().top)));
-    const perRow = tops.filter((t) => t === tops[0]).length;
-    expect(perRow).toBe(isMobile ? 2 : 4);
+    const perRow = async () => {
+      const tops = await page
+        .getByTestId("product-grid")
+        .locator("> li")
+        .evaluateAll((els) =>
+          els.slice(0, 8).map((e) => Math.round(e.getBoundingClientRect().top)),
+        );
+      return tops.filter((t) => t === tops[0]).length;
+    };
+    // Chờ CSS áp dụng xong (lần chạy đầu sau khi dev server biên dịch lại có thể chậm).
+    await expect.poll(perRow).toBe(isMobile ? 2 : 4);
   });
 });
 
