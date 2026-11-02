@@ -168,3 +168,29 @@ test.describe("T03.7 ảnh", () => {
     }
   });
 });
+
+test.describe("T03.14 chân trang", () => {
+  test("hiện đúng thời điểm dữ liệu thay đổi gần nhất (giờ Việt Nam)", async ({ page }) => {
+    const [{ at }] = await prisma.$queryRaw<{ at: Date }[]>`
+      SELECT GREATEST((SELECT MAX(updated_at) FROM product),
+                      (SELECT MAX(updated_at) FROM store_product_qty)) AS at`;
+    const p = Object.fromEntries(
+      new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Ho_Chi_Minh",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+      })
+        .formatToParts(at)
+        .map((x) => [x.type, x.value]),
+    );
+    await page.goto("/");
+    const footer = page.getByTestId("data-updated");
+    await footer.scrollIntoViewIfNeeded();
+    await expect(footer).toContainText(`${p.hour}:${p.minute} ${p.day}/${p.month}/${p.year}`);
+    await expect(footer).toContainText("Dữ liệu cập nhật lần cuối");
+  });
+});

@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ProductCard } from "@/components/catalog/product-card";
-import { formatInt, formatPercent, formatVnd } from "@/lib/format";
+import { formatDateTime, formatInt, formatPercent, formatVnd } from "@/lib/format";
 import { computeMetrics } from "@/lib/metrics";
 import type { ProductListItem } from "@/server/services/catalog";
 
@@ -40,6 +40,14 @@ describe("định dạng số", () => {
     expect(formatPercent(0.3333)).toBe("33,3%");
     expect(formatPercent(0)).toBe("0%");
     expect(formatPercent(null)).toBe("—");
+  });
+});
+
+describe("T03.14 — formatDateTime", () => {
+  it("theo giờ Việt Nam (UTC+7)", () => {
+    expect(formatDateTime(new Date("2026-11-02T07:05:00Z"))).toBe("14:05 02/11/2026");
+    expect(formatDateTime(new Date("2026-12-31T17:30:00Z"))).toBe("00:30 01/01/2027");
+    expect(formatDateTime(null)).toBe("—");
   });
 });
 

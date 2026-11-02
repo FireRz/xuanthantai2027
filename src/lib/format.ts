@@ -27,3 +27,20 @@ export function formatPercent(rate: number | null | undefined): string {
 export function orDash(s: string | null | undefined): string {
   return s && s.trim() !== "" ? s : EMPTY;
 }
+
+const VN_PARTS = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Asia/Ho_Chi_Minh",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+/** Thời điểm theo giờ Việt Nam: "14:05 02/11/2026"; thiếu → "—". */
+export function formatDateTime(d: Date | null | undefined): string {
+  if (!d) return EMPTY;
+  const p = Object.fromEntries(VN_PARTS.formatToParts(d).map((x) => [x.type, x.value]));
+  return `${p.hour}:${p.minute} ${p.day}/${p.month}/${p.year}`;
+}

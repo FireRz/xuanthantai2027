@@ -173,3 +173,16 @@ export async function listCollectionCards(
     thumbUrl: r.thumb_url,
   }));
 }
+
+/**
+ * Thời điểm dữ liệu thay đổi gần nhất (nhập Excel, sửa SP, sửa SL) = lớn nhất của
+ * `updated_at` ở bảng SP và bảng SL theo cửa hàng. Chưa có dữ liệu → null.
+ */
+export async function getLastDataUpdate(): Promise<Date | null> {
+  const rows = await prisma.$queryRaw<{ at: Date | null }[]>`
+    SELECT GREATEST(
+      (SELECT MAX(updated_at) FROM product),
+      (SELECT MAX(updated_at) FROM store_product_qty)
+    ) AS at`;
+  return rows[0]?.at ?? null;
+}

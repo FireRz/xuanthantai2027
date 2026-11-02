@@ -3,6 +3,7 @@ import { Banner } from "@/components/catalog/banner";
 import { CatalogSection } from "@/components/catalog/catalog-section";
 import { CollectionsSection } from "@/components/catalog/collections-section";
 import { ProductGridSkeleton } from "@/components/catalog/product-grid";
+import { SiteFooter } from "@/components/catalog/site-footer";
 import { StoreBar } from "@/components/catalog/store-bar";
 import { buildCatalogQuery, parseCatalogParams, type RawSearchParams } from "@/lib/catalog-params";
 import { prisma } from "@/server/db";
@@ -41,6 +42,9 @@ export default async function HomePage({
           </Suspense>
         </section>
       </main>
+      <Suspense fallback={null}>
+        <SiteFooter />
+      </Suspense>
     </>
   );
 }

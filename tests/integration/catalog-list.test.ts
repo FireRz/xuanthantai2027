@@ -1,7 +1,7 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/server/db";
 import { createProduct } from "@/server/repositories/product";
-import { listCollectionCards, listProducts } from "@/server/services/catalog";
+import { getLastDataUpdate, listCollectionCards, listProducts } from "@/server/services/catalog";
 import { makeBrandTree, resetDb } from "./helpers";
 
 beforeEach(resetDb);
@@ -167,5 +167,24 @@ describe("T03.13 — catalog.listCollectionCards", () => {
     expect(
       (await listCollectionCards({ store: "A", all: true })).map((c) => c.productCount),
     ).toEqual([2, 1]);
+  });
+});
+
+describe("T03.14 — catalog.getLastDataUpdate", () => {
+  it("DB rỗng → null", async () => {
+    expect(await getLastDataUpdate()).toBeNull();
+  });
+
+  it("lấy mốc mới nhất giữa SP và SL; sửa SL làm mốc đổi", async () => {
+    const { brand, line } = await makeBrandTree();
+    await createProduct({ sku: "NTT001", brandId: brand.id, productLineId: line.id });
+    const product = await prisma.product.findUniqueOrThrow({ where: { sku: "NTT001" } });
+
+    await prisma.$executeRaw`UPDATE product SET updated_at = '2026-10-01T03:00:00Z' WHERE id = ${product.id}::uuid`;
+    expect((await getLastDataUpdate())?.toISOString()).toBe("2026-10-01T03:00:00.000Z");
+
+    await addQty("NTT001", "A", 5, 2);
+    await prisma.$executeRaw`UPDATE store_product_qty SET updated_at = '2026-11-02T07:05:00Z'`;
+    expect((await getLastDataUpdate())?.toISOString()).toBe("2026-11-02T07:05:00.000Z");
   });
 });
