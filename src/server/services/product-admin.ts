@@ -55,3 +55,28 @@ export async function listAdminProducts(query: AdminProductQuery) {
   });
   return { rows, total, page, pages, pageSize };
 }
+
+export interface SkuLookupRow {
+  id: string;
+  sku: string;
+  hasImage: boolean;
+}
+
+/** Tra SP theo danh sách mã (không phân biệt hoa/thường) để đối chiếu tên file ảnh. */
+export async function findProductsBySkus(skus: string[]): Promise<SkuLookupRow[]> {
+  const upper = [...new Set(skus.map((s) => s.trim().toUpperCase()).filter(Boolean))];
+  if (upper.length === 0) return [];
+  const rows = await prisma.$queryRaw<{ id: string; sku: string; image_url: string | null }[]>`
+    SELECT id, sku, image_url FROM product WHERE UPPER(sku) = ANY(${upper}::text[])`;
+  return rows.map((r) => ({ id: r.id, sku: r.sku, hasImage: !!r.image_url }));
+}
+
+/** Số SP chưa có ảnh và vài mã đầu tiên để quản trị biết cần bổ sung. */
+export async function summarizeProductsWithoutImage(limit = 50) {
+  const where = { imageUrl: null };
+  const [count, rows] = await Promise.all([
+    prisma.product.count({ where }),
+    prisma.product.findMany({ where, orderBy: { sku: "asc" }, take: limit, select: { sku: true } }),
+  ]);
+  return { count, skus: rows.map((r) => r.sku) };
+}

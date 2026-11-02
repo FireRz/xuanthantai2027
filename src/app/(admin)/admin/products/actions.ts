@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { createProduct, setProductsActive, updateProduct } from "@/server/services/product";
+import { findProductsBySkus, summarizeProductsWithoutImage } from "@/server/services/product-admin";
 import { attachProductImage } from "@/server/services/product-image";
 import { guarded } from "./guard";
 
@@ -38,4 +39,13 @@ export async function setActiveAction(ids: string[], active: boolean) {
     const count = await setProductsActive(list, z.boolean().parse(active));
     return { count };
   });
+}
+
+/** Tra SP theo mã trong tên file ảnh (bước xem trước của /admin/images). */
+export async function lookupSkusAction(skus: string[]) {
+  return guarded(() => findProductsBySkus(z.array(z.string().max(200)).max(1000).parse(skus)));
+}
+
+export async function productsWithoutImageAction() {
+  return guarded(() => summarizeProductsWithoutImage());
 }

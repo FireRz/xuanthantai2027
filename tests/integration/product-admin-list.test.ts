@@ -1,6 +1,10 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/server/db";
-import { listAdminProducts } from "@/server/services/product-admin";
+import {
+  findProductsBySkus,
+  listAdminProducts,
+  summarizeProductsWithoutImage,
+} from "@/server/services/product-admin";
 import { createProduct, setProductActive } from "@/server/services/product";
 import { makeBrandTree, resetDb } from "./helpers";
 
@@ -40,5 +44,26 @@ describe("T07.4 — danh sách SP cho quản trị", () => {
     expect(p2).toMatchObject({ total: 7, pages: 3, page: 2 });
     expect(p2.rows.map((r) => r.sku)).toEqual(["P4", "P5", "P6"]);
     expect((await listAdminProducts({ pageSize: 3, page: 99 })).page).toBe(3);
+  });
+});
+
+describe("T07.8 — tra SP theo mã trong tên file ảnh", () => {
+  it("khớp không phân biệt hoa/thường, báo SP đã có ảnh; liệt kê SP chưa có ảnh", async () => {
+    const a = await makeBrandTree();
+    const mk = (sku: string) =>
+      createProduct({ sku, brandId: a.brand.id, productLineId: a.line.id });
+    const p1 = await mk("NTT001");
+    await mk("NTT002");
+    await prisma.product.update({
+      where: { id: p1.id },
+      data: { imageUrl: "https://x/i.webp", thumbUrl: "https://x/t.webp" },
+    });
+    const found = await findProductsBySkus(["ntt001", "NTT002", "KHONGCO", "ntt001"]);
+    expect(found.map((r) => [r.sku, r.hasImage]).sort()).toEqual([
+      ["NTT001", true],
+      ["NTT002", false],
+    ]);
+    expect(await findProductsBySkus([])).toEqual([]);
+    expect(await summarizeProductsWithoutImage()).toEqual({ count: 1, skus: ["NTT002"] });
   });
 });
