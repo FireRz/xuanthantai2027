@@ -30,7 +30,7 @@ Lọc theo nhãn hàng, dòng hàng, bộ sưu tập (Yêu cầu 3), chất li�
 | T04.6 | ✅ Ô tìm mã SP (debounce) | T04.3 | E2E: gõ "ntt0" → ra các SP mã chứa "NTT0" |
 | T04.7 | ✅ Menu sắp xếp | T04.3 | E2E: từng kiểu sắp xếp đúng thứ tự |
 | T04.8 | ✅ Công tắc "Xem tất cả SP" (chỉ hiện khi chọn CH) | T04.5 | E2E: CH đặt 5/200 SP → 5; bật → 200, SP không đặt hiển thị 0 |
-| T04.9 | Đồng bộ URL; đổi nhãn tự bỏ dòng/BST không còn hợp lệ | T04.5, T03.4 | E2E: copy URL → tab mới cùng kết quả |
+| T04.9 | ✅ Đồng bộ URL; đổi nhãn tự bỏ dòng/BST không còn hợp lệ | T04.5, T03.4 | E2E: copy URL → tab mới cùng kết quả |
 | T04.10 | Số kết quả + trạng thái "không có SP phù hợp" | T04.9 | E2E |
 | T04.11 | Chỉ mục & đo hiệu năng lọc + đếm + sắp xếp trên seed lớn | T04.3, T04.4, T01.11 | ≤ 1s mỗi yêu cầu |
 

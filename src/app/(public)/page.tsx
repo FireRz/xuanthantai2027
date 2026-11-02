@@ -7,8 +7,14 @@ import { CollectionsSection } from "@/components/catalog/collections-section";
 import { ProductGridSkeleton } from "@/components/catalog/product-grid";
 import { SiteFooter } from "@/components/catalog/site-footer";
 import { StoreBar } from "@/components/catalog/store-bar";
-import { buildCatalogQuery, parseCatalogParams, type RawSearchParams } from "@/lib/catalog-params";
+import {
+  buildCatalogQuery,
+  parseCatalogParams,
+  pruneInvalidSelections,
+  type RawSearchParams,
+} from "@/lib/catalog-params";
 import { prisma } from "@/server/db";
+import { listOwnedOptions } from "@/server/services/catalog";
 
 // Danh mục đọc dữ liệu mới nhất ở mỗi lần xem (SL thay đổi sau mỗi lần nhập).
 export const dynamic = "force-dynamic";
@@ -18,12 +24,17 @@ export default async function HomePage({
 }: {
   searchParams: Promise<RawSearchParams>;
 }) {
-  const params = parseCatalogParams(await searchParams);
-  const stores = await prisma.store.findMany({
-    where: { active: true },
-    select: { code: true, name: true },
-    orderBy: { code: "asc" },
-  });
+  const parsed = parseCatalogParams(await searchParams);
+  const [owned, stores] = await Promise.all([
+    listOwnedOptions(),
+    prisma.store.findMany({
+      where: { active: true },
+      select: { code: true, name: true },
+      orderBy: { code: "asc" },
+    }),
+  ]);
+  // Link cũ/gõ tay có dòng, BST không thuộc nhãn đang chọn (hoặc đã ẩn) → bỏ lựa chọn đó (T04.9).
+  const params = pruneInvalidSelections(parsed, owned.lines, owned.cols);
   // Đổi tham số thì hiện khung chờ (skeleton) trong lúc tải danh sách mới.
   const key = buildCatalogQuery(params);
 

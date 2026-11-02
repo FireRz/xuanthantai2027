@@ -99,6 +99,24 @@ export async function listProducts(params: ListParams): Promise<ProductListResul
   };
 }
 
+/**
+ * Dòng và BST đang hiện cùng nhãn sở hữu — để bỏ các lựa chọn trên URL không còn hợp lệ
+ * (dòng/BST của nhãn không được chọn, đã ẩn hoặc không tồn tại; T04.9).
+ */
+export async function listOwnedOptions() {
+  const [lines, cols] = await Promise.all([
+    prisma.productLine.findMany({
+      where: { active: true, brand: { active: true } },
+      select: { id: true, brandId: true },
+    }),
+    prisma.collection.findMany({
+      where: { active: true, brand: { active: true } },
+      select: { id: true, brandId: true },
+    }),
+  ]);
+  return { lines, cols };
+}
+
 export interface CollectionCard {
   /** Id BST; null = thẻ "Ngoài bộ sưu tập". */
   id: string | null;

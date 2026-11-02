@@ -299,3 +299,71 @@ test.describe("T04.8 công tắc 'Xem tất cả SP'", () => {
     await expect(sw(page)).not.toBeChecked();
   });
 });
+
+test.describe("T04.9 đồng bộ URL", () => {
+  test("sao chép URL → tab mới cho cùng kết quả và cùng trạng thái điều khiển", async ({
+    page,
+    context,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "Bộ lọc nhãn dạng chip chỉ có trên máy tính");
+    await page.goto("/");
+    await page
+      .getByTestId("filter-bar")
+      .getByRole("button", { name: /^An Khang/ })
+      .click();
+    await page
+      .getByTestId("filter-bar")
+      .getByRole("button", { name: /^Phúc Lộc/ })
+      .click();
+    await page.getByRole("combobox", { name: "Cửa hàng của bạn" }).selectOption("CH003");
+    await page.getByRole("switch", { name: "Xem tất cả SP" }).check();
+    await page.getByTestId("sort-menu").selectOption("price_desc");
+    await page.getByRole("searchbox", { name: "Tìm mã SP" }).fill("0");
+    await expect(page).toHaveURL(/q=0/);
+    await expect(page).toHaveURL(/sort=price_desc/);
+    await expect(page).toHaveURL(/all=1/);
+    await expect(page.getByTestId("scope-label")).toContainText("CH003");
+    const label = await page.getByTestId("scope-label").innerText();
+    const skus = await page
+      .getByTestId("product-card")
+      .evaluateAll((els) => els.map((e) => e.getAttribute("data-sku")));
+
+    const other = await context.newPage();
+    await other.goto(page.url());
+    await expect(other.getByTestId("scope-label")).toHaveText(label);
+    expect(
+      await other
+        .getByTestId("product-card")
+        .evaluateAll((els) => els.map((e) => e.getAttribute("data-sku"))),
+    ).toEqual(skus);
+    await expect(other.getByTestId("sort-menu")).toHaveValue("price_desc");
+    await expect(other.getByRole("switch", { name: "Xem tất cả SP" })).toBeChecked();
+    await expect(other.getByRole("searchbox", { name: "Tìm mã SP" })).toHaveValue("0");
+    await expect(
+      other.getByTestId("filter-bar").getByRole("button", { name: /^An Khang/ }),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    // Tải lại cũng giữ nguyên
+    await other.reload();
+    await expect(other.getByTestId("scope-label")).toHaveText(label);
+    await other.close();
+  });
+
+  test("link có dòng không thuộc nhãn đang chọn → dòng đó bị bỏ, kết quả vẫn là cả nhãn", async ({
+    page,
+  }) => {
+    const ak = await prisma.brand.findFirstOrThrow({ where: { name: "An Khang" } });
+    const pl = await prisma.brand.findFirstOrThrow({ where: { name: "Phúc Lộc" } });
+    const lineOfPl = await prisma.productLine.findFirstOrThrow({ where: { brandId: pl.id } });
+    await page.goto(`/?brand=${ak.id}&line=${lineOfPl.id}`);
+    await expect(page.getByTestId("scope-label")).toContainText("1.000 SP");
+    await expect(page.getByRole("button", { name: /^Bỏ lọc Dòng hàng/ })).toHaveCount(0);
+  });
+
+  test("tham số rác trên URL bị bỏ, trang vẫn chạy", async ({ page }) => {
+    await page.goto("/?brand=abc&line=%27%3B--&sort=bậy&view=x&n=-5&store=");
+    await expect(page.getByTestId("scope-label")).toContainText("3.000 SP");
+    await expect(page.getByTestId("product-card").first()).toBeVisible();
+  });
+});
