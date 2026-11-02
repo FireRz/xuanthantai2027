@@ -9,11 +9,13 @@ import {
   createCollection,
   createLine,
   createMaterial,
+  createPriceRange,
   createStore,
   deleteMasterItem,
   getHideImpact,
   renameBrand,
   renameMaterial,
+  renamePriceRange,
   setActive,
   updateCollection,
   updateLine,
@@ -22,7 +24,7 @@ import {
   type MasterKind,
 } from "@/server/services/master-data";
 
-const kindSchema = z.enum(["brand", "line", "collection", "material", "store"]);
+const kindSchema = z.enum(["brand", "line", "collection", "material", "priceRange", "store"]);
 const idSchema = z.uuid();
 
 const inputSchema = z.object({
@@ -75,6 +77,9 @@ export async function createItemAction(kind: MasterKind, raw: ItemInput) {
       case "material":
         await createMaterial(input.name ?? "");
         break;
+      case "priceRange":
+        await createPriceRange(input.name ?? "");
+        break;
       case "store":
         await createStore({ code: input.code ?? "", name: input.name ?? "" });
         break;
@@ -100,6 +105,9 @@ export async function updateItemAction(kind: MasterKind, id: string, raw: ItemIn
         break;
       case "material":
         await renameMaterial(itemId, input.name ?? "");
+        break;
+      case "priceRange":
+        await renamePriceRange(itemId, input.name ?? "");
         break;
       case "store":
         await updateStore(itemId, { code: input.code, name: input.name });

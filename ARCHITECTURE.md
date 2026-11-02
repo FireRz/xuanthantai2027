@@ -69,6 +69,7 @@ erDiagram
   PRODUCT_LINE ||--o{ PRODUCT : "có"
   COLLECTION |o--o{ PRODUCT : "0..1"
   MATERIAL |o--o{ PRODUCT : "0..1"
+  PRICE_RANGE |o--o{ PRODUCT : "0..1"
   PRODUCT ||--o{ STORE_PRODUCT_QTY : "SL theo CH"
   STORE ||--o{ STORE_PRODUCT_QTY : "SL theo CH"
 
@@ -76,6 +77,7 @@ erDiagram
   PRODUCT_LINE { uuid id uuid brand_id string name "UNIQUE trong nhãn" boolean active }
   COLLECTION { uuid id uuid brand_id string name "UNIQUE trong nhãn" boolean active }
   MATERIAL { uuid id string name "UNIQUE" boolean active }
+  PRICE_RANGE { uuid id string name "UNIQUE" int sort_order boolean active }
   STORE { uuid id string code "UNIQUE" string name boolean active }
   PRODUCT {
     uuid id
@@ -85,6 +87,7 @@ erDiagram
     uuid product_line_id
     uuid collection_id "nullable"
     uuid material_id "nullable"
+    uuid price_range_id "nullable"
     int price_vnd "nullable, >= 0"
     string image_url "nullable"
     string thumb_url "nullable"
@@ -116,6 +119,7 @@ erDiagram
 product.active AND brand.active AND line.active
 AND (collection_id IS NULL OR collection.active)
 AND (material_id IS NULL OR material.active)
+AND (price_range_id IS NULL OR price_range.active)
 ```
 Ẩn nhãn/dòng/BST/chất liệu → SP ẩn theo, không thay đổi `product.active` (ADR-008 M2). Cửa hàng bị ẩn → không có trong bộ lọc, chi tiết và **không cộng vào tổng** *(mặc định kỹ thuật)*.
 
@@ -131,7 +135,7 @@ Tính bằng SQL (CTE/view `product_totals`) để lọc, đếm, sắp xếp "c
 ## 5. Luồng chính
 
 ### 5.1 Xem, lọc, tìm, sắp xếp
-Tham số URL: `?brand=a,b&line=…&col=…,none&mat=…&store=CH01&all=1&q=NTT&sort=sku|updated|price_asc|price_desc|shortage&view=grid|list&sp=NTT001`
+Tham số URL: `?brand=a,b&line=…&col=…,none&mat=…&pr=…&store=CH01&all=1&q=NTT&sort=sku|updated|price_asc|price_desc|shortage&view=grid|list&sp=NTT001`
 
 1. Server đọc tham số → `catalog.listProducts()` lọc SP visible; trong một chiều dùng OR, giữa các chiều dùng AND; `col=none` = không thuộc BST.
 2. Không có `store` → số tổng; có `store` → số của CH đó, mặc định chỉ SP có đặt > 0, `all=1` hiện tất cả.
@@ -260,3 +264,4 @@ xuan-than-tai/
 | [007](docs/decisions/ADR-007-display-filter-sort.md) | Hiển thị, lọc, sắp xếp, xuất | ✅ |
 | [008](docs/decisions/ADR-008-product-data-rules.md) | Quy tắc dữ liệu & phạm vi | ✅ |
 | [009](docs/decisions/ADR-009-ui-design.md) | Giao diện & nhận diện | ✅ |
+| [010](docs/decisions/ADR-010-price-range.md) | Khung giá (danh mục, nhập qua Excel, bộ lọc) | ✅ |

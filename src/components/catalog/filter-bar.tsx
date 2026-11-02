@@ -8,14 +8,19 @@ import { cn } from "@/lib/utils";
 import type { FacetCounts, FacetOption } from "@/server/services/catalog-facets";
 import { toggleId, useCatalogNav } from "./catalog-nav";
 
-type GroupKey = "brand" | "line" | "col" | "mat";
+type GroupKey = "brand" | "line" | "col" | "mat" | "pr";
 
 const GROUPS: { key: GroupKey; label: string }[] = [
   { key: "brand", label: "Nhãn hàng" },
   { key: "line", label: "Dòng hàng" },
   { key: "col", label: "Bộ sưu tập" },
   { key: "mat", label: "Chất liệu" },
+  { key: "pr", label: "Khung giá" },
 ];
+
+/** Hàng chip trên máy tính (ít lựa chọn, chọn nhanh) và nút thả xuống (nhiều lựa chọn). */
+const CHIP_GROUPS = GROUPS.filter((g) => g.key === "brand" || g.key === "pr");
+const DROPDOWN_GROUPS = GROUPS.filter((g) => !CHIP_GROUPS.includes(g));
 
 /** Mọi lựa chọn đều hiện (cửa hàng có thể chưa đặt nhưng vẫn cần biết có SP); số đếm 0 thì làm mờ. */
 function shown(options: FacetOption[]) {
@@ -65,22 +70,25 @@ export function FilterBar({
       aria-busy={pending}
       className={cn("space-y-3", pending && "opacity-90")}
     >
-      {/* Máy tính / tablet: hàng chip Nhãn hàng */}
-      <div
-        className="hidden flex-wrap items-center gap-2 md:flex"
-        role="group"
-        aria-label="Nhãn hàng"
-      >
-        <span className="text-ink-muted mr-1 text-sm font-semibold">Nhãn hàng</span>
-        {facets.brand.map((o) => (
-          <Chip
-            key={o.id}
-            option={o}
-            selected={state.brand.includes(o.id)}
-            onClick={() => toggle("brand", o.id)}
-          />
-        ))}
-      </div>
+      {/* Máy tính / tablet: hàng chip Nhãn hàng và Khung giá */}
+      {CHIP_GROUPS.map(({ key, label }) => (
+        <div
+          key={key}
+          className="hidden flex-wrap items-center gap-2 md:flex"
+          role="group"
+          aria-label={label}
+        >
+          <span className="text-ink-muted mr-1 min-w-[5.5rem] text-sm font-semibold">{label}</span>
+          {facets[key].map((o) => (
+            <Chip
+              key={o.id}
+              option={o}
+              selected={state[key].includes(o.id)}
+              onClick={() => toggle(key, o.id)}
+            />
+          ))}
+        </div>
+      ))}
 
       {/* Một hàng cho cả hai cỡ màn hình: nút thả xuống (máy tính) hoặc nút Lọc (điện thoại) + sắp xếp, công tắc */}
       <div className="flex flex-wrap items-center gap-2">
@@ -94,7 +102,7 @@ export function FilterBar({
           <SlidersHorizontal className="size-4" aria-hidden />
           Lọc{groupCount > 0 && <span data-testid="filter-count"> ({groupCount})</span>}
         </button>
-        {GROUPS.slice(1).map(({ key, label }) => (
+        {DROPDOWN_GROUPS.map(({ key, label }) => (
           <div key={key} className="hidden md:block">
             <FilterDropdown
               label={label}
@@ -131,7 +139,16 @@ export function FilterBar({
               type="button"
               data-testid="clear-filters"
               onClick={() =>
-                go({ brand: [], line: [], col: [], mat: [], q: "", store: null, all: false })
+                go({
+                  brand: [],
+                  line: [],
+                  col: [],
+                  mat: [],
+                  pr: [],
+                  q: "",
+                  store: null,
+                  all: false,
+                })
               }
               className="text-brand focus-visible:outline-brand min-h-8 rounded-full px-2 text-sm font-semibold underline-offset-2 hover:underline focus-visible:outline-2"
             >
@@ -148,7 +165,7 @@ export function FilterBar({
         state={state}
         pending={pending}
         onToggle={toggle}
-        onClear={() => go({ brand: [], line: [], col: [], mat: [] })}
+        onClear={() => go({ brand: [], line: [], col: [], mat: [], pr: [] })}
       />
     </div>
   );
@@ -359,7 +376,7 @@ function FilterSheet({
       <div className="flex-1 space-y-5 overflow-y-auto px-4 py-4">
         {GROUPS.map(({ key, label }) => {
           const all = facets[key];
-          const list = key === "brand" ? all : shown(all);
+          const list = shown(all);
           return (
             <fieldset key={key} className="space-y-2">
               <legend className="text-ink-muted mb-1 text-sm font-semibold">{label}</legend>

@@ -410,3 +410,76 @@ test.describe("T04.10 số kết quả và trạng thái không có SP phù hợ
     await expect(scope(page)).toContainText("99 SP");
   });
 });
+
+test.describe("Khung giá (ADR-010)", () => {
+  const prChip = (page: Page, name: string) =>
+    page
+      .getByRole("group", { name: "Khung giá" })
+      .getByRole("button", { name: new RegExp(`^${name}`) });
+
+  test("máy tính: hàng chip theo thứ tự khoảng giá, chọn nhiều (HOẶC), số đếm khớp kết quả", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "Hàng chip chỉ có trên máy tính");
+    await page.goto("/");
+    const names = await page
+      .getByRole("group", { name: "Khung giá" })
+      .getByRole("button")
+      .evaluateAll((els) => els.map((e) => e.firstChild?.textContent?.trim()));
+    expect(names.slice(0, 3)).toEqual(["< 1tr", "1tr < 1.5tr", "1.5tr < 2tr"]);
+
+    const ranges = await prisma.priceRange.findMany({ orderBy: { sortOrder: "asc" } });
+    expect(names).toEqual(ranges.map((r) => r.name));
+
+    const countOf = async (name: string) =>
+      prisma.product.count({
+        where: {
+          active: true,
+          priceRange: { name },
+          brand: { active: true },
+          productLine: { active: true },
+        },
+      });
+    const [a, b] = [ranges[3], ranges[5]]; // 2tr < 5tr và 7tr < 10tr
+    await prChip(page, a.name).click();
+    await expect(page).toHaveURL(/pr=/);
+    await expect(scope(page)).toContainText(
+      `${new Intl.NumberFormat("vi-VN").format(await countOf(a.name))} SP`,
+    );
+    await prChip(page, b.name).click();
+    const sum = (await countOf(a.name)) + (await countOf(b.name));
+    await expect(scope(page)).toContainText(`${new Intl.NumberFormat("vi-VN").format(sum)} SP`);
+    // Mọi thẻ đang hiện đều có giá (SP chưa có khung giá bị ẩn khi lọc khung giá)
+    const prices = await cards(page).evaluateAll((els) =>
+      els.map((e) => e.getAttribute("data-price")),
+    );
+    expect(prices.every((p) => p !== "")).toBe(true);
+
+    await page.getByTestId("clear-filters").click();
+    await expect(page).not.toHaveURL(/pr=/);
+  });
+
+  test("điện thoại: nhóm Khung giá trong bảng lọc; Lọc (n) tính cả khung giá", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "Chỉ điện thoại");
+    await page.goto("/");
+    await page.getByTestId("open-filter-sheet").click();
+    const sheet = page.getByTestId("filter-sheet");
+    await expect(sheet.getByText("Khung giá", { exact: true })).toBeVisible();
+    await sheet.getByRole("button", { name: /^2tr < 5tr/ }).click();
+    await expect(page).toHaveURL(/pr=/);
+    await sheet.getByTestId("sheet-apply").click();
+    await expect(page.getByTestId("filter-count")).toHaveText("(1)");
+  });
+
+  test("mở link có pr: giữ nguyên; id khung giá lạ bị bỏ", async ({ page }) => {
+    const r = await prisma.priceRange.findFirstOrThrow({ orderBy: { sortOrder: "asc" } });
+    await page.goto(`/?pr=${r.id}`);
+    const total = await scope(page).innerText();
+    await page.goto(`/?pr=${r.id},00000000-0000-4000-8000-000000000000`);
+    await expect(scope(page)).toHaveText(total);
+  });
+});

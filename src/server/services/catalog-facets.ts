@@ -26,13 +26,15 @@ export interface FacetCounts {
   line: FacetOption[];
   col: FacetOption[];
   mat: FacetOption[];
+  /** Khung giá, theo thứ tự khoảng giá (ADR-010). */
+  pr: FacetOption[];
   store: FacetOption[];
   /** Số SP khớp mọi bộ lọc đang áp dụng (cho nút "Xem N SP"). */
   total: number;
 }
 
 export type FacetParams = Pick<CatalogParams, "store" | "all" | "q"> &
-  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat">>;
+  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "pr">>;
 
 type CountRow = { id: string | null; n: number };
 const toMap = (rows: CountRow[]) => new Map<string | null, number>(rows.map((r) => [r.id, r.n]));
@@ -54,6 +56,7 @@ export async function getFacetCounts(params: FacetParams): Promise<FacetCounts> 
     line: params.line,
     col: params.col,
     mat: params.mat,
+    pr: params.pr,
   };
   const scope = { store, all: params.all };
   const brandIds = params.brand ?? [];
@@ -78,7 +81,7 @@ export async function getFacetCounts(params: FacetParams): Promise<FacetCounts> 
       FROM product p ${visibleProductJoinsSql} ${qtyJoinSql(store)}
       WHERE ${Prisma.join(buildWhere(filters, scope), " AND ")}`.then((r) => r[0]?.n ?? 0);
 
-  const [brands, lines, cols, mats, stores, cBrand, cLine, cCol, cMat, cStore, total] =
+  const [brands, lines, cols, mats, stores, cBrand, cLine, cCol, cMat, cStore, total, ranges, cPr] =
     await Promise.all([
       prisma.brand.findMany({
         where: { active: true },
@@ -119,6 +122,12 @@ export async function getFacetCounts(params: FacetParams): Promise<FacetCounts> 
       countBy("mat", Prisma.sql`p.material_id`),
       storeCounts,
       totalCount,
+      prisma.priceRange.findMany({
+        where: { active: true },
+        select: { id: true, name: true },
+        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      }),
+      countBy("pr", Prisma.sql`p.price_range_id`),
     ]);
 
   return {
@@ -141,6 +150,7 @@ export async function getFacetCounts(params: FacetParams): Promise<FacetCounts> 
       })),
     ],
     mat: mats.map((o) => ({ id: o.id, name: o.name, count: cMat.get(o.id) ?? 0 })),
+    pr: ranges.map((o) => ({ id: o.id, name: o.name, count: cPr.get(o.id) ?? 0 })),
     store: stores.map((o) => ({ id: o.code, name: o.name, count: cStore.get(o.id) ?? 0 })),
     total,
   };

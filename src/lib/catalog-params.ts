@@ -1,6 +1,6 @@
 /**
  * Tham số URL của trang xem (ARCHITECTURE §5.1):
- *   ?brand=a,b&line=…&col=…,none&mat=…&store=CH01&all=1&q=NTT&sort=…&view=grid|list&sp=NTT001
+ *   ?brand=a,b&line=…&col=…,none&mat=…&pr=…&store=CH01&all=1&q=NTT&sort=…&view=grid|list&sp=NTT001
  * Giá trị lạ hoặc không hợp lệ bị bỏ, không gây lỗi (ARCHITECTURE §5.1, T04.9).
  * Id nhãn/dòng/BST/chất liệu là UUID; cửa hàng theo mã.
  */
@@ -23,6 +23,8 @@ export interface CatalogParams {
   /** Id BST hoặc NO_COLLECTION. */
   col: string[];
   mat: string[];
+  /** Id khung giá (ADR-010). */
+  pr: string[];
   store: string | null;
   /** Công tắc "Xem tất cả SP" khi đã chọn cửa hàng (ADR-002 D6). */
   all: boolean;
@@ -58,6 +60,7 @@ const schema = z.object({
   line: listOf(isId),
   col: listOf((s) => s === NO_COLLECTION || isId(s)),
   mat: listOf(isId),
+  pr: listOf(isId),
   store: single.transform((v) => v?.trim() || null),
   all: single.transform((v) => v === "1"),
   q: single.transform((v) => (v ?? "").trim().slice(0, 100)),
@@ -82,6 +85,7 @@ export function buildCatalogQuery(p: Partial<CatalogParams>): string {
   if (p.line?.length) u.set("line", p.line.join(","));
   if (p.col?.length) u.set("col", p.col.join(","));
   if (p.mat?.length) u.set("mat", p.mat.join(","));
+  if (p.pr?.length) u.set("pr", p.pr.join(","));
   if (p.store) u.set("store", p.store);
   if (p.store && p.all) u.set("all", "1");
   if (p.q) u.set("q", p.q);
@@ -93,9 +97,9 @@ export function buildCatalogQuery(p: Partial<CatalogParams>): string {
   return s ? `?${s}` : "";
 }
 
-/** Số bộ lọc nhóm (nhãn, dòng, BST, chất liệu) đang chọn — để hiện trên nút "Lọc (n)". */
-export function countGroupFilters(p: Pick<CatalogParams, "brand" | "line" | "col" | "mat">) {
-  return p.brand.length + p.line.length + p.col.length + p.mat.length;
+/** Số bộ lọc nhóm (nhãn, dòng, BST, chất liệu, khung giá) đang chọn — để hiện trên nút "Lọc (n)". */
+export function countGroupFilters(p: Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "pr">) {
+  return p.brand.length + p.line.length + p.col.length + p.mat.length + p.pr.length;
 }
 
 /** Có bộ lọc/tìm kiếm/cửa hàng nào đang áp dụng không (để hiện "Xóa lọc"). */

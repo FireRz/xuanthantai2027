@@ -1,4 +1,11 @@
-import type { Brand, Collection, Material, PrismaClient, ProductLine } from "@prisma/client";
+import type {
+  Brand,
+  Collection,
+  Material,
+  PrismaClient,
+  PriceRange,
+  ProductLine,
+} from "@prisma/client";
 
 /**
  * Sinh dữ liệu mẫu (T01.8) và dữ liệu quy mô lớn (T01.11).
@@ -26,6 +33,22 @@ const BRANDS = [
 const LINES = ["Nhẫn", "Dây chuyền", "Bông tai"];
 const COLLECTIONS = ["Lộc Xuân", "Kim Mã Đón Tết"];
 const MATERIALS = ["Vàng 24K", "Vàng 18K", "Vàng 14K", "Vàng trắng 18K", "Bạc 925"];
+/** 13 khung giá chủ dự án định sẵn (ADR-010): tên, cận dưới (gồm) của khoảng, theo thứ tự tăng dần. */
+export const PRICE_RANGES = [
+  { name: "< 1tr", from: 0 },
+  { name: "1tr < 1.5tr", from: 1_000_000 },
+  { name: "1.5tr < 2tr", from: 1_500_000 },
+  { name: "2tr < 5tr", from: 2_000_000 },
+  { name: "5tr < 7tr", from: 5_000_000 },
+  { name: "7tr < 10tr", from: 7_000_000 },
+  { name: "10tr < 15tr", from: 10_000_000 },
+  { name: "15tr < 20tr", from: 15_000_000 },
+  { name: "20tr < 30tr", from: 20_000_000 },
+  { name: "30tr < 50tr", from: 30_000_000 },
+  { name: "50tr < 70tr", from: 50_000_000 },
+  { name: "70tr < 100tr", from: 70_000_000 },
+  { name: "> 100tr", from: 100_000_000 },
+];
 const BATCH = 5000;
 
 /** mulberry32 — PRNG nhỏ, tất định. */
@@ -81,7 +104,26 @@ export async function seed(prisma: PrismaClient, opts: SeedOptions) {
   for (const name of MATERIALS) {
     materials.push(await prisma.material.upsert({ where: { name }, create: { name }, update: {} }));
   }
-  log(`Danh mục: ${brands.length} nhãn, ${materials.length} chất liệu`);
+  const priceRanges: PriceRange[] = [];
+  for (const [i, r] of PRICE_RANGES.entries()) {
+    priceRanges.push(
+      await prisma.priceRange.upsert({
+        where: { name: r.name },
+        create: { name: r.name, sortOrder: i + 1 },
+        update: {},
+      }),
+    );
+  }
+  /** Dữ liệu mẫu: khung giá suy từ giá bán; SP không giá thì không có khung giá. */
+  const rangeFor = (price: number | null) => {
+    if (price === null) return null;
+    let found = priceRanges[0];
+    for (const [i, r] of PRICE_RANGES.entries()) if (price >= r.from) found = priceRanges[i];
+    return found.id;
+  };
+  log(
+    `Danh mục: ${brands.length} nhãn, ${materials.length} chất liệu, ${priceRanges.length} khung giá`,
+  );
 
   // Cửa hàng
   const storeData = Array.from({ length: opts.stores }, (_, i) => {
@@ -103,6 +145,7 @@ export async function seed(prisma: PrismaClient, opts: SeedOptions) {
     const collection = noCollection ? null : b.collections[int(0, b.collections.length - 1)];
     const material = i % 10 === 7 ? null : materials[int(0, materials.length - 1)];
     const sku = `${b.prefix}${String(Math.floor(i / brands.length) + 1).padStart(4, "0")}`;
+    const priceVnd = i % 10 === 5 ? null : int(15, 900) * 100_000;
     return {
       sku,
       name: `${line.name} ${collection?.name ?? b.name} ${sku}`,
@@ -110,7 +153,8 @@ export async function seed(prisma: PrismaClient, opts: SeedOptions) {
       productLineId: line.id,
       collectionId: collection?.id ?? null,
       materialId: material?.id ?? null,
-      priceVnd: i % 10 === 5 ? null : int(15, 900) * 100_000,
+      priceVnd,
+      priceRangeId: rangeFor(priceVnd),
     };
   });
   for (let i = 0; i < productData.length; i += BATCH) {

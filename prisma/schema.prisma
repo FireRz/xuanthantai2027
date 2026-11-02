@@ -68,6 +68,20 @@ model Material {
   @@map("material")
 }
 
+/// Khung giá do chủ dự án định sẵn và nhập vào Excel (ADR-010); khác với giá bán lẻ của SP.
+model PriceRange {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @unique
+  /// Thứ tự hiển thị (tăng dần) — theo khoảng giá, không theo bảng chữ cái.
+  sortOrder Int       @default(0) @map("sort_order")
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  products  Product[]
+
+  @@map("price_range")
+}
+
 model Store {
   id         String            @id @default(uuid()) @db.Uuid
   code       String            @unique
@@ -89,6 +103,7 @@ model Product {
   productLineId String            @map("product_line_id") @db.Uuid
   collectionId  String?           @map("collection_id") @db.Uuid
   materialId    String?           @map("material_id") @db.Uuid
+  priceRangeId  String?           @map("price_range_id") @db.Uuid
   /// Giá bán lẻ VND, ≥ 0 (CHECK).
   priceVnd      Int?              @map("price_vnd")
   imageUrl      String?           @map("image_url")
@@ -103,12 +118,14 @@ model Product {
   // collection_id NULL → khóa ngoại không kiểm tra (MATCH SIMPLE) = SP không thuộc BST.
   collection    Collection?       @relation(fields: [collectionId, brandId], references: [id, brandId], onDelete: Restrict, onUpdate: Restrict)
   material      Material?         @relation(fields: [materialId], references: [id], onDelete: Restrict)
+  priceRange    PriceRange?       @relation(fields: [priceRangeId], references: [id], onDelete: Restrict)
   quantities    StoreProductQty[]
 
   @@index([brandId])
   @@index([productLineId])
   @@index([collectionId])
   @@index([materialId])
+  @@index([priceRangeId])
   @@index([updatedAt])
   @@index([priceVnd])
   @@map("product")

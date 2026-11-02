@@ -17,6 +17,7 @@ Lọc theo nhãn hàng, dòng hàng, bộ sưu tập (Yêu cầu 3), chất li�
 | B7 | Cửa hàng X: mặc định chỉ SP X có đặt > 0; công tắc **"Xem tất cả SP"** hiện mọi SP (số của X, không đặt = 0) |
 | B8 | Sắp xếp: **Mã SP A→Z (mặc định)**, Mới cập nhật, Giá thấp→cao, Giá cao→thấp, Còn thiếu nhiều nhất (theo phạm vi). SP không giá xếp cuối khi sắp theo giá |
 | B9 | Mọi trạng thái (lọc, tìm, sắp xếp, cửa hàng, công tắc) lưu trên URL |
+| B10 | **Khung giá** (ADR-010): chọn nhiều, hàng chip, có số đếm; SP chưa có khung giá ẩn khi đang lọc khung giá |
 
 ## Tasks
 
@@ -33,6 +34,8 @@ Lọc theo nhãn hàng, dòng hàng, bộ sưu tập (Yêu cầu 3), chất li�
 | T04.9 | ✅ Đồng bộ URL; đổi nhãn tự bỏ dòng/BST không còn hợp lệ | T04.5, T03.4 | E2E: copy URL → tab mới cùng kết quả |
 | T04.10 | ✅ Số kết quả + trạng thái "không có SP phù hợp" | T04.9 | E2E |
 | T04.11 | ✅ Chỉ mục & đo hiệu năng lọc + đếm + sắp xếp trên seed lớn | T04.3, T04.4, T01.11 | ≤ 1s mỗi yêu cầu |
+
+| T04.12 | ✅ Bộ lọc Khung giá: danh mục + migration, lọc/đếm, hàng chip | T04.4, T04.5 | Integration + E2E 375px & 1280px |
 
 ## Tiêu chí nghiệm thu
 - **AC1.** Chọn nhiều nhãn → SP thuộc bất kỳ nhãn nào đã chọn; danh sách Dòng/BST chỉ còn giá trị của các nhãn đó.

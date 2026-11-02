@@ -12,18 +12,20 @@ export const visibleProductWhere = {
   AND: [
     { OR: [{ collectionId: null }, { collection: { active: true } }] },
     { OR: [{ materialId: null }, { material: { active: true } }] },
+    { OR: [{ priceRangeId: null }, { priceRange: { active: true } }] },
   ],
 } satisfies Prisma.ProductWhereInput;
 
 /**
  * Cùng điều kiện ở dạng SQL cho truy vấn thô (product_totals, lọc, đếm).
  * Yêu cầu đã JOIN với bí danh: p (product), b (brand), l (product_line),
- * c (collection, LEFT JOIN), m (material, LEFT JOIN).
+ * c (collection, LEFT JOIN), m (material, LEFT JOIN), pr (price_range, LEFT JOIN).
  */
 export const visibleProductSql = Prisma.sql`(
   p.active AND b.active AND l.active
   AND (p.collection_id IS NULL OR c.active)
   AND (p.material_id IS NULL OR m.active)
+  AND (p.price_range_id IS NULL OR pr.active)
 )`;
 
 /** Các JOIN cần cho visibleProductSql, bắt đầu từ bảng product bí danh p. */
@@ -32,4 +34,5 @@ export const visibleProductJoinsSql = Prisma.sql`
   JOIN product_line l ON l.id = p.product_line_id
   LEFT JOIN collection c ON c.id = p.collection_id
   LEFT JOIN material m ON m.id = p.material_id
+  LEFT JOIN price_range pr ON pr.id = p.price_range_id
 `;

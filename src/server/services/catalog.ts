@@ -49,7 +49,7 @@ type Row = {
 };
 
 type ListParams = Pick<CatalogParams, "store" | "all" | "q"> &
-  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "sort">> & {
+  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "pr" | "sort">> & {
     /** Số SP lấy về (mặc định 24). */
     limit?: number;
     offset?: number;

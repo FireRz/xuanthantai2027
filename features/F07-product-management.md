@@ -34,3 +34,5 @@ Quản trị xem, sửa, ẩn/hiện sản phẩm trên web và **tải ảnh s�
 - **AC5.** Tải ảnh mới cho SP đã có ảnh → ảnh mới thay thế ảnh cũ.
 - **AC6.** File không phải ảnh bị từ chối có thông báo.
 - **AC7.** SP bị ẩn không xuất hiện ở trang xem và không được đếm trong bộ lọc.
+
+> **Khung giá (ADR-010):** form SP (T07.5) cần thêm trường Khung giá (chọn từ danh mục, có thể trống).

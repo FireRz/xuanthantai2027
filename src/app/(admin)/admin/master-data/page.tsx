@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic";
 const TABS = [
   { key: "brands", label: "Nhãn hàng" },
   { key: "materials", label: "Chất liệu" },
+  { key: "priceRanges", label: "Khung giá" },
   { key: "stores", label: "Cửa hàng" },
 ] as const;
 type TabKey = (typeof TABS)[number]["key"];
@@ -65,6 +66,7 @@ export default async function MasterDataPage({
 
       {tab === "brands" && <BrandsTab />}
       {tab === "materials" && <MaterialsTab />}
+      {tab === "priceRanges" && <PriceRangesTab />}
       {tab === "stores" && <StoresTab />}
     </div>
   );
@@ -187,6 +189,41 @@ async function MaterialsTab() {
                 key={m.id}
                 kind="material"
                 item={{ id: m.id, name: m.name, active: m.active, usage: m._count.products }}
+              />
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  );
+}
+
+async function PriceRangesTab() {
+  const ranges = await prisma.priceRange.findMany({
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    include: { _count: { select: { products: true } } },
+  });
+  return (
+    <div className="space-y-4">
+      <section className={card} aria-labelledby="add-price-range">
+        <h2 id="add-price-range" className="mb-2 font-semibold">
+          Thêm khung giá
+        </h2>
+        <p className="mb-2 text-sm text-neutral-600">
+          Khung giá mới nằm cuối danh sách. Tên phải khớp với cột Khung giá trong file Excel.
+        </p>
+        <AddForm kind="priceRange" label="Thêm khung giá" />
+      </section>
+      <section className={card} aria-label="Danh sách khung giá">
+        {ranges.length === 0 ? (
+          <p className="text-sm text-neutral-600">Chưa có khung giá nào.</p>
+        ) : (
+          <ul className="divide-y divide-neutral-100">
+            {ranges.map((r) => (
+              <ItemRow
+                key={r.id}
+                kind="priceRange"
+                item={{ id: r.id, name: r.name, active: r.active, usage: r._count.products }}
               />
             ))}
           </ul>

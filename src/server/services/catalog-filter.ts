@@ -4,10 +4,10 @@ import { prisma } from "@/server/db";
 import { visibleProductSql } from "@/server/repositories/visibility";
 
 /** Bốn bộ lọc nhiều lựa chọn (B2). Cửa hàng chọn một nên xử lý riêng. */
-export type GroupFilter = "brand" | "line" | "col" | "mat";
+export type GroupFilter = "brand" | "line" | "col" | "mat" | "pr";
 
 export type FilterInput = Pick<CatalogParams, "q"> &
-  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat">>;
+  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "pr">>;
 
 export interface ScopeStore {
   id: string;
@@ -52,6 +52,11 @@ export function buildWhere(
   const mat = f.mat ?? [];
   if (opts.omit !== "mat" && mat.length > 0)
     where.push(Prisma.sql`p.material_id IN (${uuids(mat)})`);
+
+  const pr = f.pr ?? [];
+  // SP chưa có khung giá không khớp khi đang lọc khung giá.
+  if (opts.omit !== "pr" && pr.length > 0)
+    where.push(Prisma.sql`p.price_range_id IN (${uuids(pr)})`);
 
   const col = f.col ?? [];
   if (opts.omit !== "col" && col.length > 0) {

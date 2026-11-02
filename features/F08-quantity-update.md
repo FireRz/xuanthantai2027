@@ -52,3 +52,5 @@ Cột Nhãn/Dòng/BST/Chất liệu/Mã CH có **danh sách chọn** lấy từ 
 - **AC7.** Cửa hàng / Nhãn / Dòng / BST / Chất liệu chưa có → báo lỗi, không tự tạo.
 - **AC8.** File xuất từ F11 (quản trị) nhập lại ngay không lỗi và không tạo thay đổi.
 - **AC9.** Sửa nhanh trên web cho kết quả giống nhập file.
+
+> **Khung giá (ADR-010):** sheet SanPham có thêm cột Khung giá (danh sách chọn); tên chưa có trong danh mục → lỗi như chất liệu. Ảnh hưởng T08.3, T08.5, T08.7 và xuất Excel T11.4.
