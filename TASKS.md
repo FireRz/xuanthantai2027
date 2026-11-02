@@ -148,7 +148,7 @@
 | T10.1 | Chốt hạ tầng | — | S | ✅ |
 | T10.2 | Vercel + Neon + Blob, biến môi trường (xong 2026-11-02, xuanthantai2027.vercel.app) | T01.1, *tài khoản Vercel* | S | ✅ |
 | T10.3 | Migrate khi deploy + health (/api/health 200 trên Vercel, 2026-11-02) | T10.2, T01.5 | S | ✅ |
-| T10.4 | Sao lưu + diễn tập khôi phục | T10.2 | M | ⬜ |
+| T10.4 | Sao lưu + diễn tập khôi phục | T10.2 | M | 🟨 |
 | T10.5 | Giám sát lỗi | T10.2 | S | ⬜ |
 | T10.6 | Nhập dữ liệu thật | F06, T07.8, T08.9 | M | ⬜ |
 | T10.7 | E2E + thiết bị thật | F03–F08, F11, T10.6 | M | ⬜ |

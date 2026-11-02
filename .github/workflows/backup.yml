@@ -1,0 +1,35 @@
+# Sao lưu hằng ngày (T10.4): pg_dump CSDL production -> Vercel Blob (private), giữ 7 bản.
+# Cần secret: BACKUP_DATABASE_URL (chuỗi KHÔNG pool của Neon production), BLOB_READ_WRITE_TOKEN.
+name: Backup
+
+on:
+  schedule:
+    - cron: "0 20 * * *" # 03:00 giờ Việt Nam
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Cài pg_dump 17
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+      - name: pg_dump
+        env:
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+        run: /usr/lib/postgresql/17/bin/pg_dump --format=custom --no-owner --no-privileges --dbname="$BACKUP_DATABASE_URL" --file=backup.dump
+      - name: Tải lên Blob, giữ 7 bản
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+        run: node scripts/backup-blob.mjs upload backup.dump
