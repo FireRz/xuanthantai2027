@@ -14,7 +14,7 @@ const NAV: { href: string; label: string; ready: boolean }[] = [
   { href: "/admin/products", label: "Sản phẩm", ready: true },
   { href: "/admin/images", label: "Ảnh", ready: true },
   { href: "/admin/import", label: "Nhập Excel", ready: false },
-  { href: "/admin/quantities", label: "Số lượng", ready: false },
+  { href: "/admin/quantities", label: "Số lượng", ready: true },
   { href: "/admin/export", label: "Xuất dữ liệu", ready: false },
   { href: "/admin/account", label: "Tài khoản", ready: true },
 ];
