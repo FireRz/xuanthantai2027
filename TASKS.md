@@ -160,7 +160,7 @@
 | ID | Task | Phụ thuộc | Size | TT |
 |----|------|-----------|------|----|
 | T11.1 | `export.viewerList` | T04.3 | S | ✅ |
-| T11.2 | `GET /api/export` | T11.1 | S | ⬜ |
+| T11.2 | `GET /api/export` | T11.1 | S | ✅ |
 | T11.3 | Nút xuất trên danh mục | T11.2, T04.9 | S | ⬜ |
 | T11.4 | `export.adminTemplate` | T08.3, T01.6 | M | ⬜ |
 | T11.5 | Trang `/admin/export` | T11.4, T02.3 | S | ⬜ |
