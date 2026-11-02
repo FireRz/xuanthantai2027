@@ -43,7 +43,7 @@
 | T01.6 | Repository + "SP visible" + ràng buộc cùng nhãn | T01.5 | M | ✅ |
 | T01.7 | `metrics.ts` + `product_totals` | T01.5 | S | ✅ |
 | T01.8 | Seed dữ liệu mẫu | T01.5 | S | ✅ |
-| T01.9 | Adapter Vercel Blob (còn chạy test upload/xóa thật khi có token store dev) | T01.2 | S | 🟨 |
+| T01.9 | Adapter Vercel Blob (test upload/xóa thật qua, store Public, 2026-11-02) | T01.2 | S | ✅ |
 | T01.10 | CI GitHub Actions (CI xanh trên main, 2026-11-02) | T01.3 | S | ✅ |
 | T01.11 | Seed quy mô lớn | T01.8 | S | ✅ |
 
