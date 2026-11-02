@@ -7,36 +7,25 @@ import { SiteNav } from "./site-nav";
  */
 export function Banner() {
   return (
-    <header className="relative flex min-h-[500px] flex-col overflow-hidden bg-[#cc1208] text-center text-white sm:h-[540px] sm:min-h-0">
-      {/* Cả bức tranh nằm gọn trong banner (object-contain); mép tranh mờ dần vào nền đỏ cùng màu. */}
-      {/* Nền: chính bức tranh phóng to và làm mờ, lấp hai dải bên để banner liền một khối. */}
+    <header className="relative flex min-h-[560px] flex-col overflow-hidden bg-[#cc1208] text-center text-white sm:min-h-[420px] lg:aspect-[2048/768] lg:max-h-[640px] lg:min-h-0">
+      {/* Tranh ngang (docs/brand/tet-banner-wide.png) phủ kín banner; điện thoại/tablet neo góc dưới-trái để thấy con dê. */}
       <Image
-        src="/brand/tet-banner.png"
+        src="/brand/tet-banner-wide.png"
         alt=""
         fill
+        priority
         sizes="100vw"
-        aria-hidden
-        className="scale-125 object-cover opacity-90 blur-2xl"
+        className="object-cover object-[left_bottom] lg:object-center"
       />
-      <div className="absolute bottom-0 left-1/2 aspect-[1518/1036] w-full -translate-x-1/2 [mask-image:linear-gradient(to_bottom,transparent,black_30%)] sm:inset-y-0 sm:h-full sm:w-auto sm:[mask-image:linear-gradient(to_right,transparent,black_14%,black_86%,transparent)]">
-        <Image
-          src="/brand/tet-banner.png"
-          alt=""
-          fill
-          priority
-          sizes="(min-width: 640px) 800px, 100vw"
-          className="object-cover"
-        />
-      </div>
       <SiteNav />
-      <div className="relative z-10 mx-auto flex max-w-4xl flex-1 flex-col items-center justify-start px-6 pt-6 pb-24 sm:justify-center sm:pt-0 sm:pb-20">
+      <div className="relative z-10 mx-auto flex max-w-4xl flex-1 flex-col items-center justify-start px-6 pt-24 pb-24 sm:justify-center sm:pt-0 sm:pb-16">
         <h1 className="font-display text-gold text-[30px] leading-[1.1] font-bold whitespace-nowrap [text-shadow:0_2px_12px_rgb(90_5_5/0.7)] md:text-[72px]">
           Xuân Đinh Mùi · 2027
         </h1>
         <p className="font-display text-festive-text mt-3 text-lg italic [text-shadow:0_1px_8px_rgb(90_5_5/0.8)] md:text-2xl">
           Vạn sự như ý — Tài lộc đầy nhà
         </p>
-        <p className="text-festive-text mx-auto mt-4 hidden max-w-xl text-[15px] sm:block md:text-base">
+        <p className="text-festive-text mx-auto mt-4 hidden max-w-xl text-[15px] md:text-base lg:block">
           Theo dõi số lượng đặt và hàng đã về của bộ sưu tập trang sức mùa Xuân Thần Tài 2027, theo
           từng cửa hàng.
         </p>

@@ -6,15 +6,12 @@ export function SiteNav() {
   return (
     <nav
       aria-label="Điều hướng chính"
-      className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-center gap-4 px-4 py-3 sm:px-6"
+      className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6"
     >
-      <Link href="/" className="flex items-center gap-3 rounded-lg">
+      <Link href="/" aria-label="Xuân Thần Tài 2027 — về đầu trang" className="rounded-lg">
         <Logo />
-        <span className="font-display text-[22px] leading-none font-bold text-white [text-shadow:0_1px_6px_rgb(120_10_10/0.7)] md:text-[28px]">
-          Xuân Thần Tài 2027
-        </span>
       </Link>
-      <div className="text-festive-text absolute right-6 hidden items-center gap-2 text-sm font-medium sm:flex">
+      <div className="text-festive-text hidden items-center gap-2 text-sm font-medium sm:flex">
         <a
           href="#bo-suu-tap"
           className="bg-brand-dark/70 hover:bg-brand-dark rounded-full px-3 py-1.5 hover:text-white"
