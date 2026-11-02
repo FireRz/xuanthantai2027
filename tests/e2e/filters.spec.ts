@@ -367,3 +367,46 @@ test.describe("T04.9 đồng bộ URL", () => {
     await expect(page.getByTestId("product-card").first()).toBeVisible();
   });
 });
+
+test.describe("T04.10 số kết quả và trạng thái không có SP phù hợp", () => {
+  test("số kết quả theo bộ lọc; 0 kết quả → thông báo, Xóa lọc về toàn bộ và giữ kiểu sắp xếp", async ({
+    page,
+  }) => {
+    await page.goto("/?q=ak00&sort=price_asc");
+    await expect(scope(page)).toContainText("Tổng hệ thống · 99 SP");
+    await expect(scope(page)).toHaveAttribute("role", "status");
+
+    await page.goto("/?q=zzz-khong-co&sort=price_asc");
+    await expect(scope(page)).toContainText("0 SP");
+    const empty = page.getByTestId("empty-state");
+    await expect(empty).toContainText("Không có sản phẩm phù hợp");
+    await expect(cards(page)).toHaveCount(0);
+    await empty.getByRole("link", { name: "Xóa lọc" }).click();
+    await expect(scope(page)).toContainText("3.000 SP");
+    await expect(page).toHaveURL(/sort=price_asc/);
+    await expect(page).not.toHaveURL(/q=/);
+    await expect(cards(page).first()).toBeVisible();
+  });
+
+  test("đang xem một cửa hàng mà không có SP: gợi ý bật 'Xem tất cả SP'", async ({ page }) => {
+    await page.goto("/?store=CH001&q=zzz-khong-co");
+    await expect(page.getByTestId("empty-state")).toContainText("Xem tất cả SP");
+    await page.goto("/?store=CH001&q=zzz-khong-co&all=1");
+    await expect(page.getByTestId("empty-state")).not.toContainText("Xem tất cả SP");
+  });
+
+  test("tổ hợp lọc không có SP: số đếm trong bộ lọc về 0 và vẫn bỏ được từng bộ lọc", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "Bộ lọc nhãn dạng chip chỉ có trên máy tính");
+    await page.goto("/?q=ak00");
+    await page
+      .getByTestId("filter-bar")
+      .getByRole("button", { name: /^Phúc Lộc/ })
+      .click();
+    await expect(page.getByTestId("empty-state")).toBeVisible();
+    await page.getByRole("button", { name: /^Bỏ lọc Nhãn hàng: Phúc Lộc/ }).click();
+    await expect(scope(page)).toContainText("99 SP");
+  });
+});

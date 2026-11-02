@@ -26,7 +26,7 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
   return (
     <>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <p data-testid="scope-label" className="text-ink-muted text-[15px]">
+        <p data-testid="scope-label" role="status" className="text-ink-muted text-[15px]">
           <b className="text-ink font-semibold">{scopeLabel}</b> · {formatInt(total)} SP
         </p>
         <div
@@ -59,7 +59,11 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
       </div>
 
       {total === 0 ? (
-        <EmptyState canClear={hasActiveFilter(params)} />
+        <EmptyState
+          canClear={hasActiveFilter(params)}
+          clearHref={`${buildCatalogQuery({ sort: params.sort, view: params.view })}#san-pham`}
+          storeOnly={Boolean(params.store && !params.all && scope.kind === "store")}
+        />
       ) : (
         <>
           {params.view === "list" ? <ProductTable items={items} /> : <ProductGrid items={items} />}
@@ -83,7 +87,16 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
   );
 }
 
-function EmptyState({ canClear }: { canClear: boolean }) {
+function EmptyState({
+  canClear,
+  clearHref,
+  storeOnly,
+}: {
+  canClear: boolean;
+  clearHref: string;
+  /** Đang xem một cửa hàng ở chế độ mặc định (chỉ SP cửa hàng đó đặt). */
+  storeOnly: boolean;
+}) {
   return (
     <div
       data-testid="empty-state"
@@ -92,10 +105,11 @@ function EmptyState({ canClear }: { canClear: boolean }) {
       <p className="font-display text-xl font-semibold">Không có sản phẩm phù hợp</p>
       <p className="text-ink-muted mt-1">
         {canClear ? "Hãy thử bỏ bớt điều kiện lọc." : "Danh mục hiện chưa có sản phẩm nào."}
+        {storeOnly && ' Bật "Xem tất cả SP" để xem cả sản phẩm cửa hàng này chưa đặt.'}
       </p>
       {canClear && (
         <Link
-          href="/#san-pham"
+          href={`/${clearHref}`}
           className="bg-gold text-gold-fg hover:bg-gold-dark mt-5 inline-flex min-h-11 items-center rounded-full px-6 font-semibold hover:text-white"
         >
           Xóa lọc
