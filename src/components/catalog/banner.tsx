@@ -7,18 +7,20 @@ import { SiteNav } from "./site-nav";
  */
 export function Banner() {
   return (
-    <header className="bg-brand relative flex min-h-[700px] flex-col overflow-hidden text-center text-white sm:aspect-[1518/1036] sm:max-h-[1000px] sm:min-h-0">
-      {/* Hiện trọn tranh (không cắt) trên máy tính; điện thoại neo về góc dưới-trái để thấy con dê. */}
-      <Image
-        src="/brand/tet-banner.png"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover object-[left_bottom] sm:object-center"
-      />
+    <header className="relative flex min-h-[500px] flex-col overflow-hidden bg-[#cc1208] text-center text-white sm:h-[540px] sm:min-h-0">
+      {/* Cả bức tranh nằm gọn trong banner (object-contain); mép tranh mờ dần vào nền đỏ cùng màu. */}
+      <div className="absolute bottom-0 left-1/2 aspect-[1518/1036] w-full -translate-x-1/2 [mask-image:linear-gradient(to_bottom,transparent,black_30%)] sm:inset-y-0 sm:h-full sm:w-auto sm:[mask-image:linear-gradient(to_right,transparent,black_14%,black_86%,transparent)]">
+        <Image
+          src="/brand/tet-banner.png"
+          alt=""
+          fill
+          priority
+          sizes="(min-width: 640px) 800px, 100vw"
+          className="object-cover"
+        />
+      </div>
       <SiteNav />
-      <div className="relative z-10 mx-auto flex max-w-4xl flex-1 flex-col items-center justify-start px-6 pt-36 pb-24 sm:justify-center sm:pt-0 sm:pb-28">
+      <div className="relative z-10 mx-auto flex max-w-4xl flex-1 flex-col items-center justify-start px-6 pt-6 pb-24 sm:justify-center sm:pt-0 sm:pb-20">
         <h1 className="font-display text-gold text-[30px] leading-[1.1] font-bold whitespace-nowrap [text-shadow:0_2px_12px_rgb(90_5_5/0.7)] md:text-[72px]">
           Xuân Đinh Mùi · 2027
         </h1>
