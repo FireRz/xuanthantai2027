@@ -54,11 +54,19 @@ export default async function AdminProductsPage({
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-xl font-semibold">Sản phẩm</h1>
-        <p className="mt-1 text-sm text-neutral-600">
-          {list.total} sản phẩm. Sản phẩm không xóa được, chỉ ẩn.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold">Sản phẩm</h1>
+          <p className="mt-1 text-sm text-neutral-600">
+            {list.total} sản phẩm. Sản phẩm không xóa được, chỉ ẩn.
+          </p>
+        </div>
+        <Link
+          href="/admin/products/new"
+          className="inline-flex h-10 items-center rounded-md bg-[#B3261E] px-4 text-sm font-medium text-white"
+        >
+          Thêm sản phẩm
+        </Link>
       </div>
 
       <form
@@ -142,7 +150,11 @@ export default async function AdminProductsPage({
                     className="h-12 w-12 rounded text-xs"
                   />
                 </td>
-                <td className="p-3 font-medium">{r.sku}</td>
+                <td className="p-3 font-medium">
+                  <Link href={`/admin/products/${r.id}`} className="hover:underline">
+                    {r.sku}
+                  </Link>
+                </td>
                 <td className="p-3">{r.name ?? "—"}</td>
                 <td className="p-3">{r.brand.name}</td>
                 <td className="p-3">{r.productLine.name}</td>
