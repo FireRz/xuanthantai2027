@@ -74,7 +74,7 @@ export function FilterBar({
     <div
       data-testid="filter-bar"
       aria-busy={pending}
-      className={cn("space-y-3", pending && "opacity-90")}
+      className={cn("relative space-y-3", pending && "opacity-90")}
     >
       {/* Máy tính / tablet: hàng chip Nhãn hàng và Khung giá */}
       {CHIP_GROUPS.map(({ key, label }) => (
@@ -120,7 +120,8 @@ export function FilterBar({
           Lọc{groupCount > 0 && <span data-testid="filter-count"> ({groupCount})</span>}
         </button>
         {DROPDOWN_GROUPS.map(({ key, label }) => (
-          <div key={key} className="hidden md:block">
+          // Điện thoại có sẵn chip "Dòng" cạnh nút Lọc (mockup); các nhóm còn lại nằm trong bảng lọc.
+          <div key={key} className={key === "line" ? "block" : "hidden md:block"}>
             <FilterDropdown
               label={label}
               options={options(key)}
@@ -267,7 +268,7 @@ function FilterDropdown({
   const visible = q ? list.filter((o) => labelOf(o, options).toLowerCase().includes(q)) : list;
 
   return (
-    <div ref={root} className="relative" data-testid={`dropdown-${label}`}>
+    <div ref={root} className="md:relative" data-testid={`dropdown-${label}`}>
       <button
         ref={button}
         type="button"
@@ -293,7 +294,7 @@ function FilterDropdown({
           id={panelId}
           role="group"
           aria-label={label}
-          className="border-line absolute left-0 z-40 mt-2 w-80 rounded-xl border bg-white p-2 shadow-lg"
+          className="border-line absolute left-0 z-40 mt-2 w-80 rounded-xl border bg-white p-2 shadow-lg max-md:inset-x-0 max-md:w-auto"
         >
           {list.length > 8 && (
             <input

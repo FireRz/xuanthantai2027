@@ -534,3 +534,23 @@ test.describe("Khớp mockup (docs/mockups)", () => {
     );
   });
 });
+
+test.describe("Điện thoại: chip Dòng nhanh (mockup)", () => {
+  test("chip Dòng ▾ cạnh nút Lọc, chọn được ngay không cần mở bảng lọc", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "Chỉ điện thoại");
+    await page.goto("/");
+    await expect(page.getByRole("button", { name: /^Bộ sưu tập/ })).toHaveCount(0); // chỉ chip Dòng
+    await page.getByRole("button", { name: /^Dòng hàng/ }).click();
+    const panel = page.getByRole("group", { name: "Dòng hàng" });
+    await expect(panel).toBeVisible();
+    const box = (await panel.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+    await panel.getByRole("checkbox").first().check();
+    await expect(page).toHaveURL(/line=/);
+    await expect(page.getByTestId("filter-count")).toHaveText("(1)");
+  });
+});
