@@ -1,0 +1,83 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it } from "vitest";
+import { ProductCard } from "@/components/catalog/product-card";
+import { formatInt, formatPercent, formatVnd } from "@/lib/format";
+import { computeMetrics } from "@/lib/metrics";
+import type { ProductListItem } from "@/server/services/catalog";
+
+const item = (over: Partial<ProductListItem> = {}): ProductListItem => ({
+  id: "1",
+  sku: "NTT001",
+  name: "Nhẫn Kim Tiền",
+  priceVnd: 12_500_000,
+  imageUrl: "https://blob.example/NTT001.webp",
+  thumbUrl: "https://blob.example/NTT001-thumb.webp",
+  brandName: "Nhãn A",
+  lineName: "Nhẫn",
+  collectionName: "Phúc Lộc",
+  materialName: "Vàng 18K",
+  metrics: computeMetrics(120, 90),
+  ...over,
+});
+const html = (i: ProductListItem) => renderToStaticMarkup(createElement(ProductCard, { item: i }));
+
+describe("định dạng số", () => {
+  it("giá 12500000 → 12.500.000 ₫; thiếu → —", () => {
+    expect(formatVnd(12_500_000)).toBe("12.500.000 ₫");
+    expect(formatVnd(0)).toBe("0 ₫");
+    expect(formatVnd(null)).toBe("—");
+  });
+  it("số nguyên có dấu chấm nghìn", () => {
+    expect(formatInt(1234)).toBe("1.234");
+    expect(formatInt(12)).toBe("12");
+  });
+  it("tỷ lệ: 75%, null → —, 99,6% không bị làm tròn thành 100%", () => {
+    expect(formatPercent(0.75)).toBe("75%");
+    expect(formatPercent(1)).toBe("100%");
+    expect(formatPercent(0.996)).toBe("99%");
+    expect(formatPercent(null)).toBe("—");
+  });
+});
+
+describe("T03.2 — ProductCard", () => {
+  it("đủ trường: mã, chất liệu, tên, giá, Về X/Y, thiếu, trạng thái, ảnh thumbnail lười", () => {
+    const out = html(item());
+    expect(out).toContain("NTT001 · Vàng 18K");
+    expect(out).toContain("Nhẫn Kim Tiền");
+    expect(out).toContain("12.500.000 ₫");
+    expect(out).toContain("90/120");
+    expect(out).toContain("(75%)");
+    expect(out).toContain("Còn thiếu 30");
+    expect(out).toContain('data-status="short"');
+    expect(out).toContain('src="https://blob.example/NTT001-thumb.webp"');
+    expect(out).toContain('loading="lazy"');
+    expect(out).not.toContain("NTT001.webp"); // không bao giờ dùng ảnh lớn ở danh mục
+  });
+
+  it("thiếu dữ liệu hiển thị — và ảnh thay thế; Đặt = 0 → tỷ lệ — và không có 'Còn thiếu'", () => {
+    const out = html(
+      item({
+        name: null,
+        priceVnd: null,
+        materialName: null,
+        thumbUrl: null,
+        imageUrl: null,
+        metrics: computeMetrics(0, 0),
+      }),
+    );
+    expect(out).toContain("NTT001 · —");
+    expect(out).toContain(">—</h3>");
+    expect(out).toContain("(—)");
+    expect(out).toContain("data-placeholder");
+    expect(out).toContain('data-status="noorder"');
+    expect(out).not.toContain("Còn thiếu");
+  });
+
+  it("đủ hàng: không hiện 'Còn thiếu N'", () => {
+    const out = html(item({ metrics: computeMetrics(5, 7) }));
+    expect(out).toContain('data-status="full"');
+    expect(out).toContain("7/5");
+    expect(out).not.toContain("Còn thiếu ");
+  });
+});
