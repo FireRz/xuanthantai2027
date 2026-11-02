@@ -26,6 +26,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), replace: 
 
 const html = (i: ProductListItem) =>
   renderToStaticMarkup(
+    // eslint-disable-next-line react/no-children-prop
     createElement(CatalogNavProvider, {
       params: parseCatalogParams({ sort: "price_asc" }),
       children: createElement(ProductCard, { item: i }),
