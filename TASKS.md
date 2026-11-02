@@ -62,7 +62,7 @@
 ### F03 — Danh mục công khai ([chi tiết](features/F03-product-catalog.md))
 | ID | Task | Phụ thuộc | Size | TT |
 |----|------|-----------|------|----|
-| T03.1 | `listProducts` + số liệu theo phạm vi | T01.6, T01.7 | M | ⬜ |
+| T03.1 | `listProducts` + số liệu theo phạm vi | T01.6, T01.7 | M | ✅ |
 | T03.2 | `ProductCard` | T03.9 | S | ⬜ |
 | T03.3 | `ProductGrid` responsive | T03.2 | S | ⬜ |
 | T03.4 | Trang `/` | T03.1, T03.3 | S | ⬜ |
