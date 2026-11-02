@@ -91,3 +91,9 @@ GitHub repo → **Settings → Branches → Add branch ruleset** (hoặc *Branch
 - **Khôi phục thật khi sự cố:** tải file từ Blob (dashboard Vercel → Storage → `xtt-blob`), tạo DB Neon trống (hoặc nhánh mới), rồi
   `pg_restore --no-owner --no-privileges --dbname=<url-không-pool> xtt-<mốc>.dump`; đổi `DATABASE_URL`/`DATABASE_URL_UNPOOLED` của Production sang DB mới và redeploy. Neon cũng có khôi phục theo thời điểm (tùy gói) — dùng cho sự cố trong vài giờ gần nhất.
 - Ảnh sản phẩm nằm trên Blob, không nằm trong dump; nguồn gốc ảnh do chủ dự án giữ (ADR-005).
+
+## Giám sát lỗi (T10.5)
+
+- **Log:** mọi lỗi máy chủ không bắt được (render, route, server action) được ghi 1 dòng JSON qua `src/instrumentation.ts`. Xem: Vercel → project → **Logs** → tìm `request_error` (hoặc lọc mức **Error**, mã **5xx**). `/api/health` lỗi DB cũng ghi dòng này và trả 503.
+- **Cảnh báo lỗi 5xx:** Vercel → project → **Observability → Alerts** (cần gói **Pro**, nên bật khi nâng Pro ở T10.10) → tạo cảnh báo "Error rate / 5xx" gửi email chủ dự án. Trong thời gian Hobby chưa có cảnh báo tự động: dùng dịch vụ kiểm tra sống miễn phí (ví dụ UptimeRobot) gọi `https://<tên-miền>/api/health` mỗi 5 phút, báo email khi không phải 200.
+- **Diễn tập (gây lỗi giả):** đặt biến `ERROR_DRILL=1` cho môi trường **Preview**, redeploy, mở `/<preview-url>/api/error-drill` → trả 500 và thấy dòng `request_error` trong Logs. Thử xong **xóa biến**; khi không đặt biến, đường này trả 404.
