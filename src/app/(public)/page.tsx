@@ -3,6 +3,10 @@ import { Banner } from "@/components/catalog/banner";
 import { CatalogSection } from "@/components/catalog/catalog-section";
 import { FilterSection } from "@/components/catalog/filter-section";
 import { CatalogNavProvider } from "@/components/catalog/catalog-nav";
+import {
+  ProductDetailFallback,
+  ProductDetailSection,
+} from "@/components/catalog/product-detail-section";
 import { CollectionsSection } from "@/components/catalog/collections-section";
 import { ProductGridSkeleton } from "@/components/catalog/product-grid";
 import { SiteFooter } from "@/components/catalog/site-footer";
@@ -36,7 +40,8 @@ export default async function HomePage({
   // Link cũ/gõ tay có dòng, BST không thuộc nhãn đang chọn (hoặc đã ẩn) → bỏ lựa chọn đó (T04.9).
   const params = pruneInvalidSelections(parsed, owned.lines, owned.cols);
   // Đổi tham số thì hiện khung chờ (skeleton) trong lúc tải danh sách mới.
-  const key = buildCatalogQuery(params);
+  // Mở/đóng popup (?sp=) không làm tải lại danh sách nên không đưa `sp` vào khóa.
+  const key = buildCatalogQuery({ ...params, sp: null });
 
   return (
     <CatalogNavProvider params={params}>
@@ -60,6 +65,11 @@ export default async function HomePage({
           </Suspense>
         </section>
       </main>
+      {params.sp && (
+        <Suspense key={params.sp} fallback={<ProductDetailFallback />}>
+          <ProductDetailSection sku={params.sp} store={params.store} />
+        </Suspense>
+      )}
       <Suspense fallback={null}>
         <SiteFooter />
       </Suspense>

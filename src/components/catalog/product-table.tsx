@@ -2,6 +2,7 @@ import { formatInt, formatPercent, formatVnd, orDash } from "@/lib/format";
 import { stockStatus } from "@/lib/status";
 import type { ProductListItem } from "@/server/services/catalog";
 import { ProductImage } from "./product-image";
+import { ClickableRow, ProductLink } from "./product-link";
 import { StatusBadge } from "./status-badge";
 
 // Điện thoại ẩn Nhãn / Dòng / BST / Chất liệu (UI-DESIGN §5.4).
@@ -69,11 +70,10 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
           {items.map((item) => {
             const m = item.metrics;
             return (
-              <tr
+              <ClickableRow
                 key={item.id}
-                data-testid="product-row"
-                data-sku={item.sku}
-                className="border-line hover:bg-gold-soft/60 border-t"
+                sku={item.sku}
+                className="border-line hover:bg-gold-soft/60 cursor-pointer border-t"
               >
                 <td className="px-3 py-2">
                   <ProductImage
@@ -83,7 +83,9 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
                   />
                 </td>
                 <td className="px-3 py-2 font-medium tracking-wide whitespace-nowrap uppercase">
-                  {item.sku}
+                  <ProductLink sku={item.sku} className="hover:underline">
+                    {item.sku}
+                  </ProductLink>
                 </td>
                 <td className="min-w-40 px-3 py-2 font-semibold">{orDash(item.name)}</td>
                 <td className={`px-3 py-2 ${HIDE_ON_PHONE}`}>{item.brandName}</td>
@@ -100,7 +102,7 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
                 <td className="px-3 py-2">
                   <StatusBadge status={stockStatus(m)} />
                 </td>
-              </tr>
+              </ClickableRow>
             );
           })}
         </tbody>

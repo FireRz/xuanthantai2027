@@ -1,7 +1,9 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { CatalogNavProvider } from "@/components/catalog/catalog-nav";
 import { ProductCard } from "@/components/catalog/product-card";
+import { parseCatalogParams } from "@/lib/catalog-params";
 import { formatDateTime, formatInt, formatPercent, formatVnd } from "@/lib/format";
 import { computeMetrics } from "@/lib/metrics";
 import type { ProductListItem } from "@/server/services/catalog";
@@ -20,7 +22,21 @@ const item = (over: Partial<ProductListItem> = {}): ProductListItem => ({
   metrics: computeMetrics(120, 90),
   ...over,
 });
-const html = (i: ProductListItem) => renderToStaticMarkup(createElement(ProductCard, { item: i }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }));
+
+const html = (i: ProductListItem) =>
+  renderToStaticMarkup(
+    createElement(CatalogNavProvider, {
+      params: parseCatalogParams({ sort: "price_asc" }),
+      children: createElement(ProductCard, { item: i }),
+    }),
+  );
+
+describe("T05.3 — thẻ mở popup", () => {
+  it("liên kết tới ?sp=MÃ và giữ tham số lọc đang xem", () => {
+    expect(html(item())).toContain('href="/?sort=price_asc&amp;sp=NTT001"');
+  });
+});
 
 describe("định dạng số", () => {
   it("giá 12500000 → 12.500.000 ₫; thiếu → —", () => {

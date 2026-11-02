@@ -17,10 +17,10 @@ Xem ảnh lớn và **số lượng của từng cửa hàng** cho một sản p
 |----|------|-----------|---------------|
 | T05.1 | ✅ Chốt hình thức popup | — | — |
 | T05.2 | ✅ Service `catalog.getProductDetail(sku)` (SP visible + SL mọi CH active + tổng) | T01.6, T01.7 | Integration: SP ẩn → null; tổng = công thức |
-| T05.3 | Component popup (modal / full-screen mobile), ảnh lớn | T05.2, T03.2 | E2E: bấm thẻ → popup đúng SP |
-| T05.4 | Bảng SL theo cửa hàng + dòng tổng; làm nổi CH đang lọc; cuộn tốt khi 100 CH | T05.3 | E2E: tổng trong bảng = số trên thẻ (khi không lọc CH) |
-| T05.5 | Đồng bộ `?sp=` với URL, Back/Esc đóng, giữ nguyên bộ lọc | T05.3, T04.9 | E2E: mở link có `?sp=` → popup mở sẵn; Back → đóng, bộ lọc còn |
-| T05.6 | `sp` không tồn tại / bị ẩn → thông báo "Không tìm thấy sản phẩm" | T05.3 | E2E |
+| T05.3 | ✅ Component popup (modal / full-screen mobile), ảnh lớn | T05.2, T03.2 | E2E: bấm thẻ → popup đúng SP |
+| T05.4 | ✅ Bảng SL theo cửa hàng + dòng tổng; làm nổi CH đang lọc; cuộn tốt khi 100 CH | T05.3 | E2E: tổng trong bảng = số trên thẻ (khi không lọc CH) |
+| T05.5 | ✅ Đồng bộ `?sp=` với URL, Back/Esc đóng, giữ nguyên bộ lọc | T05.3, T04.9 | E2E: mở link có `?sp=` → popup mở sẵn; Back → đóng, bộ lọc còn |
+| T05.6 | ✅ `sp` không tồn tại / bị ẩn → thông báo "Không tìm thấy sản phẩm" | T05.3 | E2E |
 
 ## Tiêu chí nghiệm thu
 - **AC1.** Bấm một SP mở popup đúng SP đó, có ảnh lớn và đủ thông tin.
