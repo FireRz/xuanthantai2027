@@ -15,10 +15,7 @@ import { ProductTable } from "./product-table";
 /** Phần "Tất cả sản phẩm": nhãn phạm vi, chuyển Lưới/Bảng, danh sách, Xem thêm. */
 export async function CatalogSection({ params }: { params: CatalogParams }) {
   const { items, total, scope } = await listProducts({
-    store: params.store,
-    all: params.all,
-    q: params.q,
-    col: params.col,
+    ...params,
     limit: params.n,
   });
 
