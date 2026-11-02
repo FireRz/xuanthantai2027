@@ -1,16 +1,16 @@
 import { LayoutGrid, List } from "lucide-react";
 import Link from "next/link";
-import { buildCatalogQuery, PAGE_SIZE, type CatalogParams } from "@/lib/catalog-params";
+import {
+  buildCatalogQuery,
+  hasActiveFilter,
+  PAGE_SIZE,
+  type CatalogParams,
+} from "@/lib/catalog-params";
 import { formatInt } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { listProducts } from "@/server/services/catalog";
 import { ProductGrid } from "./product-grid";
 import { ProductTable } from "./product-table";
-
-/** Có bộ lọc/tìm kiếm nào đang áp dụng không (để quyết định hiện nút Xóa lọc). */
-function hasActiveFilter(p: CatalogParams) {
-  return Boolean(p.store || p.q || p.col.length);
-}
 
 /** Phần "Tất cả sản phẩm": nhãn phạm vi, chuyển Lưới/Bảng, danh sách, Xem thêm. */
 export async function CatalogSection({ params }: { params: CatalogParams }) {
