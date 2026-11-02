@@ -70,7 +70,7 @@
 | T03.6 | Rỗng / lỗi / loading | T03.4 | S | ⬜ |
 | T03.7 | Ảnh thumbnail, lazy-load | T03.2 | S | ⬜ |
 | T03.8 | Nhãn phạm vi số liệu | T03.2, T04.5 | S | ⬜ |
-| T03.9 | Design tokens, font, header | T01.1, T00.3 | S | ⬜ |
+| T03.9 | Design tokens, font, header | T01.1, T00.3 | S | ✅ |
 | T03.10 | Nhãn trạng thái (4 trạng thái) | T01.7 | S | ⬜ |
 | T03.11 | Dạng Bảng + chuyển Lưới/Bảng | T03.4, T03.10 | M | ⬜ |
 | T03.12 | Banner Tết + thanh dính | T03.9, T04.2 | M | ⬜ |

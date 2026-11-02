@@ -1,9 +1,15 @@
-// Trang danh mục công khai — giao diện thật làm ở phiên 3 (F03).
+import { SiteNav } from "@/components/catalog/site-nav";
+
+// Khung tạm của T03.9 (token, font, header); nội dung trang làm ở các task sau của F03.
 export default function HomePage() {
   return (
-    <main className="mx-auto max-w-3xl p-8">
-      <h1 className="text-2xl font-bold">Xuân Thần Tài 2027</h1>
-      <p className="mt-2 text-sm text-neutral-600">Trang danh mục đang được xây dựng.</p>
-    </main>
+    <>
+      <header className="bg-brand">
+        <SiteNav />
+      </header>
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <h1 className="font-display text-2xl font-bold">Xuân Thần Tài 2027</h1>
+      </main>
+    </>
   );
 }

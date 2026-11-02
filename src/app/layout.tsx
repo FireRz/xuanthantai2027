@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { beVietnam, playfair } from "@/lib/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi">
-      <body className="antialiased">{children}</body>
+      <body className={`${playfair.variable} ${beVietnam.variable} antialiased`}>{children}</body>
     </html>
   );
 }

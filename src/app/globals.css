@@ -4,6 +4,35 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Design tokens trang xem — UI-DESIGN §2. Trang quản trị dùng token shadcn bên dưới. */
+@theme {
+  --color-cream: #fbf6ec;
+  --color-brand: #b3261e;
+  --color-brand-dark: #8e1b16;
+  --color-gold: #f2a900;
+  --color-gold-dark: #c77f00;
+  --color-gold-soft: #fff6e0;
+  --color-gold-fg: #2b1a12;
+  --color-ink: #2b1a12;
+  --color-ink-muted: #6b5a4e;
+  --color-line: #e8dcc4;
+  --color-festive-text: #fff3d6;
+  --color-status-full: #2e7d4f;
+  --color-status-short: #d9822b;
+  --color-status-none: #7a7a7a;
+  --color-status-noorder: #bdbdbd;
+  --color-status-full-soft: #e3f3ea;
+  --color-status-full-fg: #1b5e39;
+  --color-status-short-soft: #fdebd3;
+  --color-status-short-fg: #8a4b0b;
+  --color-status-none-soft: #ececec;
+  --color-status-none-fg: #4a4a4a;
+  --color-status-noorder-soft: #f3f3f3;
+  --color-status-noorder-fg: #5f5f5f;
+  --font-display: var(--font-playfair), serif;
+  --font-body: var(--font-be-vietnam), system-ui, sans-serif;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
