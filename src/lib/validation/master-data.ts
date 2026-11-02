@@ -10,12 +10,7 @@ const collapse = (s: string) => s.trim().replace(/\s+/g, " ");
 export const nameSchema = z
   .string({ error: "Vui lòng nhập tên" })
   .transform(collapse)
-  .pipe(
-    z
-      .string()
-      .min(1, "Vui lòng nhập tên")
-      .max(MAX_NAME, `Tên tối đa ${MAX_NAME} ký tự`),
-  );
+  .pipe(z.string().min(1, "Vui lòng nhập tên").max(MAX_NAME, `Tên tối đa ${MAX_NAME} ký tự`));
 
 export const storeCodeSchema = z
   .string({ error: "Vui lòng nhập mã cửa hàng" })

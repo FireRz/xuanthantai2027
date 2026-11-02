@@ -56,9 +56,9 @@ describe("T06.1 — Dòng hàng", () => {
   });
 
   it("nhãn không tồn tại → lỗi", async () => {
-    await expect(
-      createLine("00000000-0000-4000-8000-000000000000", "Nhẫn"),
-    ).rejects.toMatchObject({ code: "BRAND_NOT_FOUND" });
+    await expect(createLine("00000000-0000-4000-8000-000000000000", "Nhẫn")).rejects.toMatchObject({
+      code: "BRAND_NOT_FOUND",
+    });
   });
 
   it("trùng tên trong cùng nhãn → lỗi; khác nhãn → OK", async () => {
