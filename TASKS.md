@@ -106,7 +106,7 @@
 | ID | Task | Phụ thuộc | Size | TT |
 |----|------|-----------|------|----|
 | T06.1 | Service Nhãn / Dòng / BST | T01.6, T02.4 | M | ✅ |
-| T06.2 | Service Chất liệu | T01.6, T02.4 | S | ⬜ |
+| T06.2 | Service Chất liệu | T01.6, T02.4 | S | ✅ |
 | T06.3 | Service Cửa hàng | T01.6, T02.4 | S | ⬜ |
 | T06.4 | Ẩn/hiện (ẩn theo), xóa có điều kiện | T06.1, T06.2, T06.3 | M | ⬜ |
 | T06.5 | Trang `/admin/master-data` | T06.4, T02.3 | M | ⬜ |
