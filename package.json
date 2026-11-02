@@ -22,6 +22,7 @@
     "seed": "tsx prisma/seed.ts",
     "admin:set-password": "tsx scripts/set-admin-password.ts",
     "seed:large": "tsx prisma/seed.ts --large",
+    "perf:catalog": "tsx scripts/perf-catalog.ts",
     "vercel-build": "prisma migrate deploy && next build"
   },
   "dependencies": {

@@ -90,7 +90,7 @@
 | T04.8 | Công tắc "Xem tất cả SP" | T04.5 | S | ✅ |
 | T04.9 | Đồng bộ URL, bỏ lựa chọn không hợp lệ | T04.5, T03.4 | S | ✅ |
 | T04.10 | Số kết quả, trạng thái rỗng | T04.9 | S | ✅ |
-| T04.11 | Chỉ mục & đo hiệu năng | T04.3, T04.4, T01.11 | S | ⬜ |
+| T04.11 | Chỉ mục & đo hiệu năng (chậm nhất ≈150 ms trên 3.000 SP × 100 CH; không cần thêm chỉ mục) | T04.3, T04.4, T01.11 | S | ✅ |
 
 ### F05 — Popup chi tiết ([chi tiết](features/F05-product-detail.md))
 | ID | Task | Phụ thuộc | Size | TT |

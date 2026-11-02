@@ -32,7 +32,7 @@ Lọc theo nhãn hàng, dòng hàng, bộ sưu tập (Yêu cầu 3), chất li�
 | T04.8 | ✅ Công tắc "Xem tất cả SP" (chỉ hiện khi chọn CH) | T04.5 | E2E: CH đặt 5/200 SP → 5; bật → 200, SP không đặt hiển thị 0 |
 | T04.9 | ✅ Đồng bộ URL; đổi nhãn tự bỏ dòng/BST không còn hợp lệ | T04.5, T03.4 | E2E: copy URL → tab mới cùng kết quả |
 | T04.10 | ✅ Số kết quả + trạng thái "không có SP phù hợp" | T04.9 | E2E |
-| T04.11 | Chỉ mục & đo hiệu năng lọc + đếm + sắp xếp trên seed lớn | T04.3, T04.4, T01.11 | ≤ 1s mỗi yêu cầu |
+| T04.11 | ✅ Chỉ mục & đo hiệu năng lọc + đếm + sắp xếp trên seed lớn | T04.3, T04.4, T01.11 | ≤ 1s mỗi yêu cầu |
 
 ## Tiêu chí nghiệm thu
 - **AC1.** Chọn nhiều nhãn → SP thuộc bất kỳ nhãn nào đã chọn; danh sách Dòng/BST chỉ còn giá trị của các nhãn đó.
@@ -43,3 +43,10 @@ Lọc theo nhãn hàng, dòng hàng, bộ sưu tập (Yêu cầu 3), chất li�
 - **AC6.** Tìm "abc" ra mọi SP có mã chứa "ABC" (không phân biệt hoa/thường), kết hợp được với bộ lọc.
 - **AC7.** Mỗi kiểu sắp xếp cho thứ tự đúng; mặc định Mã A→Z; "Còn thiếu nhiều nhất" theo phạm vi đang xem.
 - **AC8.** Tải lại hoặc mở link chia sẻ giữ nguyên lọc, tìm, sắp xếp; "Xóa lọc" về toàn bộ danh mục.
+
+## Kết quả đo hiệu năng (T04.11, 2026-11-02)
+- Seed lớn: 3.000 SP × 100 cửa hàng × ma trận đầy đủ = 300.000 dòng SL; Postgres cục bộ.
+- 23 kịch bản (5 kiểu sắp xếp × tổng/cửa hàng/tải 3.000 SP, tổ hợp 4 bộ lọc + "Không thuộc BST", tìm mã, 4 kiểu đếm lựa chọn): chậm nhất ≈ 150 ms; ngưỡng ≤ 1.000 ms.
+- Chỉ mục có sẵn đã đủ: phạm vi cửa hàng dùng `store_product_qty(store_id, product_id)` + `product(sku)` (≈ 0,1 ms); phạm vi tổng phải cộng view `product_totals` trên 300.000 dòng (≈ 80–100 ms) — là phần tốn nhất, vẫn dưới ngưỡng 10 lần. Không thêm chỉ mục mới (chỉ tốn ghi khi nhập Excel mà không giảm thời gian đọc).
+- Chạy lại: `npm run seed:large && npm run perf:catalog`; test tự động `tests/integration/catalog-perf.test.ts` (seed lớn vào DB test, mất ≈ 16 giây).
+- Chưa đo qua mạng tới Neon trên Vercel (độ trễ mạng/CPU khác máy cục bộ) — nên đo lại khi có preview.
