@@ -116,7 +116,7 @@
 ### F07 — Sản phẩm & ảnh ([chi tiết](features/F07-product-management.md))
 | ID | Task | Phụ thuộc | Size | TT |
 |----|------|-----------|------|----|
-| T07.1 | Schema Zod sản phẩm | T01.5 | S | ⬜ |
+| T07.1 | Schema Zod sản phẩm | T01.5 | S | ✅ |
 | T07.2 | Service sản phẩm | T01.6, T02.4, T07.1 | M | ⬜ |
 | T07.3 | Resize trình duyệt + blob-upload + gắn/thay ảnh | T01.9, T02.4 | M | ⬜ |
 | T07.4 | Trang danh sách SP admin | T07.2, T02.3 | M | ⬜ |
