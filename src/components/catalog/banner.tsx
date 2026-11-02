@@ -7,7 +7,7 @@ import { SiteNav } from "./site-nav";
  */
 export function Banner() {
   return (
-    <header className="relative flex min-h-[560px] flex-col overflow-hidden bg-[#cc1208] text-center text-white sm:min-h-[420px] lg:aspect-[2400/900] lg:max-h-[640px] lg:min-h-0">
+    <header className="relative flex min-h-[560px] w-full flex-col overflow-hidden bg-[#cc1208] text-center text-white sm:min-h-[420px] lg:aspect-[2400/900] lg:max-h-[640px] lg:min-h-0">
       {/* Tranh ngang (docs/brand/tet-banner-2400.png) phủ kín banner; điện thoại/tablet neo góc dưới-trái để thấy con dê. */}
       <Image
         src="/brand/tet-banner-2400.png"
@@ -26,9 +26,7 @@ export function Banner() {
           Vạn sự như ý — Tài lộc đầy nhà
         </p>
         <p className="text-festive-text mx-auto mt-4 hidden max-w-2xl text-[15px] md:text-base lg:block">
-          Theo dõi số lượng đặt và hàng đã về của bộ sưu tập trang sức
-          <br />
-          mùa <span className="whitespace-nowrap">Xuân Thần Tài 2027</span>, theo từng cửa hàng.
+          Theo dõi số lượng đặt và hàng đã về của các bộ sưu tập Xuân Thần Tài
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <a
