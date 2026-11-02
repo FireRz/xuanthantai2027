@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { z } from "zod";
-import { ProductImage } from "@/components/catalog/product-image";
-import { formatVnd } from "@/lib/format";
 import { requireAdminPage } from "@/server/auth/require-admin";
 import { prisma } from "@/server/db";
+import { ProductTable } from "./product-table";
 import { listAdminProducts, type StatusFilter } from "@/server/services/product-admin";
 
 export const metadata: Metadata = { title: "Sản phẩm" };
@@ -118,67 +117,20 @@ export default async function AdminProductsPage({
         </button>
       </form>
 
-      <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
-        <table className="w-full min-w-[860px] text-left text-sm">
-          <thead className="border-b border-neutral-200 bg-neutral-50 text-xs text-neutral-600 uppercase">
-            <tr>
-              <th className="p-3">Ảnh</th>
-              <th className="p-3">Mã</th>
-              <th className="p-3">Tên</th>
-              <th className="p-3">Nhãn</th>
-              <th className="p-3">Dòng</th>
-              <th className="p-3">BST</th>
-              <th className="p-3">Chất liệu</th>
-              <th className="p-3 text-right">Giá</th>
-              <th className="p-3">Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.rows.length === 0 && (
-              <tr>
-                <td colSpan={9} className="p-6 text-center text-neutral-500">
-                  Không có sản phẩm nào khớp.
-                </td>
-              </tr>
-            )}
-            {list.rows.map((r) => (
-              <tr key={r.id} data-testid="product-row" className="border-b border-neutral-100">
-                <td className="p-2">
-                  <ProductImage
-                    thumbUrl={r.thumbUrl}
-                    alt={r.sku}
-                    className="h-12 w-12 rounded text-xs"
-                  />
-                </td>
-                <td className="p-3 font-medium">
-                  <Link href={`/admin/products/${r.id}`} className="hover:underline">
-                    {r.sku}
-                  </Link>
-                </td>
-                <td className="p-3">{r.name ?? "—"}</td>
-                <td className="p-3">{r.brand.name}</td>
-                <td className="p-3">{r.productLine.name}</td>
-                <td className="p-3">{r.collection?.name ?? "—"}</td>
-                <td className="p-3">{r.material?.name ?? "—"}</td>
-                <td className="p-3 text-right">
-                  {r.priceVnd == null ? "—" : formatVnd(r.priceVnd)}
-                </td>
-                <td className="p-3">
-                  <span
-                    className={
-                      r.active
-                        ? "rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-800"
-                        : "rounded-full bg-neutral-200 px-2 py-0.5 text-xs text-neutral-700"
-                    }
-                  >
-                    {r.active ? "Đang hiện" : "Đã ẩn"}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ProductTable
+        rows={list.rows.map((r) => ({
+          id: r.id,
+          sku: r.sku,
+          name: r.name,
+          priceVnd: r.priceVnd,
+          thumbUrl: r.thumbUrl,
+          active: r.active,
+          brand: r.brand.name,
+          line: r.productLine.name,
+          collection: r.collection?.name ?? null,
+          material: r.material?.name ?? null,
+        }))}
+      />
 
       {list.pages > 1 && (
         <nav aria-label="Phân trang" className="flex items-center justify-between text-sm">

@@ -6,6 +6,7 @@ import { createTestAdmin, login } from "./helpers";
 const tag = () => randomBytes(3).toString("hex");
 
 test.describe("quản trị sản phẩm (F07)", () => {
+  test.setTimeout(90_000);
   let admin: Awaited<ReturnType<typeof createTestAdmin>>;
   const brandIds: string[] = [];
 
@@ -104,5 +105,48 @@ test.describe("quản trị sản phẩm (F07)", () => {
     // Trang xem công khai thấy SP
     await page.goto(`/?q=${sku}`);
     await expect(page.getByText(sku).first()).toBeVisible();
+  });
+  test("T07.7: ẩn → mất khỏi trang xem, còn trong admin; hiện lại; ẩn nhiều SP cùng lúc", async ({
+    page,
+  }) => {
+    const t = tag();
+    const { brand, line } = await seed(t);
+    const mk = (sku: string) =>
+      prisma.product.create({ data: { sku, brandId: brand.id, productLineId: line.id } });
+    const [a, b, c] = [`HID${t}A`, `HID${t}B`, `HID${t}C`];
+    await mk(a);
+    await mk(b);
+    await mk(c);
+
+    await login(page, admin.username, admin.password);
+    await expect(page).toHaveURL(/\/admin$/);
+
+    await page.goto(`/?q=HID${t}`);
+    await expect(page.locator(`[data-sku="${a}"]`)).toBeVisible();
+
+    // Ẩn một SP
+    await page.goto(`/admin/products?q=HID${t}`);
+    await page.getByRole("button", { name: `Ẩn ${a}`, exact: true }).click();
+    const rowA = page.getByTestId("product-row").filter({ hasText: a });
+    await expect(rowA).toContainText("Đã ẩn");
+    await page.goto(`/?q=HID${t}`);
+    await expect(page.locator(`[data-sku="${a}"]`)).toHaveCount(0);
+    await expect(page.locator(`[data-sku="${b}"]`)).toBeVisible();
+
+    // Hiện lại
+    await page.goto(`/admin/products?q=HID${t}`);
+    await page.getByRole("button", { name: `Hiện ${a}`, exact: true }).click();
+    await expect(rowA).toContainText("Đang hiện");
+
+    // Ẩn nhiều SP cùng lúc
+    await page.getByLabel(`Chọn ${b}`).check();
+    await page.getByLabel(`Chọn ${c}`).check();
+    await page.getByRole("button", { name: "Ẩn đã chọn" }).click();
+    await expect(page.getByText("Đã ẩn 2 sản phẩm.")).toBeVisible();
+    await page.goto(`/?q=HID${t}`);
+    await expect(page.locator(`[data-sku="${a}"]`)).toBeVisible();
+    await expect(page.locator(`[data-sku="${b}"]`)).toHaveCount(0);
+    await expect(page.locator(`[data-sku="${c}"]`)).toHaveCount(0);
+    expect(await prisma.product.count({ where: { sku: { startsWith: `HID${t}` } } })).toBe(3);
   });
 });
