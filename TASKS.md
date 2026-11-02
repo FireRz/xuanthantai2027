@@ -138,7 +138,7 @@
 | T08.7 | Validate & phân loại | T08.6, T07.1, T06.1, T06.2, T06.3 | L | ✅ |
 | T08.8 | Màn hình xem trước | T08.7 | M | ✅ |
 | T08.9 | Áp dụng trong transaction | T08.7, T08.2 | M | ✅ |
-| T08.10 | Đo hiệu năng import | T08.9, T01.11 | S | ⬜ |
+| T08.10 | Đo hiệu năng import | T08.9, T01.11 | S | 🟨 |
 
 ### F09 — ✂️ Bỏ (Q-17)
 
@@ -164,7 +164,7 @@
 | T11.3 | Nút xuất trên danh mục | T11.2, T04.9 | S | ✅ |
 | T11.4 | `export.adminTemplate` | T08.3, T01.6 | M | ✅ |
 | T11.5 | Trang `/admin/export` | T11.4, T02.3 | S | ✅ |
-| T11.6 | Đo thời gian xuất | T11.2, T11.4, T01.11 | S | ⬜ |
+| T11.6 | Đo thời gian xuất | T11.2, T11.4, T01.11 | S | 🟨 |
 
 ---
 

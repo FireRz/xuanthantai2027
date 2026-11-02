@@ -5,6 +5,8 @@ import { ImportFlow } from "./import-flow";
 
 export const metadata: Metadata = { title: "Nhập Excel" };
 export const dynamic = "force-dynamic";
+// Server Action xem trước / áp dụng file lớn (3.000 SP + 100.000 dòng SL) cần nhiều thời gian hơn mặc định.
+export const maxDuration = 300;
 
 export default async function ImportPage() {
   await requireAdminPage();

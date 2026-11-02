@@ -23,6 +23,8 @@ interface Row {
 
 const EM = "—";
 
+const seconds = (ms: number) => `${(ms / 1000).toFixed(1).replace(".", ",")} giây`;
+
 /** Gộp lỗi + thay đổi thành các dòng của bảng chi tiết (mỗi trường đổi một dòng: cũ → mới). */
 function buildRows(p: ImportPreview): Row[] {
   const rows: Row[] = [];
@@ -172,7 +174,7 @@ export function ImportFlow() {
       const r = res.data!;
       setPhase({
         name: "done",
-        message: `Đã áp dụng: ${formatInt(r.newProducts)} SP mới, ${formatInt(r.updatedProducts)} SP thay đổi, ${formatInt(r.quantityRows)} dòng số lượng.`,
+        message: `Đã áp dụng: ${formatInt(r.newProducts)} SP mới, ${formatInt(r.updatedProducts)} SP thay đổi, ${formatInt(r.quantityRows)} dòng số lượng (${seconds(r.elapsedMs)}).`,
       });
     });
   }
@@ -269,6 +271,7 @@ export function ImportFlow() {
           .filter(Boolean)
           .join(", ") || "không có sheet hợp lệ"}{" "}
         · chưa ghi vào hệ thống
+        {preview.elapsedMs !== undefined && ` · kiểm tra mất ${seconds(preview.elapsedMs)}`}
       </p>
 
       {blocked ? (

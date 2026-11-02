@@ -53,6 +53,8 @@ export interface ImportPreview {
   issues: ImportIssue[];
   productItems: ProductItem[];
   quantityItems: QuantityItem[];
+  /** Thời gian server đọc + kiểm tra file (ms) — để đo hiệu năng (T08.10). */
+  elapsedMs?: number;
   /** Danh sách chi tiết đã bị cắt bớt (xem `summary` để biết tổng). */
   truncated: { issues: boolean; productItems: boolean; quantityItems: boolean };
 }
