@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { adminFont } from "@/components/admin/admin-font";
-import { LogoPlaceholder } from "@/components/admin/logo-placeholder";
+import { AdminLogo } from "@/components/admin/admin-logo";
 import { Button } from "@/components/ui/button";
 import { requireAdminPage } from "@/server/auth/require-admin";
 import { logoutAction } from "./actions";
@@ -26,7 +26,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className={`${adminFont.className} min-h-dvh bg-[#F7F7F5] text-neutral-900`}>
       <header className="flex h-14 items-center justify-between border-b border-neutral-200 bg-white px-4">
         <Link href="/admin" className="flex items-center gap-3">
-          <LogoPlaceholder />
+          <AdminLogo />
           <span className="font-semibold">Quản trị</span>
         </Link>
         <div className="flex items-center gap-3 text-sm">

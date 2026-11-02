@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { adminFont } from "@/components/admin/admin-font";
-import { LogoPlaceholder } from "@/components/admin/logo-placeholder";
+import { AdminLogo } from "@/components/admin/admin-logo";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = { title: "Đăng nhập quản trị" };
@@ -26,7 +26,7 @@ export default async function LoginPage({
     >
       <div className="w-full max-w-sm rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
         <div className="mb-6 flex items-center gap-3">
-          <LogoPlaceholder />
+          <AdminLogo />
           <div>
             <h1 className="text-lg font-semibold">Quản trị</h1>
             <p className="text-sm text-neutral-500">Xuân Thần Tài 2027</p>
