@@ -12,7 +12,7 @@ test.afterAll(() => prisma.$disconnect());
 test.describe("T03.3–T03.4 trang danh mục", () => {
   test("thấy banner, SP seed, không cuộn ngang", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Xuân Thần Tài");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Xuân Đinh Mùi · 2027");
     await expect(page.getByRole("heading", { name: "Bộ sưu tập mùa này" })).toBeVisible();
     await expect(cards(page).first()).toBeVisible();
     expect(await cards(page).count()).toBe(24);

@@ -13,12 +13,14 @@ export function formatVnd(n: number | null | undefined): string {
 }
 
 /**
- * Tỷ lệ về (0..1) → "75%". Làm tròn xuống để chưa đủ hàng không bị hiện thành 100%
- * (vd. 99,6% → 99%). Đặt = 0 (null) → "—".
+ * Tỷ lệ về (0..1) → "75%", "99,6%" (tối đa 1 chữ số thập phân, dấu phẩy kiểu Việt Nam).
+ * Làm tròn xuống để chưa đủ hàng không bị hiện thành 100% (vd. 99,96% → 99,9%).
+ * Đặt = 0 (null) → "—".
  */
 export function formatPercent(rate: number | null | undefined): string {
   if (rate === null || rate === undefined) return EMPTY;
-  return `${Math.floor(rate * 100 + 1e-9)}%`;
+  const tenths = Math.floor(rate * 1000 + 1e-9) / 10;
+  return `${String(tenths).replace(".", ",")}%`;
 }
 
 /** Giá trị văn bản có thể trống → "—". */

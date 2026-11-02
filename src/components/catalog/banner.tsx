@@ -7,24 +7,22 @@ import { SiteNav } from "./site-nav";
  */
 export function Banner() {
   return (
-    <header className="bg-brand relative overflow-hidden text-center text-white">
+    <header className="bg-brand relative flex min-h-[700px] flex-col overflow-hidden text-center text-white sm:aspect-[1518/1036] sm:max-h-[1000px] sm:min-h-0">
+      {/* Hiện trọn tranh (không cắt) trên máy tính; điện thoại neo về góc dưới-trái để thấy con dê. */}
       <Image
         src="/brand/tet-banner.png"
         alt=""
         fill
         priority
         sizes="100vw"
-        className="object-cover object-center"
+        className="object-cover object-[left_bottom] sm:object-center"
       />
       <SiteNav />
-      <div className="relative z-10 mx-auto max-w-2xl px-6 pt-8 pb-24 md:pt-14 md:pb-32">
-        <p className="text-festive-text text-xs font-semibold tracking-[0.3em] uppercase md:text-sm">
+      <div className="relative z-10 mx-auto flex max-w-4xl flex-1 flex-col items-center justify-start px-6 pt-36 pb-24 sm:justify-center sm:pt-0 sm:pb-28">
+        <h1 className="font-display text-gold text-[30px] leading-[1.1] font-bold whitespace-nowrap [text-shadow:0_2px_12px_rgb(90_5_5/0.7)] md:text-[72px]">
           Xuân Đinh Mùi · 2027
-        </p>
-        <h1 className="font-display text-gold mt-3 text-[44px] leading-[1.05] font-bold md:text-[72px]">
-          Xuân Thần Tài
         </h1>
-        <p className="font-display text-festive-text mt-3 text-lg italic md:text-2xl">
+        <p className="font-display text-festive-text mt-3 text-lg italic [text-shadow:0_1px_8px_rgb(90_5_5/0.8)] md:text-2xl">
           Vạn sự như ý — Tài lộc đầy nhà
         </p>
         <p className="text-festive-text mx-auto mt-4 hidden max-w-xl text-[15px] sm:block md:text-base">

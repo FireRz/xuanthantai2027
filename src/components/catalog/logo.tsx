@@ -1,20 +1,16 @@
 import Image from "next/image";
 
-// Logo công ty (docs/brand/ → public/brand/). Chưa có bản trắng nên đặt trong ô trắng bo góc
-// để đọc được trên nền đỏ; khi có logo-white sẽ bỏ ô trắng.
+// Logo công ty bản trắng (docs/brand/logo-white.png, tạo từ logo-PNJ.png), nền trong suốt
+// để đặt trực tiếp lên nền đỏ. Khi công ty cấp logo trắng chính thức thì thay file này.
 export function Logo({ className }: { className?: string }) {
   return (
-    <span
-      className={`flex shrink-0 items-center rounded-lg bg-white px-2 py-1 shadow-sm ${className ?? ""}`}
-    >
-      <Image
-        src="/brand/logo-PNJ.png"
-        alt="PNJ"
-        width={600}
-        height={200}
-        priority
-        className="h-8 w-auto sm:h-9"
-      />
-    </span>
+    <Image
+      src="/brand/logo-white.png"
+      alt="PNJ"
+      width={367}
+      height={163}
+      priority
+      className={`h-10 w-auto shrink-0 drop-shadow-[0_1px_4px_rgb(120_10_10/0.6)] sm:h-12 ${className ?? ""}`}
+    />
   );
 }

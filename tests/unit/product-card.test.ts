@@ -32,10 +32,13 @@ describe("định dạng số", () => {
     expect(formatInt(1234)).toBe("1.234");
     expect(formatInt(12)).toBe("12");
   });
-  it("tỷ lệ: 75%, null → —, 99,6% không bị làm tròn thành 100%", () => {
+  it("tỷ lệ: 75%, 99,6%, null → —; chưa đủ không hiện 100%", () => {
     expect(formatPercent(0.75)).toBe("75%");
     expect(formatPercent(1)).toBe("100%");
-    expect(formatPercent(0.996)).toBe("99%");
+    expect(formatPercent(0.996)).toBe("99,6%");
+    expect(formatPercent(0.9996)).toBe("99,9%");
+    expect(formatPercent(0.3333)).toBe("33,3%");
+    expect(formatPercent(0)).toBe("0%");
     expect(formatPercent(null)).toBe("—");
   });
 });
