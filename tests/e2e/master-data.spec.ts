@@ -24,6 +24,7 @@ test.describe("quản trị danh mục (T06.5)", () => {
 
   test("thêm BST dưới nhãn A → trang xem hiện BST đó; ẩn BST có xác nhận → biến mất", async ({
     page,
+    isMobile,
   }) => {
     const t = tag();
     const brand = await prisma.brand.create({ data: { name: `Nhãn A ${t}` } });
@@ -56,6 +57,26 @@ test.describe("quản trị danh mục (T06.5)", () => {
     await page.goto("/");
     await expect(page.getByText(colName).first()).toBeVisible();
 
+    // Bộ lọc trang xem: chọn nhãn A → danh sách BST có (hoặc không còn) BST vừa thêm
+    const collectionInFilter = async () => {
+      await page.goto("/");
+      if (isMobile) {
+        await page.getByTestId("open-filter-sheet").click();
+        const sheet = page.getByTestId("filter-sheet");
+        await sheet.getByRole("button", { name: new RegExp(`^${brand.name}`) }).click();
+        return sheet.getByText(colName);
+      }
+      await page.getByRole("button", { name: /^Nhãn hàng/ }).click();
+      await page
+        .getByRole("group", { name: "Nhãn hàng" })
+        .getByRole("checkbox", { name: new RegExp(`^${brand.name}`) })
+        .click();
+      await page.keyboard.press("Escape");
+      await page.getByRole("button", { name: /^Bộ sưu tập/ }).click();
+      return page.getByRole("group", { name: "Bộ sưu tập" }).getByText(colName);
+    };
+    await expect(await collectionInFilter()).toHaveCount(1);
+
     // Ẩn BST: hộp xác nhận báo 1 SP bị ảnh hưởng
     await page.goto("/admin/master-data");
     const row = page
@@ -71,6 +92,7 @@ test.describe("quản trị danh mục (T06.5)", () => {
 
     await page.goto("/");
     await expect(page.getByText(colName)).toHaveCount(0);
+    await expect(await collectionInFilter()).toHaveCount(0);
 
     // Hiện lại → thẻ quay lại
     await page.goto("/admin/master-data");
