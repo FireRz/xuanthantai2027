@@ -17,9 +17,9 @@ const GROUPS: { key: GroupKey; label: string }[] = [
   { key: "mat", label: "Chất liệu" },
 ];
 
-/** Lựa chọn hiện ra: có SP (số đếm > 0) hoặc đang được chọn (để còn bỏ chọn được). */
-function shown(options: FacetOption[], selected: string[]) {
-  return options.filter((o) => o.count > 0 || selected.includes(o.id));
+/** Mọi lựa chọn đều hiện (cửa hàng có thể chưa đặt nhưng vẫn cần biết có SP); số đếm 0 thì làm mờ. */
+function shown(options: FacetOption[]) {
+  return options;
 }
 
 /** Thêm tên nhãn cạnh dòng/BST khi các lựa chọn thuộc nhiều nhãn (tránh trùng tên "Nhẫn"). */
@@ -227,7 +227,7 @@ function FilterDropdown({
     };
   }, [open]);
 
-  const list = shown(options, selected);
+  const list = shown(options);
   const q = term.trim().toLowerCase();
   const visible = q ? list.filter((o) => labelOf(o, options).toLowerCase().includes(q)) : list;
 
@@ -276,7 +276,12 @@ function FilterDropdown({
             )}
             {visible.map((o) => (
               <li key={o.id}>
-                <label className="hover:bg-gold-soft flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-3">
+                <label
+                  className={cn(
+                    "hover:bg-gold-soft flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-3",
+                    o.count === 0 && !selected.includes(o.id) && "opacity-55",
+                  )}
+                >
                   <input
                     type="checkbox"
                     checked={selected.includes(o.id)}
@@ -354,7 +359,7 @@ function FilterSheet({
       <div className="flex-1 space-y-5 overflow-y-auto px-4 py-4">
         {GROUPS.map(({ key, label }) => {
           const all = facets[key];
-          const list = key === "brand" ? all : shown(all, state[key]);
+          const list = key === "brand" ? all : shown(all);
           return (
             <fieldset key={key} className="space-y-2">
               <legend className="text-ink-muted mb-1 text-sm font-semibold">{label}</legend>
