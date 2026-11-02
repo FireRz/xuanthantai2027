@@ -57,7 +57,7 @@
 | T02.5 | Script đặt mật khẩu | T02.2 | S | ✅ |
 | T02.6 | Trang đổi mật khẩu | T02.4 | S | ✅ |
 | T02.7 | Tạm khóa khi sai nhiều lần | T02.2 | S | ✅ |
-| T02.8 | robots + noindex | T01.1 | S | ⬜ |
+| T02.8 | robots + noindex | T01.1 | S | ✅ |
 
 ### F03 — Danh mục công khai ([chi tiết](features/F03-product-catalog.md))
 | ID | Task | Phụ thuộc | Size | TT |
