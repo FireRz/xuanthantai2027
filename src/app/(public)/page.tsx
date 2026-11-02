@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Banner } from "@/components/catalog/banner";
 import { CatalogSection } from "@/components/catalog/catalog-section";
+import { FilterSection } from "@/components/catalog/filter-section";
 import { CollectionsSection } from "@/components/catalog/collections-section";
 import { ProductGridSkeleton } from "@/components/catalog/product-grid";
 import { SiteFooter } from "@/components/catalog/site-footer";
@@ -37,6 +38,11 @@ export default async function HomePage({
           <h2 id="sp-heading" className="font-display mb-4 text-xl font-semibold md:text-2xl">
             Tất cả sản phẩm
           </h2>
+          <div className="mb-5 min-h-24">
+            <Suspense fallback={null}>
+              <FilterSection params={params} />
+            </Suspense>
+          </div>
           <Suspense key={`p${key}`} fallback={<ProductGridSkeleton />}>
             <CatalogSection params={params} />
           </Suspense>

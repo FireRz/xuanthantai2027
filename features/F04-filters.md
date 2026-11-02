@@ -26,7 +26,7 @@ Lọc theo nhãn hàng, dòng hàng, bộ sưu tập (Yêu cầu 3), chất li�
 | T04.2 | ✅ Parser/serializer tham số URL (Zod) | T01.1 | Unit: chuỗi URL ↔ object, giá trị không hợp lệ bị bỏ |
 | T04.3 | ✅ `listProducts` hỗ trợ B1, B2, B5, B6, B7, B8 | T03.1, T04.2 | Unit/integration ma trận tổ hợp trên seed |
 | T04.4 | ✅ `catalog.getFacetCounts()` cho 5 bộ lọc (B3, B4) | T03.1, T04.2 | Integration: số đếm = số SP thực khi chọn lựa chọn đó |
-| T04.5 | `FilterBar` (ADR-009 U8'): hàng chip Nhãn hàng; nút thả xuống Dòng / BST / Chất liệu (chọn nhiều, số đếm, nút "Xem N SP"); ô Cửa hàng + tìm mã ở banner / thanh dính; điện thoại: bảng lọc trượt từ dưới với chip; "Xóa lọc" | T04.4 | E2E 375px & 1280px |
+| T04.5 | ✅ `FilterBar` (ADR-009 U8'): hàng chip Nhãn hàng; nút thả xuống Dòng / BST / Chất liệu (chọn nhiều, số đếm, nút "Xem N SP"); ô Cửa hàng + tìm mã ở banner / thanh dính; điện thoại: bảng lọc trượt từ dưới với chip; "Xóa lọc" | T04.4 | E2E 375px & 1280px |
 | T04.6 | Ô tìm mã SP (debounce) | T04.3 | E2E: gõ "ntt0" → ra các SP mã chứa "NTT0" |
 | T04.7 | Menu sắp xếp | T04.3 | E2E: từng kiểu sắp xếp đúng thứ tự |
 | T04.8 | Công tắc "Xem tất cả SP" (chỉ hiện khi chọn CH) | T04.5 | E2E: CH đặt 5/200 SP → 5; bật → 200, SP không đặt hiển thị 0 |

@@ -27,6 +27,8 @@ export interface FacetCounts {
   col: FacetOption[];
   mat: FacetOption[];
   store: FacetOption[];
+  /** Số SP khớp mọi bộ lọc đang áp dụng (cho nút "Xem N SP"). */
+  total: number;
 }
 
 export type FacetParams = Pick<CatalogParams, "store" | "all" | "q"> &
@@ -71,46 +73,53 @@ export async function getFacetCounts(params: FacetParams): Promise<FacetCounts> 
         AND q.qty_ordered > 0
       GROUP BY 1`.then(toMap);
 
-  const [brands, lines, cols, mats, stores, cBrand, cLine, cCol, cMat, cStore] = await Promise.all([
-    prisma.brand.findMany({
-      where: { active: true },
-      select: { id: true, name: true },
-      orderBy: { name: "asc" },
-    }),
-    prisma.productLine.findMany({
-      where: {
-        active: true,
-        brand: { active: true },
-        ...(brandIds.length ? { brandId: { in: brandIds } } : {}),
-      },
-      select: { id: true, name: true, brandId: true, brand: { select: { name: true } } },
-      orderBy: [{ brand: { name: "asc" } }, { name: "asc" }],
-    }),
-    prisma.collection.findMany({
-      where: {
-        active: true,
-        brand: { active: true },
-        ...(brandIds.length ? { brandId: { in: brandIds } } : {}),
-      },
-      select: { id: true, name: true, brandId: true, brand: { select: { name: true } } },
-      orderBy: [{ brand: { name: "asc" } }, { name: "asc" }],
-    }),
-    prisma.material.findMany({
-      where: { active: true },
-      select: { id: true, name: true },
-      orderBy: { name: "asc" },
-    }),
-    prisma.store.findMany({
-      where: { active: true },
-      select: { id: true, code: true, name: true },
-      orderBy: { code: "asc" },
-    }),
-    countBy("brand", Prisma.sql`p.brand_id`),
-    countBy("line", Prisma.sql`p.product_line_id`),
-    countBy("col", Prisma.sql`p.collection_id`),
-    countBy("mat", Prisma.sql`p.material_id`),
-    storeCounts,
-  ]);
+  const totalCount = prisma.$queryRaw<{ n: number }[]>`
+      SELECT COUNT(*)::int AS n
+      FROM product p ${visibleProductJoinsSql} ${qtyJoinSql(store)}
+      WHERE ${Prisma.join(buildWhere(filters, scope), " AND ")}`.then((r) => r[0]?.n ?? 0);
+
+  const [brands, lines, cols, mats, stores, cBrand, cLine, cCol, cMat, cStore, total] =
+    await Promise.all([
+      prisma.brand.findMany({
+        where: { active: true },
+        select: { id: true, name: true },
+        orderBy: { name: "asc" },
+      }),
+      prisma.productLine.findMany({
+        where: {
+          active: true,
+          brand: { active: true },
+          ...(brandIds.length ? { brandId: { in: brandIds } } : {}),
+        },
+        select: { id: true, name: true, brandId: true, brand: { select: { name: true } } },
+        orderBy: [{ brand: { name: "asc" } }, { name: "asc" }],
+      }),
+      prisma.collection.findMany({
+        where: {
+          active: true,
+          brand: { active: true },
+          ...(brandIds.length ? { brandId: { in: brandIds } } : {}),
+        },
+        select: { id: true, name: true, brandId: true, brand: { select: { name: true } } },
+        orderBy: [{ brand: { name: "asc" } }, { name: "asc" }],
+      }),
+      prisma.material.findMany({
+        where: { active: true },
+        select: { id: true, name: true },
+        orderBy: { name: "asc" },
+      }),
+      prisma.store.findMany({
+        where: { active: true },
+        select: { id: true, code: true, name: true },
+        orderBy: { code: "asc" },
+      }),
+      countBy("brand", Prisma.sql`p.brand_id`),
+      countBy("line", Prisma.sql`p.product_line_id`),
+      countBy("col", Prisma.sql`p.collection_id`),
+      countBy("mat", Prisma.sql`p.material_id`),
+      storeCounts,
+      totalCount,
+    ]);
 
   return {
     brand: brands.map((o) => ({ id: o.id, name: o.name, count: cBrand.get(o.id) ?? 0 })),
@@ -122,6 +131,7 @@ export async function getFacetCounts(params: FacetParams): Promise<FacetCounts> 
       brandName: o.brand.name,
     })),
     col: [
+      { id: NO_COLLECTION, name: "Không thuộc BST", count: cCol.get(null) ?? 0 },
       ...cols.map((o) => ({
         id: o.id,
         name: o.name,
@@ -129,9 +139,9 @@ export async function getFacetCounts(params: FacetParams): Promise<FacetCounts> 
         brandId: o.brandId,
         brandName: o.brand.name,
       })),
-      { id: NO_COLLECTION, name: "Không thuộc BST", count: cCol.get(null) ?? 0 },
     ],
     mat: mats.map((o) => ({ id: o.id, name: o.name, count: cMat.get(o.id) ?? 0 })),
     store: stores.map((o) => ({ id: o.code, name: o.name, count: cStore.get(o.id) ?? 0 })),
+    total,
   };
 }

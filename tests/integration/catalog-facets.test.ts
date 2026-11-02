@@ -17,10 +17,19 @@ describe("T04.4 — catalog.getFacetCounts", () => {
     expect(f.brand.map((o) => o.count)).toEqual([18, 18]);
     expect(f.line).toHaveLength(4);
     expect(f.line.every((o) => o.count === 9)).toBe(true);
-    expect(f.col.at(-1)).toMatchObject({ id: "none", name: "Không thuộc BST" });
-    expect(f.col.at(-1)?.count).toBe(fx.products.filter((p) => p.c === null).length);
+    expect(f.col[0]).toMatchObject({ id: "none", name: "Không thuộc BST" });
+    expect(f.col[0]?.count).toBe(fx.products.filter((p) => p.c === null).length);
     expect(f.mat.map((o) => o.count)).toEqual([12, 12]);
     expect(f.store.map((o) => o.count)).toEqual([0, 0, 0]);
+    expect(f.total).toBe(36);
+  });
+
+  it("total = số SP khớp mọi bộ lọc (bằng listProducts.total)", async () => {
+    const fx = await fixture();
+    const sel = { brand: [fx.brands[0].brand.id], col: ["none"], mat: [fx.mats[1].id], q: "P" };
+    const f = await getFacetCounts({ ...base, ...sel });
+    expect(f.total).toBe((await listProducts({ ...base, ...sel, limit: 1 })).total);
+    expect(f.total).toBeGreaterThan(0);
   });
 
   it("B3: chọn nhãn → Dòng và BST chỉ còn của nhãn đó (kể cả khi chưa có SP)", async () => {
