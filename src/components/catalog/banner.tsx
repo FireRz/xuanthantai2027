@@ -7,10 +7,10 @@ import { SiteNav } from "./site-nav";
  */
 export function Banner() {
   return (
-    <header className="relative flex min-h-[560px] flex-col overflow-hidden bg-[#cc1208] text-center text-white sm:min-h-[420px] lg:aspect-[2048/768] lg:max-h-[640px] lg:min-h-0">
-      {/* Tranh ngang (docs/brand/tet-banner-wide.png) phủ kín banner; điện thoại/tablet neo góc dưới-trái để thấy con dê. */}
+    <header className="relative flex min-h-[560px] flex-col overflow-hidden bg-[#cc1208] text-center text-white sm:min-h-[420px] lg:aspect-[2400/900] lg:max-h-[640px] lg:min-h-0">
+      {/* Tranh ngang (docs/brand/tet-banner-2400.png) phủ kín banner; điện thoại/tablet neo góc dưới-trái để thấy con dê. */}
       <Image
-        src="/brand/tet-banner-wide.png"
+        src="/brand/tet-banner-2400.png"
         alt=""
         fill
         priority
@@ -25,16 +25,25 @@ export function Banner() {
         <p className="font-display text-festive-text mt-3 text-lg italic [text-shadow:0_1px_8px_rgb(90_5_5/0.8)] md:text-2xl">
           Vạn sự như ý — Tài lộc đầy nhà
         </p>
-        <p className="text-festive-text mx-auto mt-4 hidden max-w-xl text-[15px] md:text-base lg:block">
-          Theo dõi số lượng đặt và hàng đã về của bộ sưu tập trang sức mùa Xuân Thần Tài 2027, theo
-          từng cửa hàng.
+        <p className="text-festive-text mx-auto mt-4 hidden max-w-2xl text-[15px] md:text-base lg:block">
+          Theo dõi số lượng đặt và hàng đã về của bộ sưu tập trang sức
+          <br />
+          mùa <span className="whitespace-nowrap">Xuân Thần Tài 2027</span>, theo từng cửa hàng.
         </p>
-        <a
-          href="#cua-hang"
-          className="bg-gold text-gold-fg mt-6 inline-flex min-h-11 items-center rounded-full px-6 font-semibold shadow-md hover:bg-white"
-        >
-          Chọn cửa hàng của bạn ↓
-        </a>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="#bo-suu-tap"
+            className="bg-gold text-gold-fg inline-flex min-h-11 items-center rounded-full px-6 font-semibold shadow-md hover:bg-white"
+          >
+            Bộ sưu tập
+          </a>
+          <a
+            href="#san-pham"
+            className="text-festive-text border-gold bg-brand-dark/40 hover:bg-brand-dark/70 inline-flex min-h-11 items-center rounded-full border-2 px-6 font-semibold hover:text-white"
+          >
+            Sản phẩm
+          </a>
+        </div>
       </div>
       <svg
         aria-hidden
