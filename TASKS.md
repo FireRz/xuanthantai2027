@@ -53,7 +53,7 @@
 | T02.1 | Chốt xác thực | — | S | ✅ |
 | T02.2 | Auth.js Credentials + `/login` | T01.5 | M | ✅ |
 | T02.3 | Middleware `/admin/*` | T02.2 | S | ✅ |
-| T02.4 | `requireAdmin()` | T02.2 | S | ⬜ |
+| T02.4 | `requireAdmin()` | T02.2 | S | ✅ |
 | T02.5 | Script đặt mật khẩu | T02.2 | S | ⬜ |
 | T02.6 | Trang đổi mật khẩu | T02.4 | S | ⬜ |
 | T02.7 | Tạm khóa khi sai nhiều lần | T02.2 | S | ✅ |
