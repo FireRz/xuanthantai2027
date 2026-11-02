@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { NO_COLLECTION, type CatalogParams, type Sort } from "@/lib/catalog-params";
+import { prisma } from "@/server/db";
 import { visibleProductSql } from "@/server/repositories/visibility";
 
 /** Bốn bộ lọc nhiều lựa chọn (B2). Cửa hàng chọn một nên xử lý riêng. */
@@ -80,4 +81,13 @@ export function orderBySql(sort: Sort) {
     default:
       return Prisma.sql`p.sku ASC`;
   }
+}
+
+/** Cửa hàng đang hiện theo mã (không phân biệt hoa/thường); không có → null. */
+export async function findActiveStore(code: string | null) {
+  if (!code) return null;
+  return prisma.store.findFirst({
+    where: { code: { equals: code, mode: "insensitive" }, active: true },
+    select: { id: true, code: true, name: true },
+  });
 }

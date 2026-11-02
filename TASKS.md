@@ -83,7 +83,7 @@
 | T04.1 | Chốt hành vi lọc | — | S | ✅ |
 | T04.2 | Parser tham số URL | T01.1 | S | ✅ |
 | T04.3 | Lọc/tìm/sắp xếp trong `listProducts` | T03.1, T04.2 | M | ✅ |
-| T04.4 | `getFacetCounts` | T03.1, T04.2 | M | ⬜ |
+| T04.4 | `getFacetCounts` | T03.1, T04.2 | M | ✅ |
 | T04.5 | `FilterBar` desktop/mobile | T04.4 | M | ⬜ |
 | T04.6 | Ô tìm mã SP | T04.3 | S | ⬜ |
 | T04.7 | Menu sắp xếp | T04.3 | S | ⬜ |

@@ -3,7 +3,11 @@ import { computeMetrics, type QtyMetrics } from "@/lib/metrics";
 import type { CatalogParams } from "@/lib/catalog-params";
 import { prisma } from "@/server/db";
 import { visibleProductJoinsSql, visibleProductSql } from "@/server/repositories/visibility";
-import { buildWhere, orderBySql, qtyJoinSql } from "./catalog-filter";
+import { buildWhere, findActiveStore, orderBySql, qtyJoinSql } from "./catalog-filter";
+
+export { findActiveStore } from "./catalog-filter";
+export { getFacetCounts } from "./catalog-facets";
+export type { FacetCounts, FacetOption } from "./catalog-facets";
 
 /** Phạm vi số liệu: tổng hệ thống hoặc một cửa hàng (ADR-007). */
 export type Scope = { kind: "total" } | { kind: "store"; code: string; name: string };
@@ -50,15 +54,6 @@ type ListParams = Pick<CatalogParams, "store" | "all" | "q"> &
     limit?: number;
     offset?: number;
   };
-
-/** Cửa hàng đang hiện theo mã (không phân biệt hoa/thường); không có → null. */
-export async function findActiveStore(code: string | null) {
-  if (!code) return null;
-  return prisma.store.findFirst({
-    where: { code: { equals: code, mode: "insensitive" }, active: true },
-    select: { id: true, code: true, name: true },
-  });
-}
 
 /**
  * Danh sách SP hiển thị được kèm số liệu theo phạm vi:
