@@ -30,7 +30,7 @@ Góp ý của chủ dự án: mockup v1 "giống báo cáo hơn là một trang 
 | U14 | Banner chứa ô **"Cửa hàng của bạn"** + **ô tìm mã SP** + nút "Xem hàng" | Mới |
 | U15 | Khu **"Bộ sưu tập mùa này"**: thẻ BST ảnh lớn, bấm vào để lọc theo BST; có thẻ "Ngoài bộ sưu tập" | Mới |
 | U5' | Thẻ SP **gọn, ảnh to**: mã · chất liệu, tên, giá, thanh tiến độ + "Về X/Y", "Còn thiếu N"; nhãn trạng thái góc ảnh. Bảng số đầy đủ chỉ ở dạng Bảng và cửa sổ chi tiết | Bảng số nhỏ trên thẻ (U5) |
-| U8' | Bộ lọc dạng **nút bấm**: hàng chip Nhãn hàng; nút thả xuống Dòng / BST / Chất liệu (chọn nhiều, có số đếm, nút "Xem N SP"); điện thoại: bảng lọc trượt từ dưới lên với các chip | Cột lọc trái (U8) |
+| U8' | Bộ lọc dạng **nút bấm**: nút thả xuống Nhãn hàng / Dòng / BST / Chất liệu / Khung giá (chọn nhiều; điều chỉnh 2026-11-02: Nhãn hàng và Khung giá không còn là hàng chip, có số đếm, nút "Xem N SP"); điện thoại: bảng lọc trượt từ dưới lên với các chip | Cột lọc trái (U8) |
 | U16 | Thêm **chân trang** đỏ đậm (tên web + thời điểm cập nhật dữ liệu) | Mới |
 
 ## Sửa đổi sau mockup v2 (2026-10-30)

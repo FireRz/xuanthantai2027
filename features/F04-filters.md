@@ -17,7 +17,7 @@ Lọc theo nhãn hàng, dòng hàng, bộ sưu tập (Yêu cầu 3), chất li�
 | B7 | Cửa hàng X: mặc định chỉ SP X có đặt > 0; công tắc **"Xem tất cả SP"** hiện mọi SP (số của X, không đặt = 0) |
 | B8 | Sắp xếp: **Mã SP A→Z (mặc định)**, Mới cập nhật, Giá thấp→cao, Giá cao→thấp, Còn thiếu nhiều nhất (theo phạm vi). SP không giá xếp cuối khi sắp theo giá |
 | B9 | Mọi trạng thái (lọc, tìm, sắp xếp, cửa hàng, công tắc) lưu trên URL |
-| B10 | **Khung giá** (ADR-010): chọn nhiều, hàng chip, có số đếm; SP chưa có khung giá ẩn khi đang lọc khung giá |
+| B10 | **Khung giá** (ADR-010): chọn nhiều, nút thả xuống, có số đếm; SP chưa có khung giá ẩn khi đang lọc khung giá |
 
 ## Tasks
 
@@ -27,7 +27,7 @@ Lọc theo nhãn hàng, dòng hàng, bộ sưu tập (Yêu cầu 3), chất li�
 | T04.2 | ✅ Parser/serializer tham số URL (Zod) | T01.1 | Unit: chuỗi URL ↔ object, giá trị không hợp lệ bị bỏ |
 | T04.3 | ✅ `listProducts` hỗ trợ B1, B2, B5, B6, B7, B8 | T03.1, T04.2 | Unit/integration ma trận tổ hợp trên seed |
 | T04.4 | ✅ `catalog.getFacetCounts()` cho 5 bộ lọc (B3, B4) | T03.1, T04.2 | Integration: số đếm = số SP thực khi chọn lựa chọn đó |
-| T04.5 | ✅ `FilterBar` (ADR-009 U8'): hàng chip Nhãn hàng; nút thả xuống Dòng / BST / Chất liệu (chọn nhiều, số đếm, nút "Xem N SP"); ô Cửa hàng + tìm mã ở banner / thanh dính; điện thoại: bảng lọc trượt từ dưới với chip; "Xóa lọc" | T04.4 | E2E 375px & 1280px |
+| T04.5 | ✅ `FilterBar` (ADR-009 U8'): nút thả xuống Nhãn hàng / Dòng / BST / Chất liệu / Khung giá (chọn nhiều, số đếm, nút "Xem N SP"); ô Cửa hàng + tìm mã ở banner / thanh dính; điện thoại: bảng lọc trượt từ dưới với chip; "Xóa lọc" | T04.4 | E2E 375px & 1280px |
 | T04.6 | ✅ Ô tìm mã SP (debounce) | T04.3 | E2E: gõ "ntt0" → ra các SP mã chứa "NTT0" |
 | T04.7 | ✅ Menu sắp xếp | T04.3 | E2E: từng kiểu sắp xếp đúng thứ tự |
 | T04.8 | ✅ Công tắc "Xem tất cả SP" (chỉ hiện khi chọn CH) | T04.5 | E2E: CH đặt 5/200 SP → 5; bật → 200, SP không đặt hiển thị 0 |
@@ -35,7 +35,7 @@ Lọc theo nhãn hàng, dòng hàng, bộ sưu tập (Yêu cầu 3), chất li�
 | T04.10 | ✅ Số kết quả + trạng thái "không có SP phù hợp" | T04.9 | E2E |
 | T04.11 | ✅ Chỉ mục & đo hiệu năng lọc + đếm + sắp xếp trên seed lớn | T04.3, T04.4, T01.11 | ≤ 1s mỗi yêu cầu |
 
-| T04.12 | ✅ Bộ lọc Khung giá: danh mục + migration, lọc/đếm, hàng chip | T04.4, T04.5 | Integration + E2E 375px & 1280px |
+| T04.12 | ✅ Bộ lọc Khung giá: danh mục + migration, lọc/đếm, nút thả xuống | T04.4, T04.5 | Integration + E2E 375px & 1280px |
 
 ## Tiêu chí nghiệm thu
 - **AC1.** Chọn nhiều nhãn → SP thuộc bất kỳ nhãn nào đã chọn; danh sách Dòng/BST chỉ còn giá trị của các nhãn đó.

@@ -71,7 +71,7 @@ Ví dụ: Đặt 120, Về 90 → "Còn thiếu" (cam); Đặt 5, Về 7 → "Đ
 > **Cập nhật sau mockup v1 (ADR-009 U2'–U16):** trang xem là **một trang web cuộn**, theo thứ tự:
 > 1. **Banner Tết** đỏ: thanh điều hướng (logo, tên web, liên kết Bộ sưu tập / Sản phẩm) → nhãn "XUÂN ĐINH MÙI · 2027", tiêu đề "Xuân Thần Tài" cỡ 72px màu vàng cam, câu chúc in nghiêng, đoạn mô tả, **ô Cửa hàng của bạn + Tìm mã SP + nút Xem hàng**; bên phải cành mai + đồng xu; viền lượn vàng ở đáy.
 > 2. **Bộ sưu tập mùa này**: lưới thẻ BST (ảnh 4:3, nhãn hàng, tên BST, số SP, "Xem bộ sưu tập →"); thẻ cuối "Ngoài bộ sưu tập". Ảnh thẻ BST = ảnh SP đầu tiên theo mã trong BST *(mặc định kỹ thuật)*.
-> 3. **Tất cả sản phẩm**: hàng chip Nhãn hàng → hàng nút thả xuống Dòng / BST / Chất liệu, Sắp xếp, chuyển Lưới/Bảng, Xuất Excel → lưới thẻ gọn (4 cột máy tính, 2 cột điện thoại) → "Xem thêm".
+> 3. **Tất cả sản phẩm**: một hàng nút thả xuống Nhãn hàng / Dòng / BST / Chất liệu / Khung giá, Sắp xếp, chuyển Lưới/Bảng, Xuất Excel → lưới thẻ gọn (4 cột máy tính, 2 cột điện thoại) → "Xem thêm".
 > 4. **Chân trang** đỏ đậm.
 >
 > Khi đã chọn cửa hàng hoặc cuộn xuống, thanh đầu trang thu gọn (logo, tên web, ô Cửa hàng, ô tìm) và dính trên cùng.

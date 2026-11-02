@@ -10,6 +10,18 @@ const noHorizontalScroll = (page: Page) =>
 
 test.afterAll(() => prisma.$disconnect());
 
+/** Máy tính: mở nút thả xuống của nhóm, tick/bỏ tick một lựa chọn rồi đóng bảng (Esc). */
+async function pick(page: Page, group: string, name: string) {
+  const button = page.getByRole("button", { name: new RegExp(`^${group}`) });
+  if ((await button.getAttribute("aria-expanded")) !== "true") await button.click();
+  await page
+    .getByRole("group", { name: group })
+    .getByRole("checkbox", { name: new RegExp(`^${name}`) })
+    .click();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("group", { name: group })).toBeHidden();
+}
+
 test.describe("T04.5 FilterBar — máy tính", () => {
   test.beforeEach(async ({ isMobile }) => {
     test.skip(isMobile, "Chỉ máy tính");
@@ -18,12 +30,11 @@ test.describe("T04.5 FilterBar — máy tính", () => {
   test("chip Nhãn hàng chọn nhiều (HOẶC), có số đếm, Xóa lọc về toàn bộ", async ({ page }) => {
     await page.goto("/");
     await expect(scope(page)).toContainText("3.000 SP");
-    const bar = page.getByTestId("filter-bar");
 
-    await bar.getByRole("button", { name: /^An Khang/ }).click();
+    await pick(page, "Nhãn hàng", "An Khang");
     await expect(page).toHaveURL(/brand=/);
     await expect(scope(page)).toContainText("1.000 SP");
-    await bar.getByRole("button", { name: /^Phúc Lộc/ }).click();
+    await pick(page, "Nhãn hàng", "Phúc Lộc");
     await expect(scope(page)).toContainText("2.000 SP");
     await expect(page).toHaveURL(/brand=[^&]+%2C/);
 
@@ -36,10 +47,7 @@ test.describe("T04.5 FilterBar — máy tính", () => {
     page,
   }) => {
     await page.goto("/");
-    await page
-      .getByTestId("filter-bar")
-      .getByRole("button", { name: /^An Khang/ })
-      .click();
+    await pick(page, "Nhãn hàng", "An Khang");
     await expect(scope(page)).toContainText("1.000 SP");
 
     await page.getByRole("button", { name: /^Dòng hàng/ }).click();
@@ -73,23 +81,14 @@ test.describe("T04.5 FilterBar — máy tính", () => {
     await expect(col).toBeHidden();
 
     await page.getByTestId("clear-filters").click();
-    await page
-      .getByTestId("filter-bar")
-      .getByRole("button", { name: /^An Khang/ })
-      .click();
+    await pick(page, "Nhãn hàng", "An Khang");
     await page.getByRole("button", { name: /^Dòng hàng/ }).click();
     await page.getByRole("group", { name: "Dòng hàng" }).getByRole("checkbox").first().check();
     await expect(page).toHaveURL(/line=/);
     await page.keyboard.press("Escape");
     // Bỏ nhãn An Khang, chọn Phúc Lộc → dòng của An Khang bị bỏ khỏi URL
-    await page
-      .getByTestId("filter-bar")
-      .getByRole("button", { name: /^An Khang/ })
-      .click();
-    await page
-      .getByTestId("filter-bar")
-      .getByRole("button", { name: /^Phúc Lộc/ })
-      .click();
+    await pick(page, "Nhãn hàng", "An Khang");
+    await pick(page, "Nhãn hàng", "Phúc Lộc");
     await expect(page).not.toHaveURL(/line=/);
     await expect(page).toHaveURL(/brand=/);
   });
@@ -170,10 +169,7 @@ test.describe("T04.6 ô tìm mã SP (debounce)", () => {
   test("kết hợp bộ lọc: tìm + nhãn; xóa chữ về toàn bộ", async ({ page, isMobile }) => {
     test.skip(isMobile, "Bộ lọc nhãn dạng chip chỉ có trên máy tính");
     await page.goto("/");
-    await page
-      .getByTestId("filter-bar")
-      .getByRole("button", { name: /^Phúc Lộc/ })
-      .click();
+    await pick(page, "Nhãn hàng", "Phúc Lộc");
     await search(page).fill("AK00");
     await expect(page.getByTestId("empty-state")).toBeVisible(); // mã AK… không thuộc nhãn Phúc Lộc
     await search(page).fill("");
@@ -308,14 +304,8 @@ test.describe("T04.9 đồng bộ URL", () => {
   }) => {
     test.skip(isMobile, "Bộ lọc nhãn dạng chip chỉ có trên máy tính");
     await page.goto("/");
-    await page
-      .getByTestId("filter-bar")
-      .getByRole("button", { name: /^An Khang/ })
-      .click();
-    await page
-      .getByTestId("filter-bar")
-      .getByRole("button", { name: /^Phúc Lộc/ })
-      .click();
+    await pick(page, "Nhãn hàng", "An Khang");
+    await pick(page, "Nhãn hàng", "Phúc Lộc");
     await page.getByRole("combobox", { name: "Cửa hàng của bạn" }).selectOption("CH003");
     await page.getByRole("switch", { name: "Xem tất cả SP" }).check();
     await page.getByTestId("sort-menu").selectOption("price_desc");
@@ -340,9 +330,11 @@ test.describe("T04.9 đồng bộ URL", () => {
     await expect(other.getByTestId("sort-menu")).toHaveValue("price_desc");
     await expect(other.getByRole("switch", { name: "Xem tất cả SP" })).toBeChecked();
     await expect(other.getByRole("searchbox", { name: "Tìm mã SP" })).toHaveValue("0");
+    await other.getByRole("button", { name: /^Nhãn hàng/ }).click();
     await expect(
-      other.getByTestId("filter-bar").getByRole("button", { name: /^An Khang/ }),
-    ).toHaveAttribute("aria-pressed", "true");
+      other.getByRole("group", { name: "Nhãn hàng" }).getByRole("checkbox", { name: /^An Khang/ }),
+    ).toBeChecked();
+    await other.keyboard.press("Escape");
 
     // Tải lại cũng giữ nguyên
     await other.reload();
@@ -401,10 +393,7 @@ test.describe("T04.10 số kết quả và trạng thái không có SP phù hợ
   }) => {
     test.skip(isMobile, "Bộ lọc nhãn dạng chip chỉ có trên máy tính");
     await page.goto("/?q=ak00");
-    await page
-      .getByTestId("filter-bar")
-      .getByRole("button", { name: /^Phúc Lộc/ })
-      .click();
+    await pick(page, "Nhãn hàng", "Phúc Lộc");
     await expect(page.getByTestId("empty-state")).toBeVisible();
     await page.getByRole("button", { name: /^Bỏ lọc Nhãn hàng: Phúc Lộc/ }).click();
     await expect(scope(page)).toContainText("99 SP");
@@ -412,21 +401,20 @@ test.describe("T04.10 số kết quả và trạng thái không có SP phù hợ
 });
 
 test.describe("Khung giá (ADR-010)", () => {
-  const prChip = (page: Page, name: string) =>
-    page
-      .getByRole("group", { name: "Khung giá" })
-      .getByRole("button", { name: new RegExp(`^${name}`) });
-
-  test("máy tính: hàng chip theo thứ tự khoảng giá, chọn nhiều (HOẶC), số đếm khớp kết quả", async ({
+  test("máy tính: nút thả xuống Khung giá theo thứ tự khoảng giá, chọn nhiều (HOẶC), số đếm khớp kết quả", async ({
     page,
     isMobile,
   }) => {
-    test.skip(isMobile, "Hàng chip chỉ có trên máy tính");
+    test.skip(isMobile, "Nút thả xuống chỉ có trên máy tính");
     await page.goto("/");
+    await page.getByRole("button", { name: /^Khung giá/ }).click();
     const names = await page
       .getByRole("group", { name: "Khung giá" })
-      .getByRole("button")
-      .evaluateAll((els) => els.map((e) => e.firstChild?.textContent?.trim()));
+      .getByRole("checkbox")
+      .evaluateAll((els) =>
+        els.map((e) => e.parentElement?.querySelector("span")?.textContent?.trim()),
+      );
+    await page.keyboard.press("Escape");
     expect(names.slice(0, 3)).toEqual(["< 1tr", "1tr < 1.5tr", "1.5tr < 2tr"]);
 
     const ranges = await prisma.priceRange.findMany({ orderBy: { sortOrder: "asc" } });
@@ -442,12 +430,12 @@ test.describe("Khung giá (ADR-010)", () => {
         },
       });
     const [a, b] = [ranges[3], ranges[5]]; // 2tr < 5tr và 7tr < 10tr
-    await prChip(page, a.name).click();
+    await pick(page, "Khung giá", a.name);
     await expect(page).toHaveURL(/pr=/);
     await expect(scope(page)).toContainText(
       `${new Intl.NumberFormat("vi-VN").format(await countOf(a.name))} SP`,
     );
-    await prChip(page, b.name).click();
+    await pick(page, "Khung giá", b.name);
     const sum = (await countOf(a.name)) + (await countOf(b.name));
     await expect(scope(page)).toContainText(`${new Intl.NumberFormat("vi-VN").format(sum)} SP`);
     // Mọi thẻ đang hiện đều có giá (SP chưa có khung giá bị ẩn khi lọc khung giá)
@@ -485,23 +473,6 @@ test.describe("Khung giá (ADR-010)", () => {
 });
 
 test.describe("Khớp mockup (docs/mockups)", () => {
-  test("máy tính: chip 'Tất cả nhãn' kèm tổng, bật khi chưa chọn nhãn, bấm để bỏ chọn nhãn", async ({
-    page,
-    isMobile,
-  }) => {
-    test.skip(isMobile, "Hàng chip chỉ có trên máy tính");
-    await page.goto("/");
-    const all = page.getByRole("button", { name: /^Tất cả nhãn/ });
-    await expect(all).toHaveText("Tất cả nhãn3.000");
-    await expect(all).toHaveAttribute("aria-pressed", "true");
-    await page.getByRole("button", { name: /^An Khang/ }).click();
-    await expect(all).toHaveAttribute("aria-pressed", "false");
-    await expect(all).toHaveText("Tất cả nhãn3.000"); // tổng tính trên các bộ lọc khác, không trên nhãn
-    await all.click();
-    await expect(page).not.toHaveURL(/brand=/);
-    await expect(all).toHaveAttribute("aria-pressed", "true");
-  });
-
   test("nút sắp xếp dạng chip: 'Sắp xếp: Mã SP A→Z' (máy tính) / 'Mã SP A→Z' (điện thoại), đổi được", async ({
     page,
     isMobile,

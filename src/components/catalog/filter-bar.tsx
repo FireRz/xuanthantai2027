@@ -24,10 +24,6 @@ const GROUPS: { key: GroupKey; label: string }[] = [
   { key: "pr", label: "Khung giá" },
 ];
 
-/** Hàng chip trên máy tính (ít lựa chọn, chọn nhanh) và nút thả xuống (nhiều lựa chọn). */
-const CHIP_GROUPS = GROUPS.filter((g) => g.key === "brand" || g.key === "pr");
-const DROPDOWN_GROUPS = GROUPS.filter((g) => !CHIP_GROUPS.includes(g));
-
 /** Mọi lựa chọn đều hiện (cửa hàng có thể chưa đặt nhưng vẫn cần biết có SP); số đếm 0 thì làm mờ. */
 function shown(options: FacetOption[]) {
   return options;
@@ -40,7 +36,7 @@ function labelOf(o: FacetOption, options: FacetOption[]) {
 }
 
 /**
- * Bộ lọc (ADR-009 U8'): hàng chip Nhãn hàng; nút thả xuống Dòng / BST / Chất liệu (chọn nhiều,
+ * Bộ lọc (ADR-009 U8'): nút thả xuống Nhãn hàng / Dòng / BST / Chất liệu / Khung giá (chọn nhiều,
  * số đếm, nút "Xem N SP"); điện thoại: bảng lọc trượt từ dưới lên với các chip.
  * Chọn tới đâu áp dụng tới đó lên URL (B9); số đếm là của máy chủ (B4).
  */
@@ -76,38 +72,7 @@ export function FilterBar({
       aria-busy={pending}
       className={cn("relative space-y-3", pending && "opacity-90")}
     >
-      {/* Máy tính / tablet: hàng chip Nhãn hàng và Khung giá */}
-      {CHIP_GROUPS.map(({ key, label }) => (
-        <div
-          key={key}
-          className="hidden flex-wrap items-center gap-2 md:flex"
-          role="group"
-          aria-label={label}
-        >
-          <span className="text-ink-muted mr-1 min-w-[5.5rem] text-sm font-semibold">{label}</span>
-          {key === "brand" && (
-            <Chip
-              option={{
-                id: "all",
-                name: "Tất cả nhãn",
-                count: facets.brand.reduce((n, o) => n + o.count, 0),
-              }}
-              selected={state.brand.length === 0}
-              onClick={() => go({ brand: [] })}
-            />
-          )}
-          {facets[key].map((o) => (
-            <Chip
-              key={o.id}
-              option={o}
-              selected={state[key].includes(o.id)}
-              onClick={() => toggle(key, o.id)}
-            />
-          ))}
-        </div>
-      ))}
-
-      {/* Một hàng cho cả hai cỡ màn hình: nút thả xuống (máy tính) hoặc nút Lọc (điện thoại) + sắp xếp, công tắc */}
+      {/* Một hàng cho cả hai cỡ màn hình: 5 nút thả xuống (máy tính) hoặc nút Lọc (điện thoại) + sắp xếp, công tắc */}
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
@@ -119,7 +84,7 @@ export function FilterBar({
           <SlidersHorizontal className="size-4" aria-hidden />
           Lọc{groupCount > 0 && <span data-testid="filter-count"> ({groupCount})</span>}
         </button>
-        {DROPDOWN_GROUPS.map(({ key, label }) => (
+        {GROUPS.map(({ key, label }) => (
           // Điện thoại có sẵn chip "Dòng" cạnh nút Lọc (mockup); các nhóm còn lại nằm trong bảng lọc.
           <div key={key} className={key === "line" ? "block" : "hidden md:block"}>
             <FilterDropdown
@@ -187,40 +152,6 @@ export function FilterBar({
         onClear={() => go({ brand: [], line: [], col: [], mat: [], pr: [] })}
       />
     </div>
-  );
-}
-
-function Chip({
-  option,
-  selected,
-  onClick,
-}: {
-  option: FacetOption;
-  selected: boolean;
-  onClick: () => void;
-}) {
-  // 0 SP với các bộ lọc khác: làm mờ nhưng vẫn bấm được (nếu không, đã chọn dòng thì không đổi được nhãn).
-  const empty = option.count === 0 && !selected;
-  return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={onClick}
-      data-testid="filter-chip"
-      className={cn(
-        "focus-visible:outline-brand inline-flex min-h-10 items-center gap-1.5 rounded-full border px-4 text-[15px] font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2",
-        selected
-          ? "bg-brand border-brand text-white"
-          : "border-line text-ink hover:border-gold bg-white",
-        empty && "opacity-55",
-      )}
-    >
-      {selected && <Check className="size-4" aria-hidden />}
-      {option.name}
-      <span className={cn("text-sm tabular-nums", selected ? "text-white/85" : "text-ink-muted")}>
-        {formatInt(option.count)}
-      </span>
-    </button>
   );
 }
 
