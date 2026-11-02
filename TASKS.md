@@ -97,7 +97,7 @@
 | ID | Task | Phụ thuộc | Size | TT |
 |----|------|-----------|------|----|
 | T05.1 | Chốt hình thức | — | S | ✅ |
-| T05.2 | `getProductDetail` | T01.6, T01.7 | S | ⬜ |
+| T05.2 | `getProductDetail` | T01.6, T01.7 | S | ✅ |
 | T05.3 | Component popup | T05.2, T03.2 | M | ⬜ |
 | T05.4 | Bảng SL theo cửa hàng | T05.3 | S | ⬜ |
 | T05.5 | `?sp=` + Back/Esc | T05.3, T04.9 | S | ⬜ |
