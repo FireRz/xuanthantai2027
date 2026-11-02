@@ -1,4 +1,5 @@
 import ExcelJS from "exceljs";
+import { DomainError } from "@/server/errors";
 import { cellText } from "@/lib/excel-values";
 import {
   PRODUCT_COLUMNS,
@@ -72,7 +73,14 @@ function readSheet<K extends string>(
 /** Đọc file .xlsx (Buffer) thành dữ liệu chuẩn hóa của hai sheet SanPham / SoLuong. */
 export async function readWorkbook(file: Buffer | ArrayBuffer): Promise<WorkbookData> {
   const wb = new ExcelJS.Workbook();
-  await wb.xlsx.load(file as ArrayBuffer);
+  try {
+    await wb.xlsx.load(file as ArrayBuffer);
+  } catch {
+    throw new DomainError(
+      "IMPORT_FILE_INVALID",
+      "Không đọc được file. Hãy dùng file .xlsx (Excel) theo mẫu của hệ thống.",
+    );
+  }
   const sheet = (name: string) =>
     wb.worksheets.find((w) => normalizeText(w.name) === normalizeText(name));
   const sp = sheet(SHEET_PRODUCTS);
