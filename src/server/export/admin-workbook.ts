@@ -40,8 +40,9 @@ export interface QuantitySheetRow {
 
 export interface AdminWorkbookData {
   lists: WorkbookLists;
-  products: Iterable<ProductSheetRow>;
-  quantities: Iterable<QuantitySheetRow>;
+  /** Có thể là generator bất đồng bộ để xuất hàng trăm nghìn dòng mà không giữ hết trong bộ nhớ. */
+  products: Iterable<ProductSheetRow> | AsyncIterable<ProductSheetRow>;
+  quantities: Iterable<QuantitySheetRow> | AsyncIterable<QuantitySheetRow>;
 }
 
 export const EMPTY_LISTS: WorkbookLists = {
@@ -184,7 +185,7 @@ export async function writeAdminWorkbook(
     sp,
     PRODUCT_COLUMNS.map((c) => c.header),
   );
-  for (const p of data.products) {
+  for await (const p of data.products) {
     const row = sp.addRow(
       PRODUCT_COLUMNS.map((c) => {
         switch (c.key) {
@@ -227,7 +228,7 @@ export async function writeAdminWorkbook(
     sl,
     QUANTITY_COLUMNS.map((c) => c.header),
   );
-  for (const q of data.quantities) {
+  for await (const q of data.quantities) {
     sl.addRow([q.sku, q.store, q.ordered, q.received]).commit();
   }
   const storeCol = QUANTITY_COLUMNS.findIndex((c) => c.key === "store") + 1;

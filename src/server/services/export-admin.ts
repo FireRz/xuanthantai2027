@@ -1,5 +1,10 @@
 import { prisma } from "@/server/db";
-import type { WorkbookLists } from "@/server/export/admin-workbook";
+import type {
+  AdminWorkbookData,
+  ProductSheetRow,
+  QuantitySheetRow,
+  WorkbookLists,
+} from "@/server/export/admin-workbook";
 
 /**
  * Dữ liệu cho file Excel mẫu / xuất quản trị. Các danh sách chọn lấy từ dữ liệu hiện có
@@ -40,4 +45,87 @@ export async function loadWorkbookLists(): Promise<WorkbookLists> {
 /** File mẫu trống: có danh sách chọn từ dữ liệu hiện có (T08.5). */
 export async function templateData() {
   return { lists: await loadWorkbookLists(), products: [], quantities: [] };
+}
+
+const PRODUCT_BATCH = 1000;
+const QTY_BATCH = 20_000;
+
+/** SP đang hoạt động theo mã A→Z, đọc theo lô (keyset) để không giữ cả bảng trong bộ nhớ. */
+async function* exportProducts(): AsyncGenerator<ProductSheetRow> {
+  let cursor: string | undefined;
+  for (;;) {
+    const batch = await prisma.product.findMany({
+      where: { active: true },
+      orderBy: { sku: "asc" },
+      take: PRODUCT_BATCH,
+      ...(cursor ? { skip: 1, cursor: { sku: cursor } } : {}),
+      select: {
+        sku: true,
+        name: true,
+        priceVnd: true,
+        brand: { select: { name: true } },
+        productLine: { select: { name: true } },
+        collection: { select: { name: true } },
+        material: { select: { name: true } },
+        priceRange: { select: { name: true } },
+      },
+    });
+    if (batch.length === 0) return;
+    cursor = batch[batch.length - 1].sku;
+    for (const p of batch) {
+      yield {
+        sku: p.sku,
+        name: p.name,
+        brand: p.brand.name,
+        line: p.productLine.name,
+        collection: p.collection?.name ?? null,
+        material: p.material?.name ?? null,
+        priceRange: p.priceRange?.name ?? null,
+        price: p.priceVnd,
+      };
+    }
+    if (batch.length < PRODUCT_BATCH) return;
+  }
+}
+
+/** Mọi cặp (SP đang hoạt động, cửa hàng) đã có số liệu, theo (mã SP, mã CH); đọc theo lô bằng khóa (sku, code). */
+async function* exportQuantities(): AsyncGenerator<QuantitySheetRow> {
+  let after: { sku: string; code: string } | null = null;
+  for (;;) {
+    const rows: { sku: string; code: string; qty_ordered: number; qty_received: number }[] = after
+      ? await prisma.$queryRaw`
+            SELECT p.sku, s.code, q.qty_ordered, q.qty_received
+            FROM store_product_qty q
+            JOIN product p ON p.id = q.product_id
+            JOIN store s ON s.id = q.store_id
+            WHERE p.active AND (p.sku, s.code) > (${after.sku}, ${after.code})
+            ORDER BY p.sku, s.code
+            LIMIT ${QTY_BATCH}`
+      : await prisma.$queryRaw`
+            SELECT p.sku, s.code, q.qty_ordered, q.qty_received
+            FROM store_product_qty q
+            JOIN product p ON p.id = q.product_id
+            JOIN store s ON s.id = q.store_id
+            WHERE p.active
+            ORDER BY p.sku, s.code
+            LIMIT ${QTY_BATCH}`;
+    for (const r of rows) {
+      yield { sku: r.sku, store: r.code, ordered: r.qty_ordered, received: r.qty_received };
+    }
+    if (rows.length < QTY_BATCH) return;
+    const last = rows[rows.length - 1];
+    after = { sku: last.sku, code: last.code };
+  }
+}
+
+/**
+ * Xuất quản trị (T11.4): đúng mẫu nhập — SP đang hoạt động (SP ẩn không xuất; nhập lại không ảnh hưởng
+ * chúng nhờ R8) và mọi cặp (SP, CH) có số liệu — nên nhập lại ngay được với 0 lỗi, 0 thay đổi (AC3).
+ */
+export async function adminTemplate(): Promise<AdminWorkbookData> {
+  return {
+    lists: await loadWorkbookLists(),
+    products: exportProducts(),
+    quantities: exportQuantities(),
+  };
 }
