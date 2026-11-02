@@ -23,7 +23,7 @@
 |----|------|-----------|---------------|
 | T11.1 | ✅ Service `export.viewerList(params)` dùng lại `catalog.listProducts` (không phân trang) | T04.3 | Integration: số dòng = số kết quả trên trang |
 | T11.2 | ✅ Route `GET /api/export` → .xlsx (ExcelJS, stream) | T11.1 | E2E: tải file, mở được, đúng cột & dữ liệu |
-| T11.3 | Nút "Xuất Excel" trên danh mục (desktop + mobile) | T11.2, T04.9 | E2E: lọc CH X → file chỉ chứa phạm vi X |
+| T11.3 | ✅ Nút "Xuất Excel" trên danh mục (desktop + mobile) | T11.2, T04.9 | E2E: lọc CH X → file chỉ chứa phạm vi X |
 | T11.4 | Service `export.adminTemplate()` dùng `lib/excel-template.ts` | T08.3, T01.6 | Integration: xuất → import preview → 0 thay đổi, 0 lỗi |
 | T11.5 | Trang `/admin/export` | T11.4, T02.3 | E2E |
 | T11.6 | Đo thời gian xuất với seed lớn | T11.2, T11.4, T01.11 | Xuất ≤ 20s với 3.000 SP × 100 CH |

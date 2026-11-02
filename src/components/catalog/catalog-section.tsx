@@ -9,6 +9,7 @@ import {
 import { formatInt } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { listProducts } from "@/server/services/catalog";
+import { ExportButton } from "./export-button";
 import { ProductGrid } from "./product-grid";
 import { ProductTable } from "./product-table";
 
@@ -29,32 +30,35 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
         <p data-testid="scope-label" role="status" className="text-ink-muted text-[15px]">
           <b className="text-ink font-semibold">{scopeLabel}</b> · {formatInt(total)} SP
         </p>
-        <div
-          role="group"
-          aria-label="Kiểu hiển thị"
-          className="border-line inline-flex rounded-full border bg-white p-0.5 text-sm font-medium"
-        >
-          {(
-            [
-              ["grid", "Lưới", LayoutGrid],
-              ["list", "Bảng", List],
-            ] as const
-          ).map(([view, label, Icon]) => (
-            <Link
-              key={view}
-              href={viewHref(view)}
-              scroll={false}
-              replace
-              aria-current={params.view === view ? "true" : undefined}
-              className={cn(
-                "inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5",
-                params.view === view ? "bg-brand text-white" : "text-ink-muted hover:text-ink",
-              )}
-            >
-              <Icon className="size-4" aria-hidden />
-              {label}
-            </Link>
-          ))}
+        <div className="flex items-center gap-2">
+          <div
+            role="group"
+            aria-label="Kiểu hiển thị"
+            className="border-line inline-flex rounded-full border bg-white p-0.5 text-sm font-medium"
+          >
+            {(
+              [
+                ["grid", "Lưới", LayoutGrid],
+                ["list", "Bảng", List],
+              ] as const
+            ).map(([view, label, Icon]) => (
+              <Link
+                key={view}
+                href={viewHref(view)}
+                scroll={false}
+                replace
+                aria-current={params.view === view ? "true" : undefined}
+                className={cn(
+                  "inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5",
+                  params.view === view ? "bg-brand text-white" : "text-ink-muted hover:text-ink",
+                )}
+              >
+                <Icon className="size-4" aria-hidden />
+                {label}
+              </Link>
+            ))}
+          </div>
+          <ExportButton params={params} />
         </div>
       </div>
 

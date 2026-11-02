@@ -86,3 +86,35 @@ test.describe("T11.2 GET /api/export", () => {
     expect(none.rows.length).toBe(0);
   });
 });
+
+test.describe("T11.3 nút Xuất Excel trên danh mục", () => {
+  test("lọc cửa hàng X → bấm nút → file chỉ chứa phạm vi X, cùng số SP với trang", async ({
+    page,
+    isMobile,
+  }) => {
+    const store = await prisma.store.findFirstOrThrow({
+      where: { active: true },
+      orderBy: { code: "asc" },
+    });
+    await page.goto(`/?store=${store.code}&sort=price_asc&n=48`);
+    await expect(page.getByTestId("scope-label")).toContainText(store.code);
+    const label = await page.getByTestId("scope-label").innerText();
+    const total = Number(label.match(/([\d.]+) SP/)![1].replace(/\./g, ""));
+
+    if (isMobile) {
+      await expect(page.getByTestId("export-button")).toBeHidden();
+      await page.getByTestId("export-menu").locator("summary").click();
+    }
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByTestId(isMobile ? "export-button-mobile" : "export-button").click(),
+    ]);
+    expect(download.suggestedFilename()).toContain(`_${store.code}_`);
+    const path = await download.path();
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.readFile(path);
+    const ws = wb.getWorksheet("DanhSach")!;
+    expect(String(ws.getCell("A2").value)).toContain(`(${store.code})`);
+    expect(ws.rowCount - 5).toBe(total); // đủ mọi SP, không chỉ 48 đang hiển thị
+  });
+});
