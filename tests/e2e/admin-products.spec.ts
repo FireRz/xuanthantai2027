@@ -139,8 +139,12 @@ test.describe("quản trị sản phẩm (F07)", () => {
     await expect(rowA).toContainText("Đang hiện");
 
     // Ẩn nhiều SP cùng lúc
-    await page.getByLabel(`Chọn ${b}`).check();
-    await page.getByLabel(`Chọn ${c}`).check();
+    // Chọn bằng bàn phím: nút Next.js Dev Tools (chỉ có ở chế độ dev) che các ô ở góc dưới trái
+    for (const sku of [b, c]) {
+      await page.getByLabel(`Chọn ${sku}`).focus();
+      await page.keyboard.press("Space");
+      await expect(page.getByLabel(`Chọn ${sku}`)).toBeChecked();
+    }
     await page.getByRole("button", { name: "Ẩn đã chọn" }).click();
     await expect(page.getByText("Đã ẩn 2 sản phẩm.")).toBeVisible();
     await page.goto(`/?q=HID${t}`);
@@ -148,5 +152,33 @@ test.describe("quản trị sản phẩm (F07)", () => {
     await expect(page.locator(`[data-sku="${b}"]`)).toHaveCount(0);
     await expect(page.locator(`[data-sku="${c}"]`)).toHaveCount(0);
     expect(await prisma.product.count({ where: { sku: { startsWith: `HID${t}` } } })).toBe(3);
+  });
+  test("T07.9: lọc SP chưa có ảnh; trang ảnh có hướng dẫn đặt tên", async ({ page }) => {
+    const t = tag();
+    const { brand, line } = await seed(t);
+    const data = { brandId: brand.id, productLineId: line.id };
+    await prisma.product.create({
+      data: {
+        ...data,
+        sku: `NOI${t}1`,
+        imageUrl: "https://x/i.webp",
+        thumbUrl: "https://x/t.webp",
+      },
+    });
+    await prisma.product.create({ data: { ...data, sku: `NOI${t}2` } });
+
+    await login(page, admin.username, admin.password);
+    await expect(page).toHaveURL(/\/admin$/);
+    await page.goto(`/admin/products?q=NOI${t}`);
+    await expect(page.getByTestId("product-row")).toHaveCount(2);
+    await page.getByLabel("Chỉ SP chưa có ảnh").check();
+    await page.getByRole("button", { name: "Lọc" }).click();
+    await expect(page.getByTestId("product-row")).toHaveCount(1);
+    await expect(page.getByTestId("product-row")).toContainText(`NOI${t}2`);
+
+    await page.goto("/admin/images");
+    await expect(page.getByRole("region", { name: "Hướng dẫn đặt tên ảnh" })).toContainText(
+      "Tên file = mã sản phẩm",
+    );
   });
 });

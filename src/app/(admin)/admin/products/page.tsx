@@ -16,6 +16,7 @@ interface Filters {
   q?: string;
   brand?: string;
   status: StatusFilter;
+  noImage: boolean;
 }
 
 function pageHref(f: Filters, page: number) {
@@ -23,6 +24,7 @@ function pageHref(f: Filters, page: number) {
   if (f.q) sp.set("q", f.q);
   if (f.brand) sp.set("brand", f.brand);
   if (f.status !== "all") sp.set("status", f.status);
+  if (f.noImage) sp.set("noimage", "1");
   if (page > 1) sp.set("page", String(page));
   const s = sp.toString();
   return `/admin/products${s ? `?${s}` : ""}`;
@@ -40,6 +42,7 @@ export default async function AdminProductsPage({
     q: first(raw.q)?.trim() || undefined,
     brand: brandParam.success ? brandParam.data : undefined,
     status: parseStatus(first(raw.status)),
+    noImage: first(raw.noimage) === "1",
   };
   const [brands, list] = await Promise.all([
     prisma.brand.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
@@ -47,6 +50,7 @@ export default async function AdminProductsPage({
       q: f.q,
       brandId: f.brand,
       status: f.status,
+      noImage: f.noImage,
       page: Number(first(raw.page)) || 1,
     }),
   ]);
@@ -60,6 +64,12 @@ export default async function AdminProductsPage({
             {list.total} sản phẩm. Sản phẩm không xóa được, chỉ ẩn.
           </p>
         </div>
+        <Link
+          href="/admin/images"
+          className="inline-flex h-10 items-center rounded-md border border-neutral-300 bg-white px-4 text-sm font-medium"
+        >
+          Tải ảnh hàng loạt
+        </Link>
         <Link
           href="/admin/products/new"
           className="inline-flex h-10 items-center rounded-md bg-[#B3261E] px-4 text-sm font-medium text-white"
@@ -108,6 +118,10 @@ export default async function AdminProductsPage({
             <option value="active">Đang hiện</option>
             <option value="hidden">Đang ẩn</option>
           </select>
+        </label>
+        <label className="flex h-10 items-center gap-2 text-sm font-medium">
+          <input type="checkbox" name="noimage" value="1" defaultChecked={f.noImage} />
+          Chỉ SP chưa có ảnh
         </label>
         <button
           type="submit"

@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { defineConfig, devices } from "@playwright/test";
 
+const ADMIN_WRITE = /(admin-products|admin-product-image|master-data)\.spec\.ts/;
 const port = Number(process.env.E2E_PORT ?? 3100);
 
 // Hai viewport bắt buộc theo Definition of Done: điện thoại 375px và máy tính 1280px.
@@ -18,10 +19,26 @@ export default defineConfig({
   projects: [
     {
       name: "mobile",
+      testIgnore: ADMIN_WRITE,
       use: { ...devices["Pixel 7"], viewport: { width: 375, height: 812 } },
     },
     {
       name: "desktop",
+      testIgnore: ADMIN_WRITE,
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } },
+    },
+    // Các spec thêm / ẩn SP, cửa hàng hiển thị ở trang xem làm đổi tổng "3.000 SP" mà spec bộ lọc kiểm đếm
+    // → chạy SAU các project trên (dependencies) để không ảnh hưởng nhau khi chạy song song.
+    {
+      name: "mobile-admin",
+      testMatch: ADMIN_WRITE,
+      dependencies: ["mobile", "desktop"],
+      use: { ...devices["Pixel 7"], viewport: { width: 375, height: 812 } },
+    },
+    {
+      name: "desktop-admin",
+      testMatch: ADMIN_WRITE,
+      dependencies: ["mobile", "desktop"],
       use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } },
     },
   ],

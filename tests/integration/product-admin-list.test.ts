@@ -67,3 +67,17 @@ describe("T07.8 — tra SP theo mã trong tên file ảnh", () => {
     expect(await summarizeProductsWithoutImage()).toEqual({ count: 1, skus: ["NTT002"] });
   });
 });
+
+describe("T07.9 — lọc SP chưa có ảnh", () => {
+  it("noImage chỉ giữ SP chưa có ảnh", async () => {
+    const a = await makeBrandTree();
+    const p1 = await createProduct({ sku: "A1", brandId: a.brand.id, productLineId: a.line.id });
+    await createProduct({ sku: "A2", brandId: a.brand.id, productLineId: a.line.id });
+    await prisma.product.update({
+      where: { id: p1.id },
+      data: { imageUrl: "https://x/i.webp", thumbUrl: "https://x/t.webp" },
+    });
+    expect((await listAdminProducts({ noImage: true })).rows.map((r) => r.sku)).toEqual(["A2"]);
+    expect((await listAdminProducts({})).total).toBe(2);
+  });
+});
