@@ -121,7 +121,7 @@
 | T07.3 | Resize trình duyệt + blob-upload + gắn/thay ảnh | T01.9, T02.4 | M | ✅ |
 | T07.4 | Trang danh sách SP admin | T07.2, T02.3 | M | ✅ |
 | T07.5 | Form thêm/sửa SP | T07.2, T06.1, T06.2 | M | ✅ |
-| T07.6 | Đổi ảnh trong form | T07.3, T07.5 | S | ⬜ |
+| T07.6 | Đổi ảnh trong form | T07.3, T07.5 | S | ✅ |
 | T07.7 | Ẩn/hiện SP | T07.2 | S | ⬜ |
 | T07.8 | Tải ảnh hàng loạt | T07.3, T02.3 | L | ⬜ |
 | T07.9 | Lọc "chưa có ảnh" + hướng dẫn | T07.4, T07.8 | S | ⬜ |

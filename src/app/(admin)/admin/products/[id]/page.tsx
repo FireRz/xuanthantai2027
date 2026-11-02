@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireAdminPage } from "@/server/auth/require-admin";
 import { prisma } from "@/server/db";
 import { loadFormOptions } from "../form-options";
+import { ImageUploader } from "../image-uploader";
 import { ProductForm } from "../product-form";
 
 export const metadata: Metadata = { title: "Sửa sản phẩm" };
@@ -38,6 +39,7 @@ export default async function EditProductPage({
           </p>
         )}
       </div>
+      <ImageUploader productId={product.id} sku={product.sku} thumbUrl={product.thumbUrl} />
       <ProductForm
         options={options}
         initial={{
