@@ -191,3 +191,5 @@ Mockup là trang HTML tĩnh dùng dữ liệu giả, logo thật (nếu đã có
 **Bản mockup v3 (2026-10-30, cùng link):** ô chọn cửa hàng chuyển xuống **thanh "Cửa hàng của bạn" dính dưới banner** (ADR-009 U14'); bỏ hình mai/đồng xu tự vẽ, thay bằng **ô chờ ảnh trang trí Tết** do chủ dự án cung cấp (U17, xem `docs/brand/README.md`). Cập nhật: banner dùng **tạm ảnh tranh Tết (dê, mây lành, hoa) do chủ dự án gửi** làm nền toàn banner, chữ căn giữa (ADR-009 U18). Sau đó thay bằng ảnh chính thức chủ dự án gửi (`docs/brand/tet-banner.png`, ADR-009 U18').
 
 ✅ **Mockup đã được chủ dự án duyệt ngày 2026-10-30 (T00.3).** Đây là chuẩn giao diện để code.
+
+**Mockup dựng lại (2026-11-02):** bản artifact gốc không còn truy cập được, nên mockup được viết lại thành file tĩnh [docs/mockups/index.html](mockups/index.html) (mở trực tiếp trong trình duyệt): 8 bảng — máy tính Lưới / Bảng lọc cửa hàng / popup chi tiết, điện thoại trang chủ / bảng lọc / chi tiết / Bảng, quản trị xem trước nhập Excel. Màn xem công khai khớp giao diện đã code ở phiên 3; bộ lọc, popup và quản trị là bản dựng theo mô tả ở trên, chưa code.

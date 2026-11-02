@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup — Xuân Thần Tài 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* Mockup tĩnh dựng lại (2026-11-02) theo UI-DESIGN.md và giao diện đã làm ở phiên 3.
+   Dữ liệu giả. Mở trực tiếp file này trong trình duyệt (ảnh lấy từ ../../public/brand/). */
+:root{
+  --bg:#FBF6EC;--surface:#fff;--primary:#B3261E;--primary-dark:#8E1B16;--accent:#F2A900;--accent-dark:#C77F00;
+  --accent-soft:#FFF6E0;--accent-fg:#2B1A12;--text:#2B1A12;--muted:#6B5A4E;--border:#E8DCC4;--festive:#FFF3D6;
+  --full:#2E7D4F;--short:#D9822B;--none:#7A7A7A;--noorder:#BDBDBD;
+  --full-bg:#E3F3EA;--full-fg:#1B5E39;--short-bg:#FDEBD3;--short-fg:#8A4B0B;--none-bg:#ECECEC;--none-fg:#4A4A4A;--noorder-bg:#F3F3F3;--noorder-fg:#5F5F5F;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#2a2a2a;font-family:"Be Vietnam Pro",system-ui,sans-serif;color:var(--text);font-size:14px}
+.tabs{position:sticky;top:0;z-index:100;display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;background:#111;color:#fff}
+.tabs button{border:0;border-radius:999px;padding:8px 14px;font:600 13px "Be Vietnam Pro";background:#333;color:#ddd;cursor:pointer}
+.tabs button.on{background:var(--accent);color:var(--accent-fg)}
+.note{padding:8px 14px;background:#fff3cd;color:#5c4400;font-size:12px}
+.board{display:none;padding:20px 12px 60px}.board.on{display:block}
+.desk{width:1280px;max-width:100%;margin:0 auto;background:var(--bg);position:relative;overflow:hidden;border-radius:6px}
+.phone{width:375px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden;border-radius:22px;border:8px solid #000}
+.cap{color:#bbb;text-align:center;font-size:12px;margin:0 0 10px}
+.serif{font-family:"Playfair Display",serif}
+/* banner */
+.hero{position:relative;height:480px;background:#cc1208 url(../../public/brand/tet-banner-2400.png) center/cover;color:#fff;text-align:center}
+.phone .hero{height:560px;background-position:left bottom}
+.nav{padding:14px 24px;display:flex;align-items:center}
+.logo{height:40px}
+.hero h1{margin:0;font:700 72px/1.1 "Playfair Display",serif;color:var(--accent);text-shadow:0 2px 12px rgba(90,5,5,.7)}
+.phone .hero h1{font-size:30px;white-space:nowrap}
+.hero .in{position:absolute;left:0;right:0;top:120px}
+.phone .hero .in{top:100px}
+.hero .wish{font:italic 600 24px "Playfair Display",serif;margin:14px 0 0;color:var(--festive)}
+.phone .hero .wish{font-size:17px}
+.hero .desc{margin:14px 0 0;color:var(--festive);font-size:16px}
+.phone .hero .desc{display:none}
+.btns{margin-top:22px;display:flex;gap:12px;justify-content:center}
+.btn{display:inline-flex;align-items:center;min-height:44px;padding:0 24px;border-radius:999px;font-weight:600;border:2px solid var(--accent);color:var(--festive);background:rgba(142,27,22,.4)}
+.btn.gold{background:var(--accent);color:var(--accent-fg)}
+.wave{position:absolute;left:0;right:0;bottom:-1px;height:36px;width:100%}
+/* store bar */
+.store{display:flex;gap:14px;align-items:center;padding:10px 24px;background:#fff;border-bottom:2px solid var(--accent);position:sticky;top:0}
+.phone .store{flex-wrap:wrap;padding:10px 14px;gap:8px}
+.store b{white-space:nowrap}
+.sel{min-height:44px;border:2px solid var(--primary);background:var(--accent-soft);border-radius:8px;padding:0 12px;display:flex;align-items:center;font-weight:500;min-width:260px}
+.phone .sel{width:100%}
+.inp{flex:1;min-height:44px;border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;padding:0 12px;color:#999;background:#fff}
+.go{min-height:44px;border-radius:999px;background:var(--accent);color:var(--accent-fg);padding:0 22px;display:flex;align-items:center;font-weight:600}
+main{padding:0 24px 28px}.phone main{padding:0 14px 22px}
+h2{font:600 24px "Playfair Display",serif;margin:34px 0 14px}.phone h2{font-size:20px;margin:24px 0 12px}
+/* collections */
+.cols{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.phone .cols{grid-template-columns:1fr 1fr;gap:10px}
+.col{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.col .ph{aspect-ratio:4/3;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font:700 20px "Playfair Display",serif;color:rgba(199,127,0,.4)}
+.col .t{padding:14px}.phone .col .t{padding:10px}
+.col small{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:500}
+.col h3{margin:2px 0;font:600 20px "Playfair Display",serif}.phone .col h3{font-size:15px}
+.col .lk{color:var(--primary);font-weight:600;font-size:13px;margin-top:6px}
+.col.sel2{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary)}
+/* filters */
+.fil{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{border:1px solid var(--border);background:#fff;border-radius:999px;padding:8px 14px;font-weight:500;min-height:38px;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.chip small{opacity:.7}
+.drop::after{content:"▾";font-size:11px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:12px 0 16px}
+.seg{display:inline-flex;border:1px solid var(--border);background:#fff;border-radius:999px;padding:2px;font-weight:500}
+.seg span{padding:8px 14px;border-radius:999px;color:var(--muted)}.seg .on{background:var(--primary);color:#fff}
+.scope{color:var(--muted)}.scope b{color:var(--text)}
+/* product card */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.phone .grid{grid-template-columns:1fr 1fr;gap:10px}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative}
+.card .img{aspect-ratio:1;background:linear-gradient(135deg,#fff6e0,#fbe9c0);display:flex;align-items:center;justify-content:center;font:700 22px "Playfair Display",serif;color:rgba(199,127,0,.45)}
+.card .tag{position:absolute;top:8px;right:8px}
+.card .b{padding:12px}.phone .card .b{padding:9px}
+.card .sku{font-size:13px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.03em}
+.card .nm{font-weight:600;font-size:15px;line-height:1.3;min-height:2.6em;margin:2px 0 4px}
+.card .pr{font-weight:600}
+.prog{height:6px;border-radius:99px;background:var(--accent-soft);margin-top:8px;overflow:hidden}.prog i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.card .st{display:flex;justify-content:space-between;font-size:12.5px;margin-top:6px;font-variant-numeric:tabular-nums}.card .st em{font-style:normal;color:var(--short-fg);font-weight:600}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:600;white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.full{background:var(--full-bg);color:var(--full-fg)}.short{background:var(--short-bg);color:var(--short-fg)}.none{background:var(--none-bg);color:var(--none-fg)}.noorder{background:var(--noorder-bg);color:var(--noorder-fg)}
+.more{text-align:center;margin-top:28px;color:var(--muted)}.more .btn{margin-top:8px;border-color:var(--accent)}
+/* table */
+.tbl{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);font-size:14px}
+.tbl th{background:var(--accent-soft);color:var(--muted);font-size:12px;text-align:left;padding:9px 10px;white-space:nowrap}
+.tbl td{padding:8px 10px;border-top:1px solid var(--border)}
+.tbl .n{text-align:right;font-variant-numeric:tabular-nums}
+.tbl .th{width:44px;height:44px;border:1px solid var(--border);border-radius:6px;background:var(--accent-soft)}
+.scroll{overflow-x:auto;border-radius:12px}
+/* footer */
+footer{background:var(--primary-dark);color:var(--festive);padding:26px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.phone footer{flex-direction:column;padding:22px 14px;text-align:center}
+footer b{color:#fff}
+/* popup */
+.ov{position:absolute;inset:0;background:rgba(43,26,18,.55);z-index:20;display:flex;align-items:center;justify-content:center}
+.pop{background:#fff;border-radius:16px;width:860px;max-width:94%;max-height:92%;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.phone .pop{width:100%;max-width:100%;height:100%;max-height:100%;border-radius:0}
+.pop .hd{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--border)}
+.pop .hd h3{margin:0;font:600 24px "Playfair Display",serif}.phone .pop .hd h3{font-size:19px}
+.x{font-size:22px;color:var(--muted)}
+.pop .top{display:grid;grid-template-columns:300px 1fr;gap:22px;padding:20px 22px}.phone .pop .top{grid-template-columns:1fr;padding:14px}
+.pop .big{aspect-ratio:1;border-radius:12px;background:linear-gradient(135deg,#fff6e0,#fbe9c0);display:flex;align-items:center;justify-content:center;font:700 34px "Playfair Display",serif;color:rgba(199,127,0,.45)}
+.pop .sum{background:var(--accent-soft);border-radius:10px;padding:12px 14px;margin-top:12px;font-weight:500;font-variant-numeric:tabular-nums}
+.pop .sum span{display:inline-block;margin-right:12px}
+.pop table{margin:0 22px 22px;width:calc(100% - 44px)}.phone .pop table{margin:0 14px 14px;width:calc(100% - 28px);font-size:13px}
+.hl td{background:var(--accent-soft);font-weight:600}.tot td{font-weight:700;border-top:2px solid var(--text)}
+/* sheet */
+.dim{position:absolute;inset:0;background:rgba(43,26,18,.5);z-index:20}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:21;background:#fff;border-radius:20px 20px 0 0;padding:16px 16px 18px;max-height:78%;overflow:auto}
+.sheet h4{margin:0 0 4px;font:600 18px "Playfair Display",serif}
+.sheet .lbl{font-weight:600;margin:14px 0 8px;font-size:13px;color:var(--muted)}
+.sheet .cta{position:sticky;bottom:0;box-shadow:0 -10px 12px #fff;margin-top:16px;min-height:48px;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-weight:700;display:flex;align-items:center;justify-content:center}
+/* admin */
+.adm{width:1180px;max-width:100%;margin:0 auto;background:#F7F7F5;color:#1F2937;border-radius:6px;overflow:hidden;min-height:700px}
+.adm header{background:#fff;border-bottom:1px solid #e5e7eb;padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.adm .lg{display:flex;gap:10px;align-items:center;font-weight:600}
+.adm .lg i{width:56px;height:34px;border:1px dashed #9ca3af;border-radius:4px;display:flex;align-items:center;justify-content:center;font:600 11px "Be Vietnam Pro";color:#6b7280;font-style:normal}
+.adm .wrap{display:flex}
+.adm nav{width:210px;background:#fff;border-right:1px solid #e5e7eb;padding:8px;min-height:644px}
+.adm nav div{padding:9px 12px;border-radius:6px;font-weight:500}.adm nav .on{background:#fdecea;color:var(--primary);font-weight:600}
+.adm .ct{flex:1;padding:22px}
+.adm h3{margin:0 0 4px;font-size:20px}.adm p.s{margin:0 0 16px;color:#6b7280}
+.sum4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.sum4 div{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px}.sum4 b{font-size:26px;display:block}.sum4 .er b{color:#b91c1c}.sum4 .er{border-color:#fca5a5;background:#fef2f2}
+.adm .tb{display:flex;gap:8px;margin-bottom:10px}.adm .tb span{padding:7px 14px;border-radius:99px;background:#fff;border:1px solid #e5e7eb;font-weight:500}.adm .tb .on{background:var(--primary);border-color:var(--primary);color:#fff}
+.adm table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e5e7eb;font-size:13px}
+.adm th{background:#f3f4f6;text-align:left;padding:8px 10px;font-size:12px;color:#4b5563}.adm td{padding:8px 10px;border-top:1px solid #e5e7eb}
+.adm .err td{background:#fef2f2}.adm .old{color:#9ca3af;text-decoration:line-through}.adm .new{color:#166534;font-weight:600}
+.adm .act{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.adm .b1{padding:11px 22px;border-radius:8px;background:#d1d5db;color:#6b7280;font-weight:600}.adm .b2{padding:11px 22px;border-radius:8px;border:1px solid #d1d5db;background:#fff;font-weight:600}
+.warn{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-weight:500}
+</style>
+</head>
+<body>
+<div class="tabs" id="tabs"></div>
+<div class="note">Mockup tĩnh dựng lại ngày 2026-11-02 (bản gốc đã duyệt ở T00.3 không còn truy cập được). Dữ liệu giả. Các màn xem công khai khớp giao diện đã làm ở phiên 3; bộ lọc, popup và màn quản trị làm theo UI-DESIGN.md (chưa code).</div>
+<div id="boards"></div>
+
+<script>
+const P=[
+ ["AK0001","Bông tai Kim Mã Đón Tết","Bạc 925",36700000,866,511,"Nhãn An Khang"],
+ ["AK0002","Nhẫn Lộc Xuân AK0002","Vàng trắng 18K",null,950,618,"Nhãn An Khang"],
+ ["AK0003","Dây chuyền Lộc Xuân","Vàng trắng 18K",38100000,992,992,"Nhãn An Khang"],
+ ["AK0004","Nhẫn An Khang AK0004","Vàng trắng 18K",14100000,0,0,"Nhãn An Khang"],
+ ["PL0005","Nhẫn Kim Mã Đón Tết","Vàng 18K",54200000,40,0,"Phúc Lộc"],
+ ["PL0006","Bông tai Phúc Lộc","Vàng 24K",6600000,120,90,"Phúc Lộc"],
+ ["TT0007","Dây chuyền Thần Tài","Vàng 14K",40900000,60,66,"Thần Tài Gold"],
+ ["TT0008","Lắc tay Lộc Xuân","—",2700000,30,12,"Thần Tài Gold"]
+];
+const st=(o,v)=>o===0?["noorder","Không đặt"]:v===0?["none","Chưa về"]:Math.max(o-v,0)===0?["full","Đủ hàng"]:["short","Còn thiếu"];
+const n=x=>x==null?"—":String(x).replace(/\B(?=(\d{3})+(?!\d))/g,".");
+const vnd=x=>x==null?"—":n(x)+" ₫";
+const pct=(o,v)=>o===0?"—":(Math.floor(Math.min(v/o,1)*1000)/10+"").replace(".",",")+"%";
+const badge=(o,v)=>{const[c,t]=st(o,v);return `<span class="badge ${c}">${t}</span>`};
+const card=p=>{const[,nm,mat,pr,o,v]=[0,p[1],p[2],p[3],p[4],p[5]];const sh=Math.max(o-v,0);
+ return `<div class="card"><div class="img">PNJ</div><span class="tag">${badge(o,v)}</span><div class="b"><div class="sku">${p[0]} · ${mat}</div><div class="nm">${nm}</div><div class="pr">${vnd(pr)}</div><div class="prog"><i style="width:${o?Math.min(v/o,1)*100:0}%"></i></div><div class="st"><span>Về <b>${n(v)}/${n(o)}</b> (${pct(o,v)})</span>${sh?`<em>Còn thiếu ${n(sh)}</em>`:""}</div></div></div>`};
+const wave=`<svg class="wave" viewBox="0 0 1440 40" preserveAspectRatio="none"><path d="M0 40V22C120 6 240 6 360 20s240 16 360 4 240-18 360-6 240 18 360 6V40Z" fill="#fbf6ec"/><path d="M0 22C120 6 240 6 360 20s240 16 360 4 240-18 360-6 240 18 360 6" fill="none" stroke="#f2a900" stroke-width="3"/></svg>`;
+const hero=`<div class="hero"><div class="nav"><img class="logo" src="../../public/brand/logo-white.png" alt="PNJ"></div><div class="in"><h1>Xuân Đinh Mùi · 2027</h1><p class="wish">Vạn sự như ý — Tài lộc đầy nhà</p><p class="desc">Theo dõi số lượng đặt và hàng đã về của các bộ sưu tập Xuân Thần Tài</p><div class="btns"><span class="btn gold">Bộ sưu tập</span><span class="btn">Sản phẩm</span></div></div>${wave}</div>`;
+const storeBar=(store,q)=>`<div class="store"><b>🏬 Cửa hàng của bạn</b><div class="sel">${store||"Tất cả cửa hàng (tổng hệ thống)"} <span style="margin-left:auto">▾</span></div><div class="inp">🔍 ${q||"Tìm mã SP"}</div><div class="go">Xem hàng</div></div>`;
+const bsts=sel=>`<h2>Bộ sưu tập mùa này</h2><div class="cols">${[["An Khang","Kim Mã Đón Tết",371],["An Khang","Lộc Xuân",379],["Phúc Lộc","Kim Mã Đón Tết",398],["Phúc Lộc","Lộc Xuân",352],["Thần Tài Gold","Kim Mã Đón Tết",379],["Thần Tài Gold","Lộc Xuân",371],["","Ngoài bộ sưu tập",750]].map((c,i)=>`<div class="col ${sel===i?"sel2":""}"><div class="ph">PNJ</div><div class="t"><small>${c[0]}</small><h3>${c[1]}</h3><div style="color:var(--muted);font-size:13px">${c[2]} SP</div><div class="lk">${sel===i?"Bỏ lọc ✕":"Xem bộ sưu tập →"}</div></div></div>`).join("")}</div>`;
+const filters=(mobile)=>mobile?`<div class="fil"><span class="chip on">Nhãn: An Khang</span><span class="chip drop">Dòng</span></div><div class="fil"><span class="chip">⚙ Lọc (2)</span><span class="chip">⇅ Mã A→Z</span></div>`:`<div class="fil"><span class="chip on">Tất cả nhãn <small>3.000</small></span><span class="chip">An Khang <small>1.000</small></span><span class="chip">Phúc Lộc <small>1.000</small></span><span class="chip">Thần Tài Gold <small>1.000</small></span></div><div class="fil"><span class="chip drop">Dòng hàng</span><span class="chip drop">Bộ sưu tập</span><span class="chip drop">Chất liệu</span><span class="chip drop">Sắp xếp: Mã A→Z</span><span class="chip" style="margin-left:auto">⬇ Xuất Excel</span></div>`;
+const bar=(scope,view)=>`<div class="bar"><div class="scope"><b>${scope}</b></div><div class="seg"><span class="${view=="g"?"on":""}">▦ Lưới</span><span class="${view=="l"?"on":""}">☰ Bảng</span></div></div>`;
+const footer=`<footer><div style="display:flex;gap:12px;align-items:center"><img class="logo" style="height:34px" src="../../public/brand/logo-white.png" alt="PNJ"><span class="serif" style="font:700 20px 'Playfair Display';color:#fff">Xuân Thần Tài 2027</span></div><div>Dữ liệu cập nhật lần cuối: <b>12:03 02/11/2026</b></div></footer>`;
+const more=t=>`<div class="more">Đang hiển thị 24 / ${t} SP<br><span class="btn gold">Xem thêm</span></div>`;
+const gridHTML=()=>`<div class="grid">${P.concat(P.slice(0,4)).map(card).join("")}</div>`;
+const tableHTML=(mobile,store)=>{const sc=store?1:1;return `<div class="scroll"><table class="tbl"><thead><tr><th></th><th>Mã SP</th><th>Tên</th>${mobile?"":"<th>Nhãn</th><th>Dòng</th><th>BST</th><th>Chất liệu</th>"}<th class="n">Giá</th><th class="n">Đặt</th><th class="n">Về</th><th class="n">Thiếu</th><th class="n">%</th><th>Trạng thái</th></tr></thead><tbody>${P.map(p=>{const o=store?Math.round(p[4]/50)+(p[4]?1:0):p[4],v=store?Math.min(o,Math.round(p[5]/50)):p[5];return `<tr><td><div class="th"></div></td><td><b>${p[0]}</b></td><td>${p[1]}</td>${mobile?"":`<td>${p[6]}</td><td>Nhẫn</td><td>Lộc Xuân</td><td>${p[2]}</td>`}<td class="n">${vnd(p[3])}</td><td class="n">${n(o)}</td><td class="n">${n(v)}</td><td class="n">${n(Math.max(o-v,0))}</td><td class="n">${pct(o,v)}</td><td>${badge(o,v)}</td></tr>`}).join("")}</tbody></table></div>`};
+const page=(mobile,body,overlay)=>`<div class="${mobile?"phone":"desk"}" style="${mobile?"height:812px":"height:"+(overlay?"900px":"auto")};${overlay&&mobile?"":""}">${overlay||""}<div style="${mobile||overlay?"height:100%;overflow:hidden":""}">${hero}${body.store}<main>${body.main}</main>${footer}</div></div>`;
+
+const rowsStore=[["CH001 Quận 1",20,20],["CH002 Quận 3",15,10],["CH005 Thủ Đức",12,2],["CH008 Bình Thạnh",10,0],["CH010 Gò Vấp",5,7]];
+const popTable=(hl)=>`<table class="tbl"><thead><tr><th>Cửa hàng</th><th class="n">Đặt</th><th class="n">Về</th><th class="n">Thiếu</th><th class="n">%</th><th>TT</th></tr></thead><tbody>${rowsStore.map(r=>`<tr class="${r[0].startsWith(hl)?"hl":""}"><td>${r[0]}</td><td class="n">${r[1]}</td><td class="n">${r[2]}</td><td class="n">${Math.max(r[1]-r[2],0)}</td><td class="n">${pct(r[1],r[2])}</td><td>${badge(r[1],r[2])}</td></tr>`).join("")}<tr class="tot"><td>TỔNG</td><td class="n">62</td><td class="n">39</td><td class="n">23</td><td class="n">62,9%</td><td>${badge(62,39)}</td></tr></tbody></table>`;
+const popup=(mobile)=>`<div class="ov"><div class="pop"><div class="hd"><h3>Bông tai Kim Mã Đón Tết</h3><span class="x">✕</span></div><div class="top"><div class="big">PNJ</div><div><div class="sku" style="color:var(--muted);font-weight:500">AK0001</div><div style="margin:6px 0">Nhãn An Khang · Bông tai · BST Kim Mã Đón Tết</div><div>Chất liệu: Bạc 925</div><div style="font-weight:700;font-size:20px;margin:8px 0">36.700.000 ₫</div><div class="sum"><span>Đặt <b>62</b></span><span>Về <b>39</b></span><span>Thiếu <b>23</b></span><span><b>62,9%</b></span> ${badge(62,39)}</div></div></div>${popTable("CH005")}</div></div>`;
+
+const sheet=`<div class="dim"></div><div class="sheet"><div style="display:flex;justify-content:space-between"><h4>Bộ lọc</h4><span class="x">✕</span></div><div class="lbl">Nhãn hàng</div><div class="fil"><span class="chip on">An Khang <small>1.000</small></span><span class="chip">Phúc Lộc <small>1.000</small></span><span class="chip">Thần Tài Gold <small>1.000</small></span></div><div class="lbl">Dòng hàng</div><div class="fil"><span class="chip on">Nhẫn <small>340</small></span><span class="chip">Dây chuyền <small>330</small></span><span class="chip">Bông tai <small>330</small></span></div><div class="lbl">Bộ sưu tập</div><div class="fil"><span class="chip">Kim Mã Đón Tết <small>371</small></span><span class="chip">Lộc Xuân <small>379</small></span><span class="chip">Không thuộc BST <small>250</small></span></div><div class="lbl">Chất liệu</div><div class="fil"><span class="chip">Vàng 24K <small>600</small></span><span class="chip">Vàng 18K <small>610</small></span><span class="chip">Bạc 925 <small>590</small></span></div><div class="lbl">Sắp xếp</div><div class="fil"><span class="chip on">Mã A→Z</span><span class="chip">Mới cập nhật</span><span class="chip">Giá ↑</span><span class="chip">Giá ↓</span><span class="chip">Còn thiếu nhiều nhất</span></div><div class="cta">Xem 340 kết quả</div></div>`;
+
+const admin=`<div class="adm"><header><div class="lg"><i>LOGO</i>Quản trị</div><span style="color:#6b7280">admin · Đăng xuất</span></header><div class="wrap"><nav><div>Danh mục</div><div>Sản phẩm</div><div>Ảnh</div><div class="on">Nhập Excel</div><div>Số lượng</div><div>Xuất dữ liệu</div><div>Tài khoản</div></nav><div class="ct"><h3>Xem trước nhập Excel</h3><p class="s">File: <b>so-lieu-dot-1.xlsx</b> · 2 sheet (SanPham, SoLuong) · chưa ghi vào hệ thống</p><div class="warn">Còn 3 lỗi — sửa file rồi tải lại. Nút Áp dụng bị khóa cho đến khi hết lỗi.</div><div class="sum4"><div><b>12</b>SP mới</div><div><b>48</b>SP thay đổi</div><div><b>310</b>Dòng SL thay đổi</div><div class="er"><b>3</b>Lỗi</div></div><div class="tb"><span>Tất cả</span><span>SP mới</span><span>Thay đổi</span><span class="on">Lỗi (3)</span></div><table><thead><tr><th>Sheet</th><th>Dòng</th><th>Cột</th><th>Mã SP / CH</th><th>Cũ → Mới</th><th>Lý do</th></tr></thead><tbody><tr class="err"><td>SoLuong</td><td>41</td><td>MaCuaHang</td><td>AK0007 / CH999</td><td>—</td><td>Cửa hàng CH999 chưa có trong danh mục</td></tr><tr class="err"><td>SanPham</td><td>18</td><td>BoSuuTap</td><td>PL0105</td><td>—</td><td>BST "Xuân 2028" chưa có trong nhãn Phúc Lộc</td></tr><tr class="err"><td>SoLuong</td><td>77</td><td>SLDat</td><td>TT0010 / CH002</td><td>—</td><td>Số lượng phải là số nguyên ≥ 0</td></tr><tr><td>SoLuong</td><td>12</td><td>SLVe</td><td>AK0001 / CH005</td><td><span class="old">2</span> → <span class="new">5</span></td><td>Thay đổi</td></tr><tr><td>SanPham</td><td>9</td><td>Gia</td><td>AK0003</td><td><span class="old">38.100.000</span> → <span class="new">39.000.000</span></td><td>Thay đổi</td></tr></tbody></table><div class="act"><span class="b2">Chọn file khác</span><span class="b1">Áp dụng (khóa)</span></div></div></div></div>`;
+
+const B=[
+ ["Máy tính · Lưới",()=>page(false,{store:storeBar(),main:bsts()+`<h2 id="sp">Tất cả sản phẩm</h2>${filters(false)}${bar("Tổng hệ thống · 3.000 SP","g")}${gridHTML()}${more("3.000")}`})],
+ ["Máy tính · Bảng + cửa hàng",()=>page(false,{store:storeBar("CH005 — Thủ Đức"),main:bsts(2)+`<h2>Tất cả sản phẩm</h2>${filters(false)}${bar("Cửa hàng: Thủ Đức (CH005) · 2.707 SP","l")}${tableHTML(false,true)}${more("2.707")}`})],
+ ["Máy tính · Popup chi tiết",()=>page(false,{store:storeBar("CH005 — Thủ Đức"),main:`<h2>Tất cả sản phẩm</h2>${filters(false)}${bar("Cửa hàng: Thủ Đức (CH005) · 2.707 SP","g")}${gridHTML()}`},popup(false))],
+ ["Điện thoại · Trang chủ",()=>page(true,{store:storeBar(),main:bsts()+`<h2>Tất cả sản phẩm</h2>${filters(true)}${bar("Tổng hệ thống · 3.000 SP","g")}${gridHTML()}${more("3.000")}`})],
+ ["Điện thoại · Bảng lọc",()=>page(true,{store:storeBar("CH005 — Thủ Đức"),main:`<h2>Tất cả sản phẩm</h2>${filters(true)}${bar("Cửa hàng: Thủ Đức · 2.707 SP","g")}${gridHTML()}`},sheet)],
+ ["Điện thoại · Chi tiết",()=>page(true,{store:storeBar(),main:""},popup(true))],
+ ["Điện thoại · Bảng",()=>page(true,{store:storeBar(),main:`<h2>Tất cả sản phẩm</h2>${bar("Tổng hệ thống · 3.000 SP","l")}${tableHTML(true,false)}`})],
+ ["Quản trị · Xem trước nhập Excel",()=>admin]
+];
+const tabs=document.getElementById("tabs"),boards=document.getElementById("boards");
+B.forEach((b,i)=>{const t=document.createElement("button");t.textContent=b[0];t.onclick=()=>show(i);tabs.appendChild(t);
+ const s=document.createElement("section");s.className="board";s.innerHTML=`<p class="cap">${b[0]}</p>`+b[1]();boards.appendChild(s)});
+function show(i){[...tabs.children].forEach((t,j)=>t.classList.toggle("on",i===j));[...boards.children].forEach((s,j)=>s.classList.toggle("on",i===j));location.hash=i+1}
+show(Math.max(0,(parseInt(location.hash.slice(1))||1)-1));
+</script>
+</body>
+</html>
