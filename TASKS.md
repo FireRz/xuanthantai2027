@@ -152,7 +152,7 @@
 | T10.5 | Giám sát lỗi | T10.2 | S | 🟨 |
 | T10.6 | Nhập dữ liệu thật | F06, T07.8, T08.9 | M | ⬜ |
 | T10.7 | E2E + thiết bị thật | F03–F08, F11, T10.6 | M | ⬜ |
-| T10.8 | Tài liệu hướng dẫn | F03–F08, F11 | S | ⬜ |
+| T10.8 | Tài liệu hướng dẫn | F03–F08, F11 | S | ✅ |
 | T10.9 | UAT | T10.7, T10.8 | M | ⬜ |
 | T10.10 | Checklist go-live (Vercel Pro) | T10.9 | M | ⬜ |
 

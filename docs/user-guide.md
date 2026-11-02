@@ -1,0 +1,121 @@
+# Hướng dẫn sử dụng — Xuân Thần Tài 2027
+
+Hai phần: **A. Người xem (cửa hàng)** và **B. Quản trị**. Tên nút, tên mục dưới đây trùng với giao diện.
+
+---
+
+## A. Dành cho người xem (cửa hàng)
+
+Không cần đăng nhập. Mở đường link được gửi; dùng được trên điện thoại và máy tính.
+
+### A1. Xem danh mục
+
+- Trang chủ hiện các sản phẩm (SP): ảnh, mã, tên, chất liệu, giá bán lẻ, số lượng **Đặt / Về / Còn thiếu**, tỷ lệ về và nhãn trạng thái màu.
+- Nút **Lưới** / **Bảng** đổi cách hiển thị. Cuối danh sách bấm **Xem thêm** để tải tiếp.
+- Bấm vào một SP để mở cửa sổ chi tiết: ảnh lớn và bảng số lượng **theo từng cửa hàng**. Bấm **Đóng** để quay lại.
+
+### A2. Xem hàng của cửa hàng mình
+
+1. Ở ô **Cửa hàng của bạn**, chọn cửa hàng của mình.
+2. Danh sách chỉ còn SP mà cửa hàng bạn **có đặt**, và các con số là của riêng cửa hàng bạn.
+3. Muốn xem cả SP chưa đặt: bật **Xem tất cả SP**.
+4. Chọn **Tất cả cửa hàng (tổng hệ thống)** để quay về số tổng.
+
+### A3. Lọc, tìm, sắp xếp
+
+- **Bộ lọc**: Nhãn hàng, Dòng hàng, Bộ sưu tập (có mục "Không thuộc BST"), Chất liệu, Khung giá. Chọn được nhiều giá trị; bên cạnh mỗi lựa chọn có số SP. Trên điện thoại bấm **Bộ lọc** để mở bảng lọc.
+- **Tìm mã SP**: gõ mã (không phân biệt hoa thường) vào ô **Tìm mã SP**.
+- **Sắp xếp**: Mã SP A→Z (mặc định), Mới cập nhật, Giá thấp → cao, Giá cao → thấp, Còn thiếu nhiều nhất.
+
+### A4. Xuất Excel
+
+Bấm **Xuất Excel** để tải file chứa đúng danh sách đang lọc (kèm số lượng của cửa hàng bạn chọn, nếu có).
+
+### A5. Cách tính cần biết
+
+- **Còn thiếu** = Đặt − Về, không âm (Về nhiều hơn Đặt thì Còn thiếu = 0).
+- **Tỷ lệ về** = Về / Đặt, tối đa 100%; chưa đặt thì hiện "—".
+- Số tổng hệ thống = cộng số của mọi cửa hàng đang hiển thị.
+
+---
+
+## B. Dành cho quản trị
+
+Vào `<địa chỉ web>/login`, đăng nhập bằng tên đăng nhập và mật khẩu. Menu: **Danh mục · Sản phẩm · Ảnh · Nhập Excel · Số lượng · Xuất dữ liệu · Tài khoản**.
+
+### B1. Thứ tự nhập dữ liệu lần đầu
+
+Làm đúng thứ tự, vì file Excel chỉ chọn được những giá trị đã có:
+
+1. **Danh mục → Cửa hàng**: nhập mã (duy nhất) và tên từng cửa hàng.
+2. **Danh mục → Nhãn hàng**: tạo nhãn.
+3. Dưới từng nhãn: tạo **Dòng hàng** (bắt buộc, mỗi SP thuộc một dòng) và **Bộ sưu tập** (không bắt buộc).
+4. **Chất liệu** và **Khung giá** (không bắt buộc, dùng để lọc).
+5. **Nhập Excel**: tải file mẫu → điền → nhập (B3).
+6. **Ảnh**: tải ảnh hàng loạt (B4).
+7. Đối chiếu số liệu trên trang xem với file nguồn.
+
+Trang **Danh mục** có hướng dẫn từng bước và đánh dấu bước đã xong.
+
+### B2. Quản lý danh mục
+
+- Thêm bằng ô "Thêm …" ở mỗi mục; sửa tên ngay trên dòng.
+- **Xóa** chỉ được khi chưa có SP hay số lượng nào dùng. Nếu đang dùng, hãy **Ẩn**.
+- **Ẩn** nhãn / dòng / BST / chất liệu → các SP thuộc nó cũng ẩn khỏi trang xem (hộp thoại cho biết bao nhiêu SP bị ảnh hưởng). **Ẩn cửa hàng** → số của cửa hàng đó không còn cộng vào tổng. Hiện lại là trở về như cũ.
+- Hệ thống không xóa dữ liệu vĩnh viễn; SP cũng chỉ ẩn/hiện, và **mã SP không sửa được** sau khi tạo.
+
+### B3. Nhập Excel
+
+1. Vào **Nhập Excel → Tải file mẫu**. File có sheet:
+   - **SanPham** — mỗi SP một dòng: Mã SP, Tên SP, Nhãn hàng, Dòng hàng, Bộ sưu tập, Chất liệu, Khung giá, Giá bán lẻ.
+   - **SoLuong** — mỗi cặp (SP, cửa hàng) một dòng: Mã SP, Mã cửa hàng, SL đặt, SL đã về.
+   - **HuongDan** — giải thích từng cột. Các cột Nhãn, Dòng, BST, Chất liệu, Khung giá, Mã cửa hàng có ô chọn từ danh sách.
+2. Điền file, lưu dạng **.xlsx**. Quy tắc:
+   - Mã SP không trùng, không có khoảng trắng; mã chưa có trên web → tạo SP mới (SP mới cần Nhãn hàng và Dòng hàng).
+   - Dòng phải thuộc đúng nhãn của SP; BST cũng vậy.
+   - Số lượng là số nguyên ≥ 0; SL về được phép lớn hơn SL đặt.
+   - **Ô để trống = giữ nguyên**. Muốn về 0 thì gõ 0. Giá trị có trong file **ghi đè** số cũ.
+   - Cửa hàng, nhãn, dòng, BST, chất liệu, khung giá chưa có trên web sẽ báo lỗi → tạo ở **Danh mục** trước.
+3. **Chọn file Excel**. Hệ thống hiện bản **xem trước**: thẻ tổng hợp (SP mới, SP thay đổi, dòng SL thay đổi, lỗi), các tab Tất cả / SP mới / Thay đổi / Lỗi, từng thay đổi dạng **cũ → mới**.
+4. Có lỗi: bảng lỗi ghi rõ **sheet, dòng, cột, lý do**. Sửa file rồi chọn lại (**Nhập file khác**). Nút **Áp dụng** bị khóa cho tới khi hết lỗi.
+5. Hết lỗi, kiểm tra lại số liệu → bấm **Áp dụng**. Áp dụng là "tất cả hoặc không": nếu lỗi giữa chừng, dữ liệu không đổi.
+
+### B4. Tải ảnh hàng loạt
+
+1. Đặt tên file ảnh = **mã SP** + đuôi `.jpg`, `.png` hoặc `.webp` (VD `NTT001.jpg`). Không phân biệt hoa thường.
+2. Mỗi SP **một ảnh**; tải lại cùng mã là thay ảnh. Hai file cùng mã → báo "trùng mã", không file nào được gắn.
+3. Vào **Ảnh**, kéo thả nhiều ảnh, một thư mục hoặc một file `.zip` (thư mục con trong zip được chấp nhận).
+4. Xem **Kết quả đối chiếu**: Khớp / Không khớp mã SP nào / Trùng mã / Không phải ảnh / SP chưa có ảnh. Xử lý các mục chưa khớp rồi tải.
+5. Ảnh được thu nhỏ ngay trên máy bạn nên ảnh gốc lớn vẫn tải nhanh. Theo dõi thanh tiến độ cho tới khi báo **Xong**.
+6. Tìm SP còn thiếu ảnh: **Sản phẩm** → tick "Chỉ SP chưa có ảnh". Đổi ảnh riêng cho một SP: mở SP đó trong **Sản phẩm**.
+
+### B5. Thêm / sửa từng sản phẩm
+
+**Sản phẩm → Thêm sản phẩm** (hoặc bấm vào một SP để sửa): chọn Nhãn trước rồi mới chọn được Dòng và BST của nhãn đó; bấm **Lưu thay đổi**. Lọc danh sách theo **Đang hiện / Đang ẩn**.
+
+### B6. Sửa nhanh số lượng
+
+**Số lượng** có hai chế độ: **Theo sản phẩm** (sửa SL đặt / SL đã về của một SP ở mọi cửa hàng) và **Theo cửa hàng** (chọn cửa hàng, sửa nhiều SP). Nhập số nguyên ≥ 0 rồi bấm **Lưu thay đổi**; số mới ghi đè số cũ.
+
+### B7. Xuất – sửa – nhập lại
+
+1. **Xuất dữ liệu** → tải file (cùng khuôn với file mẫu, gồm mọi SP đang hoạt động và mọi cặp SP × cửa hàng đã có số liệu). Với nhiều nghìn SP có thể mất vài chục giây.
+2. Sửa trong Excel, giữ nguyên tên sheet và tiêu đề cột.
+3. **Nhập Excel** như B3. Dòng nào không đổi sẽ không bị tính là thay đổi. SP đang ẩn không có trong file xuất và không bị ảnh hưởng khi nhập lại.
+
+### B8. Tài khoản và mật khẩu
+
+- Đổi mật khẩu: **Tài khoản → Đổi mật khẩu** (nhập mật khẩu hiện tại, mật khẩu mới ≥ 10 ký tự, nhập lại).
+- Nhập sai 5 lần liên tiếp: tài khoản bị khóa tạm 15 phút.
+- **Quên mật khẩu** (không đăng nhập được): người phát triển đặt lại bằng lệnh `npm run admin:set-password` với chuỗi kết nối CSDL production (xem `docs/deploy.md`, bước 9). Mật khẩu cũ hết hiệu lực, các phiên cũ bị đăng xuất, khóa tạm được gỡ. Không gửi mật khẩu qua chat hay email.
+
+### B9. Xử lý sự cố thường gặp
+
+| Hiện tượng                                     | Cách xử lý                                                        |
+| ---------------------------------------------- | ----------------------------------------------------------------- |
+| Nhập Excel báo "chưa có" nhãn / dòng / cửa hàng… | Tạo ở **Danh mục** trước rồi nhập lại                            |
+| Báo dòng không thuộc nhãn                      | Kiểm tra cột Nhãn hàng và Dòng hàng của SP có khớp nhau           |
+| Không chọn được file                           | Lưu lại dạng .xlsx (không dùng .xls / .csv)                       |
+| Ảnh "Không khớp mã SP nào"                     | Tên file chưa đúng mã, hoặc SP chưa được tạo (nhập Excel trước)   |
+| SP không hiện ở trang xem                      | Kiểm tra SP / nhãn / dòng / BST / chất liệu có đang bị ẩn         |
+| Số tổng ít hơn dự kiến                         | Có thể một cửa hàng đang bị ẩn (số của nó không cộng vào tổng)    |
