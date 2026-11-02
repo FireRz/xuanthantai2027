@@ -85,6 +85,24 @@ describe("POST /api/blob-upload (T02.4)", () => {
     expect((await POST(uploadRequest())).status).toBe(401);
   });
 
+  it("T07.3: đường dẫn ngoài thư mục cho phép → 400, đường dẫn ảnh SP → có token", async () => {
+    const { session: s } = await makeAdminSession();
+    session.current = s;
+    process.env.BLOB_READ_WRITE_TOKEN ||= "vercel_blob_rw_teststore_secret123";
+    const req = (pathname: string) =>
+      new Request("http://localhost/api/blob-upload", {
+        method: "POST",
+        body: JSON.stringify({
+          type: "blob.generate-client-token",
+          payload: { pathname, callbackUrl: "http://localhost/api/blob-upload", multipart: false },
+        }),
+      });
+    expect((await POST(req("evil/x.webp"))).status).toBe(400);
+    const ok = await POST(req("products/NTT001/image.webp"));
+    expect(ok.status).toBe(200);
+    expect(await ok.json()).toMatchObject({ type: "blob.generate-client-token" });
+  });
+
   it("quản trị hợp lệ → qua cổng (không còn 401)", async () => {
     const { session: s } = await makeAdminSession();
     session.current = s;

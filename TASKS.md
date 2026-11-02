@@ -118,7 +118,7 @@
 |----|------|-----------|------|----|
 | T07.1 | Schema Zod sản phẩm | T01.5 | S | ✅ |
 | T07.2 | Service sản phẩm | T01.6, T02.4, T07.1 | M | ✅ |
-| T07.3 | Resize trình duyệt + blob-upload + gắn/thay ảnh | T01.9, T02.4 | M | ⬜ |
+| T07.3 | Resize trình duyệt + blob-upload + gắn/thay ảnh | T01.9, T02.4 | M | ✅ |
 | T07.4 | Trang danh sách SP admin | T07.2, T02.3 | M | ⬜ |
 | T07.5 | Form thêm/sửa SP | T07.2, T06.1, T06.2 | M | ⬜ |
 | T07.6 | Đổi ảnh trong form | T07.3, T07.5 | S | ⬜ |
