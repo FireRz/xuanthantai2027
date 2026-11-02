@@ -142,6 +142,17 @@ test.describe("quản trị danh mục (T06.5)", () => {
     }
   });
 
+  test("có hướng dẫn thứ tự nhập, trỏ tới đúng tab", async ({ page }) => {
+    await login(page, admin.username, admin.password);
+    await expect(page).toHaveURL(/\/admin$/);
+    await page.goto("/admin/master-data");
+    const guide = page.getByTestId("setup-guide");
+    await expect(guide.getByText("Hướng dẫn thứ tự nhập")).toBeVisible();
+    await guide.getByText("Hướng dẫn thứ tự nhập").click(); // mở nếu đang thu gọn
+    await guide.getByRole("link", { name: "Tạo cửa hàng" }).click();
+    await expect(page).toHaveURL(/tab=stores/);
+  });
+
   test("chưa đăng nhập vào /admin/master-data → /login", async ({ page }) => {
     await page.goto("/admin/master-data");
     await expect(page).toHaveURL(/\/login/);

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireAdminPage } from "@/server/auth/require-admin";
 import { prisma } from "@/server/db";
 import { AddForm } from "./add-form";
+import { SetupGuide } from "./setup-guide";
 import { ItemRow } from "./item-row";
 
 export const metadata: Metadata = { title: "Danh mục" };
@@ -25,6 +26,13 @@ export default async function MasterDataPage({
 }) {
   await requireAdminPage();
   const tab = parseTab((await searchParams).tab);
+  const [stores, brands, lines, collections, materials] = await Promise.all([
+    prisma.store.count(),
+    prisma.brand.count(),
+    prisma.productLine.count(),
+    prisma.collection.count(),
+    prisma.material.count(),
+  ]);
 
   return (
     <div className="space-y-5">
@@ -35,6 +43,8 @@ export default async function MasterDataPage({
           được, chỉ ẩn.
         </p>
       </div>
+
+      <SetupGuide counts={{ stores, brands, lines, collections, materials }} />
 
       <nav aria-label="Loại danh mục" className="flex gap-1 border-b border-neutral-200">
         {TABS.map((t) => (
