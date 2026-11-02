@@ -86,8 +86,8 @@
 | T04.4 | `getFacetCounts` | T03.1, T04.2 | M | ✅ |
 | T04.5 | `FilterBar` desktop/mobile | T04.4 | M | ✅ |
 | T04.6 | Ô tìm mã SP | T04.3 | S | ✅ |
-| T04.7 | Menu sắp xếp | T04.3 | S | ⬜ |
-| T04.8 | Công tắc "Xem tất cả SP" | T04.5 | S | ⬜ |
+| T04.7 | Menu sắp xếp | T04.3 | S | ✅ |
+| T04.8 | Công tắc "Xem tất cả SP" | T04.5 | S | ✅ |
 | T04.9 | Đồng bộ URL, bỏ lựa chọn không hợp lệ | T04.5, T03.4 | S | ⬜ |
 | T04.10 | Số kết quả, trạng thái rỗng | T04.9 | S | ⬜ |
 | T04.11 | Chỉ mục & đo hiệu năng | T04.3, T04.4, T01.11 | S | ⬜ |

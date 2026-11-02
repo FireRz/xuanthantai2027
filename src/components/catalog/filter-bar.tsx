@@ -65,48 +65,50 @@ export function FilterBar({
       aria-busy={pending}
       className={cn("space-y-3", pending && "opacity-90")}
     >
-      {/* Máy tính / tablet */}
-      <div className="hidden space-y-3 md:block">
-        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Nhãn hàng">
-          <span className="text-ink-muted mr-1 text-sm font-semibold">Nhãn hàng</span>
-          {facets.brand.map((o) => (
-            <Chip
-              key={o.id}
-              option={o}
-              selected={state.brand.includes(o.id)}
-              onClick={() => toggle("brand", o.id)}
-            />
-          ))}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {GROUPS.slice(1).map(({ key, label }) => (
+      {/* Máy tính / tablet: hàng chip Nhãn hàng */}
+      <div
+        className="hidden flex-wrap items-center gap-2 md:flex"
+        role="group"
+        aria-label="Nhãn hàng"
+      >
+        <span className="text-ink-muted mr-1 text-sm font-semibold">Nhãn hàng</span>
+        {facets.brand.map((o) => (
+          <Chip
+            key={o.id}
+            option={o}
+            selected={state.brand.includes(o.id)}
+            onClick={() => toggle("brand", o.id)}
+          />
+        ))}
+      </div>
+
+      {/* Một hàng cho cả hai cỡ màn hình: nút thả xuống (máy tính) hoặc nút Lọc (điện thoại) + sắp xếp, công tắc */}
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setSheetOpen(true)}
+          aria-haspopup="dialog"
+          data-testid="open-filter-sheet"
+          className="border-brand text-brand focus-visible:outline-brand inline-flex min-h-11 items-center gap-2 rounded-full border-2 bg-white px-4 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 md:hidden"
+        >
+          <SlidersHorizontal className="size-4" aria-hidden />
+          Lọc{groupCount > 0 && <span data-testid="filter-count"> ({groupCount})</span>}
+        </button>
+        {GROUPS.slice(1).map(({ key, label }) => (
+          <div key={key} className="hidden md:block">
             <FilterDropdown
-              key={key}
               label={label}
               options={options(key)}
               selected={state[key]}
               total={facets.total}
               onToggle={(id) => toggle(key, id)}
             />
-          ))}
-          {toolbar && <div className="ml-auto flex flex-wrap items-center gap-3">{toolbar}</div>}
-        </div>
-      </div>
-
-      {/* Điện thoại */}
-      <div className="flex flex-wrap items-center gap-2 md:hidden">
-        <button
-          type="button"
-          onClick={() => setSheetOpen(true)}
-          aria-haspopup="dialog"
-          data-testid="open-filter-sheet"
-          className="border-brand text-brand focus-visible:outline-brand inline-flex min-h-11 items-center gap-2 rounded-full border-2 bg-white px-4 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
-        >
-          <SlidersHorizontal className="size-4" aria-hidden />
-          Lọc{groupCount > 0 && <span data-testid="filter-count"> ({groupCount})</span>}
-        </button>
+          </div>
+        ))}
         {toolbar && (
-          <div className="flex flex-1 flex-wrap items-center justify-end gap-2">{toolbar}</div>
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
+            {toolbar}
+          </div>
         )}
       </div>
 

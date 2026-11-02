@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { prisma } from "../../src/server/db";
 
 // Chạy trên DB dev đã seed quy mô lớn (npm run seed:large): 3 nhãn × 1.000 SP, 100 cửa hàng.
 
@@ -6,6 +7,8 @@ const scope = (page: Page) => page.getByTestId("scope-label");
 const cards = (page: Page) => page.getByTestId("product-card");
 const noHorizontalScroll = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+
+test.afterAll(() => prisma.$disconnect());
 
 test.describe("T04.5 FilterBar — máy tính", () => {
   test.beforeEach(async ({ isMobile }) => {
@@ -175,5 +178,124 @@ test.describe("T04.6 ô tìm mã SP (debounce)", () => {
     await expect(page.getByTestId("empty-state")).toBeVisible(); // mã AK… không thuộc nhãn Phúc Lộc
     await search(page).fill("");
     await expect(scope(page)).toContainText("1.000 SP");
+  });
+});
+
+test.describe("T04.7 menu sắp xếp", () => {
+  const sortBy = async (page: Page, value: string) =>
+    page.getByTestId("sort-menu").selectOption(value);
+  const attrs = (page: Page, name: string) =>
+    cards(page).evaluateAll((els, n) => els.map((e) => e.getAttribute(n)), name);
+
+  test("mặc định Mã A→Z; có đủ 5 kiểu", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByTestId("sort-menu")).toHaveValue("sku");
+    await expect(page.getByTestId("sort-menu").locator("option")).toHaveText([
+      "Mã SP A→Z",
+      "Mới cập nhật",
+      "Giá thấp → cao",
+      "Giá cao → thấp",
+      "Còn thiếu nhiều nhất",
+    ]);
+    const skus = (await attrs(page, "data-sku")) as string[];
+    expect([...skus].sort()).toEqual(skus);
+  });
+
+  test("giá thấp → cao và cao → thấp; SP không giá xếp cuối", async ({ page }) => {
+    await page.goto("/?n=120");
+    await sortBy(page, "price_asc");
+    await expect(page).toHaveURL(/sort=price_asc/);
+    await expect(cards(page)).toHaveCount(24);
+    const asc = ((await attrs(page, "data-price")) as string[]).map((p) => (p === "" ? null : +p));
+    const priced = asc.filter((p): p is number => p !== null);
+    expect([...priced].sort((a, b) => a - b)).toEqual(priced);
+    // Không có SP không giá nằm trước SP có giá
+    expect(asc.indexOf(null) === -1 || asc.slice(asc.indexOf(null)).every((p) => p === null)).toBe(
+      true,
+    );
+
+    await sortBy(page, "price_desc");
+    await expect(page).toHaveURL(/sort=price_desc/);
+    await expect
+      .poll(async () => {
+        const d = ((await attrs(page, "data-price")) as string[])
+          .filter((p) => p !== "")
+          .map((p) => +p);
+        return d.length > 1 && [...d].sort((a, b) => b - a).join() === d.join();
+      })
+      .toBe(true);
+  });
+
+  test("còn thiếu nhiều nhất: giảm dần theo phạm vi tổng và theo cửa hàng", async ({ page }) => {
+    await page.goto("/?sort=shortage");
+    const total = ((await attrs(page, "data-shortage")) as string[]).map(Number);
+    expect([...total].sort((a, b) => b - a)).toEqual(total);
+
+    await page.goto("/?sort=shortage&store=CH001&all=1");
+    const store = ((await attrs(page, "data-shortage")) as string[]).map(Number);
+    expect([...store].sort((a, b) => b - a)).toEqual(store);
+    expect(store).not.toEqual(total);
+  });
+
+  test("mới cập nhật: SP cập nhật gần nhất lên đầu; chọn lại Mã A→Z trả về URL gọn", async ({
+    page,
+  }) => {
+    const newest = await prisma.product.findFirstOrThrow({
+      where: { active: true, brand: { active: true }, productLine: { active: true } },
+      orderBy: [{ updatedAt: "desc" }, { sku: "asc" }],
+      select: { sku: true },
+    });
+    await page.goto("/");
+    await sortBy(page, "updated");
+    await expect(page).toHaveURL(/sort=updated/);
+    await expect(cards(page).first()).toHaveAttribute("data-sku", newest.sku);
+    await sortBy(page, "sku");
+    await expect(page).not.toHaveURL(/sort=/);
+  });
+
+  test("giữ nguyên bộ lọc khi đổi kiểu sắp xếp", async ({ page }) => {
+    await page.goto("/?q=ak00");
+    await sortBy(page, "price_desc");
+    await expect(page).toHaveURL(/q=ak00/);
+    await expect(scope(page)).toContainText("99 SP");
+  });
+});
+
+test.describe("T04.8 công tắc 'Xem tất cả SP'", () => {
+  const sw = (page: Page) => page.getByRole("switch", { name: "Xem tất cả SP" });
+
+  test("chỉ hiện khi đã chọn cửa hàng", async ({ page }) => {
+    await page.goto("/");
+    await expect(sw(page)).toHaveCount(0);
+    await page.goto("/?store=CH001");
+    await expect(sw(page)).toHaveCount(1);
+    await page.goto("/?store=KHONG-CO");
+    await expect(sw(page)).toHaveCount(0);
+  });
+
+  test("CH đặt n/3.000 SP → n; bật → 3.000, SP không đặt hiển thị 0; tắt → n", async ({ page }) => {
+    const store = await prisma.store.findUniqueOrThrow({ where: { code: "CH001" } });
+    const ordered = await prisma.storeProductQty.count({
+      where: { storeId: store.id, qtyOrdered: { gt: 0 }, product: { active: true } },
+    });
+    const fmt = (n: number) => new Intl.NumberFormat("vi-VN").format(n);
+
+    await page.goto("/?store=CH001");
+    await expect(scope(page)).toContainText(`${fmt(ordered)} SP`);
+    await sw(page).check();
+    await expect(page).toHaveURL(/all=1/);
+    await expect(scope(page)).toContainText("3.000 SP");
+    await sw(page).uncheck();
+    await expect(page).not.toHaveURL(/all=1/);
+    await expect(scope(page)).toContainText(`${fmt(ordered)} SP`);
+  });
+
+  test("đổi cửa hàng thì công tắc tự tắt", async ({ page }) => {
+    await page.goto("/?store=CH001&all=1");
+    await expect(sw(page)).toBeChecked();
+    await page.getByRole("combobox", { name: "Cửa hàng của bạn" }).selectOption("CH002");
+    await expect(page).toHaveURL(/store=CH002/);
+    await expect(page).not.toHaveURL(/all=1/);
+    await expect(sw(page)).not.toBeChecked();
   });
 });

@@ -22,6 +22,8 @@ export function ProductCard({
     <article
       data-testid="product-card"
       data-sku={item.sku}
+      data-price={item.priceVnd ?? ""}
+      data-shortage={m.shortage}
       className="group border-line hover:border-gold flex flex-col overflow-hidden rounded-xl border bg-white transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="relative aspect-square">
