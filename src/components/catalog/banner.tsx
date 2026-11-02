@@ -9,6 +9,15 @@ export function Banner() {
   return (
     <header className="relative flex min-h-[500px] flex-col overflow-hidden bg-[#cc1208] text-center text-white sm:h-[540px] sm:min-h-0">
       {/* Cả bức tranh nằm gọn trong banner (object-contain); mép tranh mờ dần vào nền đỏ cùng màu. */}
+      {/* Nền: chính bức tranh phóng to và làm mờ, lấp hai dải bên để banner liền một khối. */}
+      <Image
+        src="/brand/tet-banner.png"
+        alt=""
+        fill
+        sizes="100vw"
+        aria-hidden
+        className="scale-125 object-cover opacity-90 blur-2xl"
+      />
       <div className="absolute bottom-0 left-1/2 aspect-[1518/1036] w-full -translate-x-1/2 [mask-image:linear-gradient(to_bottom,transparent,black_30%)] sm:inset-y-0 sm:h-full sm:w-auto sm:[mask-image:linear-gradient(to_right,transparent,black_14%,black_86%,transparent)]">
         <Image
           src="/brand/tet-banner.png"
