@@ -483,3 +483,54 @@ test.describe("Khung giá (ADR-010)", () => {
     await expect(scope(page)).toHaveText(total);
   });
 });
+
+test.describe("Khớp mockup (docs/mockups)", () => {
+  test("máy tính: chip 'Tất cả nhãn' kèm tổng, bật khi chưa chọn nhãn, bấm để bỏ chọn nhãn", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "Hàng chip chỉ có trên máy tính");
+    await page.goto("/");
+    const all = page.getByRole("button", { name: /^Tất cả nhãn/ });
+    await expect(all).toHaveText("Tất cả nhãn3.000");
+    await expect(all).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: /^An Khang/ }).click();
+    await expect(all).toHaveAttribute("aria-pressed", "false");
+    await expect(all).toHaveText("Tất cả nhãn3.000"); // tổng tính trên các bộ lọc khác, không trên nhãn
+    await all.click();
+    await expect(page).not.toHaveURL(/brand=/);
+    await expect(all).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("nút sắp xếp dạng chip: 'Sắp xếp: Mã SP A→Z' (máy tính) / 'Mã SP A→Z' (điện thoại), đổi được", async ({
+    page,
+    isMobile,
+  }) => {
+    await page.goto("/");
+    const pill = page.getByTestId("sort-menu").locator("xpath=..");
+    await expect(pill.locator("> span:visible")).toHaveText(
+      isMobile ? ["Mã SP A→Z"] : ["Sắp xếp:", "Mã SP A→Z"],
+    );
+    await page.getByTestId("sort-menu").selectOption("price_desc");
+    await expect(pill.locator("> span:visible").last()).toHaveText("Giá cao → thấp");
+    await expect(page).toHaveURL(/sort=price_desc/);
+  });
+
+  test("điện thoại: bảng lọc có nhóm Sắp xếp dạng chip", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "Chỉ điện thoại");
+    await page.goto("/");
+    await page.getByTestId("open-filter-sheet").click();
+    const sheet = page.getByTestId("filter-sheet");
+    await expect(sheet.getByText("Sắp xếp", { exact: true })).toBeVisible();
+    await expect(sheet.getByRole("button", { name: "Mã SP A→Z" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await sheet.getByRole("button", { name: "Còn thiếu nhiều nhất" }).click();
+    await expect(page).toHaveURL(/sort=shortage/);
+    await expect(sheet.getByRole("button", { name: "Còn thiếu nhiều nhất" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+});

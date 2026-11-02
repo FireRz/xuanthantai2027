@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { SORTS, type Sort } from "@/lib/catalog-params";
 import { useCatalogNav } from "./catalog-nav";
 
@@ -16,15 +16,17 @@ export const SORT_LABELS: Record<Sort, string> = {
 export function SortMenu() {
   const { state, go } = useCatalogNav();
   return (
-    <label className="flex items-center gap-2 text-[15px]">
-      <ArrowUpDown className="text-ink-muted size-4 shrink-0" aria-hidden />
-      <span className="sr-only md:not-sr-only md:font-medium">Sắp xếp</span>
+    <label className="border-line focus-within:outline-brand relative inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border bg-white px-4 text-[15px] font-medium focus-within:outline-2 focus-within:outline-offset-2 md:min-h-10">
+      <ArrowUpDown className="size-4 shrink-0" aria-hidden />
+      <span className="text-ink-muted hidden md:inline">Sắp xếp:</span>
+      <span>{SORT_LABELS[state.sort]}</span>
+      <ChevronDown className="size-4 shrink-0" aria-hidden />
       <select
         aria-label="Sắp xếp"
         data-testid="sort-menu"
         value={state.sort}
         onChange={(e) => go({ sort: e.target.value as Sort })}
-        className="border-line focus-visible:outline-brand min-h-11 rounded-lg border bg-white px-3 focus-visible:outline-2 focus-visible:outline-offset-2 md:min-h-10"
+        className="absolute inset-0 size-full cursor-pointer opacity-0"
       >
         {SORTS.map((s) => (
           <option key={s} value={s}>

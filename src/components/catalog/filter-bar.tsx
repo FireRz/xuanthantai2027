@@ -2,11 +2,17 @@
 
 import { Check, ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import { countGroupFilters, hasActiveFilter, type CatalogParams } from "@/lib/catalog-params";
+import {
+  countGroupFilters,
+  hasActiveFilter,
+  SORTS,
+  type CatalogParams,
+} from "@/lib/catalog-params";
 import { formatInt } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { FacetCounts, FacetOption } from "@/server/services/catalog-facets";
 import { toggleId, useCatalogNav } from "./catalog-nav";
+import { SORT_LABELS } from "./catalog-toolbar";
 
 type GroupKey = "brand" | "line" | "col" | "mat" | "pr";
 
@@ -79,6 +85,17 @@ export function FilterBar({
           aria-label={label}
         >
           <span className="text-ink-muted mr-1 min-w-[5.5rem] text-sm font-semibold">{label}</span>
+          {key === "brand" && (
+            <Chip
+              option={{
+                id: "all",
+                name: "Tất cả nhãn",
+                count: facets.brand.reduce((n, o) => n + o.count, 0),
+              }}
+              selected={state.brand.length === 0}
+              onClick={() => go({ brand: [] })}
+            />
+          )}
           {facets[key].map((o) => (
             <Chip
               key={o.id}
@@ -165,6 +182,7 @@ export function FilterBar({
         state={state}
         pending={pending}
         onToggle={toggle}
+        onSort={(sort) => go({ sort })}
         onClear={() => go({ brand: [], line: [], col: [], mat: [], pr: [] })}
       />
     </div>
@@ -332,6 +350,7 @@ function FilterSheet({
   state,
   pending,
   onToggle,
+  onSort,
   onClear,
 }: {
   open: boolean;
@@ -340,6 +359,7 @@ function FilterSheet({
   state: CatalogParams;
   pending: boolean;
   onToggle: (key: GroupKey, id: string) => void;
+  onSort: (sort: CatalogParams["sort"]) => void;
   onClear: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -397,6 +417,19 @@ function FilterSheet({
             </fieldset>
           );
         })}
+        <fieldset className="space-y-2">
+          <legend className="text-ink-muted mb-1 text-sm font-semibold">Sắp xếp</legend>
+          <div className="flex flex-wrap gap-2">
+            {SORTS.map((sort) => (
+              <SheetChip
+                key={sort}
+                label={SORT_LABELS[sort]}
+                selected={state.sort === sort}
+                onClick={() => onSort(sort)}
+              />
+            ))}
+          </div>
+        </fieldset>
       </div>
       <div className="border-line flex gap-3 border-t px-4 py-3">
         <button
@@ -428,7 +461,7 @@ function SheetChip({
   onClick,
 }: {
   label: string;
-  count: number;
+  count?: number;
   selected: boolean;
   onClick: () => void;
 }) {
@@ -446,9 +479,11 @@ function SheetChip({
     >
       {selected && <Check className="size-4" aria-hidden />}
       {label}
-      <span className={cn("text-sm tabular-nums", selected ? "text-white/85" : "text-ink-muted")}>
-        {formatInt(count)}
-      </span>
+      {count !== undefined && (
+        <span className={cn("text-sm tabular-nums", selected ? "text-white/85" : "text-ink-muted")}>
+          {formatInt(count)}
+        </span>
+      )}
     </button>
   );
 }
