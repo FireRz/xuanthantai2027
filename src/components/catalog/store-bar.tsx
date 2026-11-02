@@ -1,9 +1,12 @@
 "use client";
 
 import { Search, Store } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { buildCatalogQuery, type CatalogParams } from "@/lib/catalog-params";
+import { useEffect, useState } from "react";
+import type { CatalogParams } from "@/lib/catalog-params";
+import { useCatalogNav } from "./catalog-nav";
+
+/** Thời gian chờ sau phím cuối trước khi lọc theo mã (ms). */
+export const SEARCH_DEBOUNCE_MS = 350;
 
 export interface StoreOption {
   code: string;
@@ -14,9 +17,8 @@ export interface StoreOption {
  * Thanh "Cửa hàng của bạn" dính dưới banner (ADR-009 U14'): ô chọn cửa hàng (chọn một) + ô tìm mã SP.
  * Đổi cửa hàng áp dụng ngay; bấm "Xem hàng" áp dụng cả mã tìm và cuộn xuống danh sách.
  */
-export function StoreBar({ stores, params }: { stores: StoreOption[]; params: CatalogParams }) {
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
+export function StoreBar({ stores }: { stores: StoreOption[] }) {
+  const { state: params, go: navigate, pending } = useCatalogNav();
   const [q, setQ] = useState(params.q);
   const [prevQ, setPrevQ] = useState(params.q);
   if (params.q !== prevQ) {
@@ -25,14 +27,18 @@ export function StoreBar({ stores, params }: { stores: StoreOption[]; params: Ca
     setQ(params.q);
   }
 
-  const go = (patch: Partial<CatalogParams>, hash = "") => {
-    const next = { ...params, n: undefined, ...patch };
-    // Đổi cửa hàng thì bỏ công tắc "xem tất cả" của cửa hàng cũ.
-    if (patch.store !== undefined) next.all = false;
-    startTransition(() =>
-      router.push(`/${buildCatalogQuery(next)}${hash}`, { scroll: hash !== "" }),
-    );
-  };
+  // Gõ tới đâu tìm tới đó: chờ SEARCH_DEBOUNCE_MS sau phím cuối rồi mới lọc (T04.6).
+  useEffect(() => {
+    const next = q.trim();
+    if (next === params.q) return;
+    const t = setTimeout(() => go({ q: next }), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q, params.q]);
+
+  // Đổi cửa hàng thêm mục vào lịch sử; gõ tìm mã chỉ thay mục hiện tại (Back không phải lùi từng chữ).
+  const go = (patch: Partial<CatalogParams>, hash = "") =>
+    navigate(patch, { hash, mode: patch.store !== undefined ? "push" : "replace" });
 
   return (
     <div

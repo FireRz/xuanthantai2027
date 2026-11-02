@@ -147,3 +147,33 @@ test.describe("T04.5 FilterBar — điện thoại (bảng lọc trượt từ d
     await expect(cards(page).first()).toBeVisible();
   });
 });
+
+test.describe("T04.6 ô tìm mã SP (debounce)", () => {
+  const search = (page: Page) => page.getByRole("searchbox", { name: "Tìm mã SP" });
+
+  test("gõ 'ak00' (không cần bấm nút) → mọi SP có mã chứa AK00, không phân biệt hoa/thường", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await search(page).pressSequentially("ak00", { delay: 60 });
+    await expect(page).toHaveURL(/q=ak00/);
+    await expect(search(page)).toHaveValue("ak00"); // không bị URL trễ ghi đè
+    await expect(scope(page)).toContainText("99 SP"); // AK0001…AK0099
+    const skus = await cards(page).evaluateAll((els) => els.map((e) => e.getAttribute("data-sku")));
+    expect(skus.length).toBeGreaterThan(0);
+    expect(skus.every((s) => s!.toUpperCase().includes("AK00"))).toBe(true);
+  });
+
+  test("kết hợp bộ lọc: tìm + nhãn; xóa chữ về toàn bộ", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Bộ lọc nhãn dạng chip chỉ có trên máy tính");
+    await page.goto("/");
+    await page
+      .getByTestId("filter-bar")
+      .getByRole("button", { name: /^Phúc Lộc/ })
+      .click();
+    await search(page).fill("AK00");
+    await expect(page.getByTestId("empty-state")).toBeVisible(); // mã AK… không thuộc nhãn Phúc Lộc
+    await search(page).fill("");
+    await expect(scope(page)).toContainText("1.000 SP");
+  });
+});

@@ -6,7 +6,7 @@ import { countGroupFilters, hasActiveFilter, type CatalogParams } from "@/lib/ca
 import { formatInt } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { FacetCounts, FacetOption } from "@/server/services/catalog-facets";
-import { toggleId, useCatalogNav } from "./use-catalog-nav";
+import { toggleId, useCatalogNav } from "./catalog-nav";
 
 type GroupKey = "brand" | "line" | "col" | "mat";
 
@@ -35,20 +35,17 @@ function labelOf(o: FacetOption, options: FacetOption[]) {
  */
 export function FilterBar({
   facets,
-  params,
   toolbar,
 }: {
   facets: FacetCounts;
-  params: CatalogParams;
   /** Sắp xếp + công tắc "Xem tất cả SP" (T04.7, T04.8). */
   toolbar?: React.ReactNode;
 }) {
   const owned = (xs: FacetOption[]) =>
     xs.filter((o) => o.brandId).map((o) => ({ id: o.id, brandId: o.brandId as string }));
-  const { state, go, pending } = useCatalogNav(params, {
-    lines: owned(facets.line),
-    cols: owned(facets.col),
-  });
+  const { state, go: navigate, pending } = useCatalogNav();
+  const go = (patch: Partial<CatalogParams>) =>
+    navigate(patch, { owned: { lines: owned(facets.line), cols: owned(facets.col) } });
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const toggle = (key: GroupKey, id: string) => go({ [key]: toggleId(state[key], id) });

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Banner } from "@/components/catalog/banner";
 import { CatalogSection } from "@/components/catalog/catalog-section";
 import { FilterSection } from "@/components/catalog/filter-section";
+import { CatalogNavProvider } from "@/components/catalog/catalog-nav";
 import { CollectionsSection } from "@/components/catalog/collections-section";
 import { ProductGridSkeleton } from "@/components/catalog/product-grid";
 import { SiteFooter } from "@/components/catalog/site-footer";
@@ -27,9 +28,9 @@ export default async function HomePage({
   const key = buildCatalogQuery(params);
 
   return (
-    <>
+    <CatalogNavProvider params={params}>
       <Banner />
-      <StoreBar stores={stores} params={params} />
+      <StoreBar stores={stores} />
       <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
         <Suspense key={`c${key}`} fallback={null}>
           <CollectionsSection params={params} />
@@ -51,6 +52,6 @@ export default async function HomePage({
       <Suspense fallback={null}>
         <SiteFooter />
       </Suspense>
-    </>
+    </CatalogNavProvider>
   );
 }
