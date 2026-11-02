@@ -50,8 +50,8 @@ type Row = {
 
 type ListParams = Pick<CatalogParams, "store" | "all" | "q"> &
   Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "pr" | "sort">> & {
-    /** Số SP lấy về (mặc định 24). */
-    limit?: number;
+    /** Số SP lấy về (mặc định 24); `null` = không giới hạn (dùng khi xuất Excel). */
+    limit?: number | null;
     offset?: number;
   };
 
@@ -63,7 +63,7 @@ type ListParams = Pick<CatalogParams, "store" | "all" | "q"> &
  */
 export async function listProducts(params: ListParams): Promise<ProductListResult> {
   const store = await findActiveStore(params.store);
-  const limit = params.limit ?? 24;
+  const limit = params.limit === null ? Prisma.sql`ALL` : (params.limit ?? 24);
   const offset = params.offset ?? 0;
 
   const where = buildWhere(params, { store, all: params.all });
