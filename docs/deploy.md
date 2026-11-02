@@ -64,6 +64,13 @@ Tab **Storage** → `xtt-blob` → **.env.local** → sao chép dòng `BLOB_READ
 
 GitHub repo → **Settings → Branches → Add branch ruleset** (hoặc *Branch protection rule*) cho `main`: bật **Require status checks to pass** → chọn check **check** (workflow CI).
 
+**9. Tạo tài khoản quản trị (và đặt lại khi quên mật khẩu)**
+
+1. Trên máy, trong file `.env` đặt `DATABASE_URL` = chuỗi kết nối **không pool** của CSDL cần tạo (Vercel → Storage → Neon → `DATABASE_URL_UNPOOLED`).
+2. Chạy `npm run admin:set-password` (thêm `-- --username=ten` nếu muốn tên khác "admin"). Script hỏi mật khẩu 2 lần, **không hiện ký tự**, tối thiểu 10 ký tự.
+3. Quên mật khẩu: chạy lại đúng lệnh trên — mật khẩu cũ hết hiệu lực, mọi phiên đăng nhập cũ bị đăng xuất, khóa tạm (nếu có) được gỡ.
+4. **Không gửi mật khẩu qua chat, không ghi vào mã nguồn.** Xong nhớ trả `DATABASE_URL` trong `.env` về CSDL dev.
+
 ## Sự cố thường gặp
 
 | Hiện tượng                                       | Cách xử lý                                                                            |

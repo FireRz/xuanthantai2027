@@ -20,6 +20,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
+    "admin:set-password": "tsx scripts/set-admin-password.ts",
     "seed:large": "tsx prisma/seed.ts --large",
     "vercel-build": "prisma migrate deploy && next build"
   },
