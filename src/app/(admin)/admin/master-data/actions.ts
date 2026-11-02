@@ -22,10 +22,6 @@ import {
   type MasterKind,
 } from "@/server/services/master-data";
 
-export type ActionResult<T = undefined> =
-  | ({ ok: true; message?: string } & (T extends undefined ? object : { data: T }))
-  | { ok: false; error: string };
-
 const kindSchema = z.enum(["brand", "line", "collection", "material", "store"]);
 const idSchema = z.uuid();
 

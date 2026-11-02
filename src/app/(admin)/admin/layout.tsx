@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: { default: "Quản trị", template: 
 
 // Mục trong sidebar (UI-DESIGN §8). Mục chưa có trang hiển thị mờ, bật dần theo từng phiên.
 const NAV: { href: string; label: string; ready: boolean }[] = [
-  { href: "/admin/master-data", label: "Danh mục", ready: false },
+  { href: "/admin/master-data", label: "Danh mục", ready: true },
   { href: "/admin/products", label: "Sản phẩm", ready: false },
   { href: "/admin/images", label: "Ảnh", ready: false },
   { href: "/admin/import", label: "Nhập Excel", ready: false },
