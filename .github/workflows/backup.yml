@@ -1,5 +1,5 @@
 # Sao lưu hằng ngày (T10.4): pg_dump CSDL production -> Vercel Blob (private), giữ 7 bản.
-# Cần secret: BACKUP_DATABASE_URL (chuỗi KHÔNG pool của Neon production), BLOB_READ_WRITE_TOKEN.
+# Cần secret: BACKUP_DATABASE_URL (chuỗi KHÔNG pool của Neon production), BACKUP_BLOB_TOKEN (token của Blob store RIÊNG, chế độ private).
 name: Backup
 
 on:
@@ -31,5 +31,5 @@ jobs:
         run: /usr/lib/postgresql/18/bin/pg_dump --format=custom --no-owner --no-privileges --dbname="$BACKUP_DATABASE_URL" --file=backup.dump
       - name: Tải lên Blob, giữ 7 bản
         env:
-          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BACKUP_BLOB_TOKEN }}
         run: node scripts/backup-blob.mjs upload backup.dump

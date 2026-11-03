@@ -81,14 +81,14 @@ GitHub repo → **Settings → Branches → Add branch ruleset** (hoặc *Branch
 
 ## Sao lưu và khôi phục (T10.4)
 
-- **Sao lưu hằng ngày:** workflow `Backup` (`.github/workflows/backup.yml`) chạy 03:00 giờ Việt Nam: `pg_dump` (định dạng custom) CSDL production → Vercel Blob `backups/xtt-<UTC>.dump` (private), tự xóa bản cũ, giữ 7 bản mới nhất. Dump chứa cả băm mật khẩu quản trị nên Blob để chế độ private.
+- **Sao lưu hằng ngày:** workflow `Backup` (`.github/workflows/backup.yml`) chạy 03:00 giờ Việt Nam: `pg_dump` (định dạng custom) CSDL production → Vercel Blob store sao lưu `backups/xtt-<UTC>.dump`, tự xóa bản cũ, giữ 7 bản mới nhất. Dump chứa cả băm mật khẩu quản trị nên phải ở store Private riêng (store ảnh là public).
 - **Secrets GitHub cần tạo** (repo → Settings → Secrets and variables → Actions):
   - `BACKUP_DATABASE_URL`: chuỗi kết nối **không pool** của Neon **production** (`DATABASE_URL_UNPOOLED`).
-  - `BLOB_READ_WRITE_TOKEN`: token của Blob store `xtt-blob`.
+  - `BACKUP_BLOB_TOKEN`: token của Blob store **riêng, chế độ Private** (ví dụ `xtt-backup`), chỉ dùng cho sao lưu. Không dùng store ảnh `xtt-blob` (public). Khi tạo store, KHÔNG kết nối vào project Vercel (tránh ghi đè `BLOB_READ_WRITE_TOKEN` của store ảnh); chỉ sao chép token từ trang store.
   - Không gửi các giá trị này qua chat.
 - **Chạy thử ngay:** Actions → **Backup** → Run workflow; kiểm tra Blob có file trong `backups/`.
 - **Diễn tập khôi phục:** Actions → **Restore drill** → Run workflow. Workflow tải bản mới nhất, `pg_restore` vào Postgres trống, rồi `scripts/verify-restore.mjs` so số dòng từng bảng với production (chỉ đọc). Đạt khi in `ĐẠT: số dòng mọi bảng khớp`. Diễn tập lại mỗi khi đổi cấu trúc dữ liệu lớn và trước go-live.
-- **Khôi phục thật khi sự cố:** tải file từ Blob (dashboard Vercel → Storage → `xtt-blob`), tạo DB Neon trống (hoặc nhánh mới), rồi
+- **Khôi phục thật khi sự cố:** tải file từ Blob store sao lưu (dashboard Vercel → Storage → `xtt-backup`), tạo DB Neon trống (hoặc nhánh mới), rồi
   `pg_restore --no-owner --no-privileges --dbname=<url-không-pool> xtt-<mốc>.dump`; đổi `DATABASE_URL`/`DATABASE_URL_UNPOOLED` của Production sang DB mới và redeploy. Neon cũng có khôi phục theo thời điểm (tùy gói) — dùng cho sự cố trong vài giờ gần nhất.
 - Ảnh sản phẩm nằm trên Blob, không nằm trong dump; nguồn gốc ảnh do chủ dự án giữ (ADR-005).
 

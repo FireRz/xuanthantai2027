@@ -2,7 +2,7 @@
  * Sao lưu CSDL lên Vercel Blob (T10.4, ADR-005).
  *   node scripts/backup-blob.mjs upload <file.dump>   tải lên backups/ rồi xóa bản cũ, giữ 7 bản mới nhất
  *   node scripts/backup-blob.mjs download <out-file>  tải bản mới nhất về <out-file>
- * Cần BLOB_READ_WRITE_TOKEN. Bản dump chứa cả băm mật khẩu quản trị nên lưu ở chế độ private.
+ * Cần BLOB_READ_WRITE_TOKEN (workflow gán từ secret BACKUP_BLOB_TOKEN). Bản dump chứa cả băm mật khẩu quản trị nên lưu ở chế độ private.
  */
 import { del, get, list, put } from "@vercel/blob";
 import fs from "node:fs";

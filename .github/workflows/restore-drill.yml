@@ -32,7 +32,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - name: Tải bản sao lưu mới nhất
         env:
-          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BACKUP_BLOB_TOKEN }}
         run: node scripts/backup-blob.mjs download backup.dump
       - name: Khôi phục vào DB trống
         run: |
