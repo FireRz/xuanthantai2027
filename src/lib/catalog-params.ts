@@ -6,7 +6,7 @@
  */
 import { z } from "zod";
 
-export const SORTS = ["sku", "updated", "price_asc", "price_desc", "shortage"] as const;
+export const SORTS = ["sku", "updated", "price_asc", "price_desc", "shortage", "sold"] as const;
 export type Sort = (typeof SORTS)[number];
 export const VIEWS = ["grid", "list"] as const;
 export type View = (typeof VIEWS)[number];

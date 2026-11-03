@@ -1,4 +1,5 @@
 import { formatInt, formatPercent, formatVnd, orDash } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { stockStatus } from "@/lib/status";
 import type { ProductListItem } from "@/server/services/catalog";
 import { ProductImage } from "./product-image";
@@ -28,7 +29,7 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
             <th scope="col" className={`${th} w-16 rounded-tl-xl`}>
               Ảnh
             </th>
-            <th scope="col" className={th}>
+            <th scope="col" className={`${th} sticky left-0 lg:static`}>
               Mã SP
             </th>
             <th scope="col" className={th}>
@@ -88,7 +89,7 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
                     className="border-line size-12 rounded-md border text-xs"
                   />
                 </td>
-                <td className="px-3 py-2 font-medium tracking-wide whitespace-nowrap uppercase">
+                <td className="sticky left-0 bg-white px-3 py-2 font-medium tracking-wide whitespace-nowrap uppercase lg:static">
                   <ProductLink sku={item.sku} className="hover:underline">
                     {item.sku}
                   </ProductLink>
@@ -106,7 +107,14 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
                 <td className={`px-3 py-2 ${num}`}>{formatInt(m.shortage)}</td>
                 <td className={`px-3 py-2 ${num}`}>{formatPercent(m.rate)}</td>
                 <td className={`px-3 py-2 ${num}`}>{formatInt(item.sold)}</td>
-                <td className={`px-3 py-2 ${num}`}>{formatInt(item.stock)}</td>
+                <td
+                  className={cn(
+                    `px-3 py-2 ${num}`,
+                    item.stock === 0 && m.received > 0 && "text-status-short-fg font-bold",
+                  )}
+                >
+                  {formatInt(item.stock)}
+                </td>
                 <td className="px-3 py-2">
                   <StatusBadge status={stockStatus(m)} />
                 </td>

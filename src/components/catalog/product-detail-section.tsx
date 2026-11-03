@@ -83,7 +83,10 @@ function DetailBody({
               Bán <b>{formatInt(d.totalSold)}</b>
             </span>
             <span>
-              Tồn <b>{formatInt(d.totalStock)}</b>
+              Tồn{" "}
+              <b className={cn(d.totalStock === 0 && t.received > 0 && "text-status-short-fg")}>
+                {formatInt(d.totalStock)}
+              </b>
             </span>
             <b>{formatPercent(t.rate)}</b>
             <StatusBadge status={stockStatus(t)} />
@@ -91,88 +94,137 @@ function DetailBody({
         </div>
       </div>
 
-      <div className="border-line mx-4 mb-4 max-h-[min(50vh,28rem)] overflow-auto rounded-xl border md:mx-6 md:mb-6">
-        <table
-          data-testid="store-qty-table"
-          className="w-full border-collapse text-[13px] md:text-[15px]"
-        >
-          <caption className="sr-only">Số lượng theo từng cửa hàng</caption>
-          <thead>
-            <tr>
-              <th scope="col" className={`${th} text-left`}>
-                Cửa hàng
-              </th>
-              <th scope="col" className={`${th} ${num}`}>
-                Đặt
-              </th>
-              <th scope="col" className={`${th} ${num}`}>
-                Về
-              </th>
-              <th scope="col" className={`${th} ${num}`}>
-                Thiếu
-              </th>
-              <th scope="col" className={`${th} ${num}`}>
-                %
-              </th>
-              <th scope="col" className={`${th} ${num}`}>
-                Bán
-              </th>
-              <th scope="col" className={`${th} ${num}`}>
-                Tồn
-              </th>
-              <th scope="col" className={`${th} text-left`}>
-                TT
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {d.stores.map((s) => {
-              const hl = filtered !== null && s.code.toUpperCase() === filtered;
-              return (
-                <tr
-                  key={s.code}
-                  data-testid="store-qty-row"
-                  data-store={s.code}
-                  data-highlight={hl ? "true" : undefined}
-                  aria-current={hl ? "true" : undefined}
-                  className={cn("border-line border-t", hl && "bg-gold-soft font-semibold")}
-                >
-                  <td className="px-3 py-2">
-                    <span className="font-medium">{s.code}</span> {s.name}
-                  </td>
-                  <td className={`px-3 py-2 ${num}`}>{formatInt(s.metrics.ordered)}</td>
-                  <td className={`px-3 py-2 ${num}`}>{formatInt(s.metrics.received)}</td>
-                  <td className={`px-3 py-2 ${num}`}>{formatInt(s.metrics.shortage)}</td>
-                  <td className={`px-3 py-2 ${num}`}>{formatPercent(s.metrics.rate)}</td>
-                  <td className={`px-3 py-2 ${num}`}>{formatInt(s.sold)}</td>
-                  <td className={`px-3 py-2 ${num}`}>{formatInt(s.stock)}</td>
-                  <td className="px-3 py-2">
-                    <StatusBadge status={stockStatus(s.metrics)} />
+      {d.storeFiltered && d.stores[0] && <StoreFigures store={d.stores[0]} />}
+      {!d.storeFiltered && (
+        <div className="border-line mx-4 mb-4 max-h-[min(50vh,28rem)] overflow-auto rounded-xl border md:mx-6 md:mb-6">
+          <table
+            data-testid="store-qty-table"
+            className="w-full border-collapse text-[13px] md:text-[15px]"
+          >
+            <caption className="sr-only">Số lượng theo từng cửa hàng</caption>
+            <thead>
+              <tr>
+                <th scope="col" className={`${th} text-left`}>
+                  Cửa hàng
+                </th>
+                <th scope="col" className={`${th} ${num}`}>
+                  Đặt
+                </th>
+                <th scope="col" className={`${th} ${num}`}>
+                  Về
+                </th>
+                <th scope="col" className={`${th} ${num}`}>
+                  Thiếu
+                </th>
+                <th scope="col" className={`${th} ${num}`}>
+                  %
+                </th>
+                <th scope="col" className={`${th} ${num}`}>
+                  Bán
+                </th>
+                <th scope="col" className={`${th} ${num}`}>
+                  Tồn
+                </th>
+                <th scope="col" className={`${th} text-left`}>
+                  TT
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {d.stores.map((s) => {
+                const hl = filtered !== null && s.code.toUpperCase() === filtered;
+                return (
+                  <tr
+                    key={s.code}
+                    data-testid="store-qty-row"
+                    data-store={s.code}
+                    data-highlight={hl ? "true" : undefined}
+                    aria-current={hl ? "true" : undefined}
+                    className={cn("border-line border-t", hl && "bg-gold-soft font-semibold")}
+                  >
+                    <td className="px-3 py-2">
+                      <span className="font-medium">{s.code}</span> {s.name}
+                    </td>
+                    <td className={`px-3 py-2 ${num}`}>{formatInt(s.metrics.ordered)}</td>
+                    <td className={`px-3 py-2 ${num}`}>{formatInt(s.metrics.received)}</td>
+                    <td className={`px-3 py-2 ${num}`}>{formatInt(s.metrics.shortage)}</td>
+                    <td className={`px-3 py-2 ${num}`}>{formatPercent(s.metrics.rate)}</td>
+                    <td className={`px-3 py-2 ${num}`}>{formatInt(s.sold)}</td>
+                    <td
+                      className={cn(
+                        `px-3 py-2 ${num}`,
+                        s.stock === 0 && s.metrics.received > 0 && "text-status-short-fg font-bold",
+                      )}
+                    >
+                      {formatInt(s.stock)}
+                    </td>
+                    <td className="px-3 py-2">
+                      <StatusBadge status={stockStatus(s.metrics)} />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            {!d.storeFiltered && (
+              <tfoot>
+                <tr data-testid="store-qty-total" className="font-bold">
+                  <th scope="row" className={`${totalCell} text-left`}>
+                    TỔNG
+                  </th>
+                  <td className={`${totalCell} ${num}`}>{formatInt(t.ordered)}</td>
+                  <td className={`${totalCell} ${num}`}>{formatInt(t.received)}</td>
+                  <td className={`${totalCell} ${num}`}>{formatInt(t.shortage)}</td>
+                  <td className={`${totalCell} ${num}`}>{formatPercent(t.rate)}</td>
+                  <td className={`${totalCell} ${num}`}>{formatInt(d.totalSold)}</td>
+                  <td className={`${totalCell} ${num}`}>{formatInt(d.totalStock)}</td>
+                  <td className={totalCell}>
+                    <StatusBadge status={stockStatus(t)} />
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-          {!d.storeFiltered && (
-          <tfoot>
-            <tr data-testid="store-qty-total" className="font-bold">
-              <th scope="row" className={`${totalCell} text-left`}>
-                TỔNG
-              </th>
-              <td className={`${totalCell} ${num}`}>{formatInt(t.ordered)}</td>
-              <td className={`${totalCell} ${num}`}>{formatInt(t.received)}</td>
-              <td className={`${totalCell} ${num}`}>{formatInt(t.shortage)}</td>
-              <td className={`${totalCell} ${num}`}>{formatPercent(t.rate)}</td>
-              <td className={`${totalCell} ${num}`}>{formatInt(d.totalSold)}</td>
-              <td className={`${totalCell} ${num}`}>{formatInt(d.totalStock)}</td>
-              <td className={totalCell}>
-                <StatusBadge status={stockStatus(t)} />
-              </td>
-            </tr>
-          </tfoot>
-          )}
-        </table>
-      </div>
+              </tfoot>
+            )}
+          </table>
+        </div>
+      )}
     </div>
+  );
+}
+
+function StoreFigures({ store: s }: { store: ProductDetail["stores"][number] }) {
+  const m = s.metrics;
+  const figures: { label: string; value: string; warn?: boolean }[] = [
+    { label: "Đặt", value: formatInt(m.ordered) },
+    { label: "Về", value: formatInt(m.received) },
+    { label: "Thiếu", value: formatInt(m.shortage), warn: m.shortage > 0 },
+    { label: "Bán", value: formatInt(s.sold) },
+    { label: "Tồn", value: formatInt(s.stock), warn: s.stock === 0 && m.received > 0 },
+  ];
+  return (
+    <section
+      data-testid="store-qty-table"
+      aria-label={`Số lượng tại ${s.code}`}
+      className="border-line mx-4 mb-4 rounded-xl border md:mx-6 md:mb-6"
+    >
+      <h3 className="bg-gold-soft rounded-t-xl px-4 py-2 font-semibold">
+        <span data-testid="store-qty-row" data-store={s.code} data-highlight="true">
+          {s.code} {s.name}
+        </span>
+      </h3>
+      <dl className="grid grid-cols-3 gap-px sm:grid-cols-5">
+        {figures.map((f) => (
+          <div key={f.label} className="px-4 py-3 text-center">
+            <dt className="text-ink-muted text-sm">{f.label}</dt>
+            <dd
+              className={cn(
+                "font-display text-2xl font-bold tabular-nums md:text-3xl",
+                f.warn && "text-status-short-fg",
+              )}
+            >
+              {f.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }

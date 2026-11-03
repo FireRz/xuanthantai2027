@@ -88,6 +88,8 @@ export function orderBySql(sort: Sort) {
       return Prisma.sql`p.price_vnd DESC NULLS LAST, p.sku ASC`;
     case "shortage":
       return Prisma.sql`GREATEST(COALESCE(q.qty_ordered, 0) - COALESCE(q.qty_received, 0), 0) DESC, p.sku ASC`;
+    case "sold":
+      return Prisma.sql`COALESCE(q.qty_sold, 0) DESC, p.sku ASC`;
     default:
       return Prisma.sql`p.sku ASC`;
   }

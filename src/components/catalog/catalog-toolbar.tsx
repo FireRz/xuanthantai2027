@@ -10,9 +10,10 @@ export const SORT_LABELS: Record<Sort, string> = {
   price_asc: "Giá thấp → cao",
   price_desc: "Giá cao → thấp",
   shortage: "Còn thiếu nhiều nhất",
+  sold: "Bán chạy nhất",
 };
 
-/** Menu sắp xếp (B8, T04.7): 5 kiểu, mặc định Mã A→Z; "Còn thiếu" tính theo phạm vi đang xem. */
+/** Menu sắp xếp (B8, T04.7): 6 kiểu, mặc định Mã A→Z; "Còn thiếu" tính theo phạm vi đang xem. */
 export function SortMenu() {
   const { state, go } = useCatalogNav();
   return (

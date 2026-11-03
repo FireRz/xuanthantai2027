@@ -18,6 +18,7 @@ export function ProductCard({
 }) {
   const { metrics: m } = item;
   const status = stockStatus(m);
+  const outOfStock = item.stock === 0 && m.received > 0;
   const pct = m.rate === null ? 0 : Math.round(m.rate * 100);
   return (
     <article
@@ -70,14 +71,18 @@ export function ProductCard({
                 </span>
               )}
             </div>
-            <div className="text-ink-muted mt-1 flex gap-x-4 text-[13px] tabular-nums">
-              <span>
-                Bán <b className="text-navy font-semibold">{formatInt(item.sold)}</b>
-              </span>
-              <span>
-                Tồn <b className="text-navy font-semibold">{formatInt(item.stock)}</b>
-              </span>
-            </div>
+            <p className="text-ink-muted mt-1 text-[13px] tabular-nums">
+              Bán <b className="text-navy font-semibold">{formatInt(item.sold)}</b>
+              {" · "}
+              Tồn{" "}
+              <b
+                className={
+                  outOfStock ? "text-status-short-fg font-bold" : "text-navy font-semibold"
+                }
+              >
+                {formatInt(item.stock)}
+              </b>
+            </p>
           </div>
         </div>
       </ProductLink>

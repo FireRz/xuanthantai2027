@@ -15,7 +15,7 @@ export interface StoreOption {
 
 /**
  * Thanh "Cửa hàng của bạn" dính dưới banner (ADR-009 U14'): ô chọn cửa hàng (chọn một) + ô tìm mã SP.
- * Đổi cửa hàng áp dụng ngay; bấm "Xem hàng" áp dụng cả mã tìm và cuộn xuống danh sách.
+ * Đổi cửa hàng áp dụng ngay; bấm "Tìm" áp dụng cả mã tìm và cuộn xuống danh sách.
  */
 export function StoreBar({ stores }: { stores: StoreOption[] }) {
   const { state: params, go: navigate, pending } = useCatalogNav();
@@ -90,7 +90,7 @@ export function StoreBar({ stores }: { stores: StoreOption[] }) {
           disabled={pending}
           className="bg-gold text-gold-fg hover:bg-gold-dark focus-visible:outline-brand min-h-11 rounded-full px-5 font-semibold hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-70"
         >
-          Xem hàng
+          Tìm
         </button>
       </form>
     </div>

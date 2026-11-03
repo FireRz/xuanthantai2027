@@ -76,10 +76,10 @@ test.describe("T03.8, T03.12 cửa hàng và phạm vi", () => {
     await expect(page.getByLabel("Cửa hàng của bạn")).toBeInViewport();
   });
 
-  test("tìm theo mã (Xem hàng)", async ({ page }) => {
+  test("tìm theo mã (nút Tìm)", async ({ page }) => {
     await page.goto("/");
     await page.getByLabel("Tìm mã SP").fill("ak0001");
-    await page.getByRole("button", { name: "Xem hàng" }).click();
+    await page.getByRole("button", { name: "Tìm", exact: true }).click();
     await expect(page).toHaveURL(/q=ak0001/);
     await expect(cards(page).first()).toHaveAttribute("data-sku", "AK0001");
   });
