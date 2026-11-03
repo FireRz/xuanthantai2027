@@ -71,13 +71,20 @@ function DetailBody({
     : { m: t, sold: d.totalSold, stock: d.totalStock };
   const scopeLabel = d.scope ? `Cửa hàng ${d.scope.code} · ${d.scope.name}` : "Tất cả cửa hàng";
   return (
-    <div data-testid="product-detail" data-sku={d.sku}>
-      <div className="grid gap-4 p-4 md:grid-cols-[300px_1fr] md:gap-6 md:px-6 md:py-5">
+    // Máy tính: phần trên đứng yên, chỉ bảng cửa hàng cuộn (giữ tiêu đề cột + dòng TỔNG dính).
+    // Điện thoại: cả popup cuộn một lần, bảng chỉ cuộn ngang — không còn hai thanh cuộn lồng nhau.
+    <div
+      data-testid="product-detail"
+      data-sku={d.sku}
+      className="md:flex md:min-h-0 md:flex-1 md:flex-col"
+    >
+      <div className="grid shrink-0 gap-4 p-4 md:grid-cols-[300px_1fr] md:gap-6 md:px-6 md:py-5">
+        {/* Điện thoại: ảnh tối đa 30% chiều cao màn hình để số liệu hiện ngay màn đầu. */}
         <ProductImage
           thumbUrl={d.imageUrl ?? d.thumbUrl}
           alt={d.name ?? d.sku}
           priority
-          className="border-line aspect-square w-full rounded-xl border"
+          className="border-line mx-auto aspect-square w-full max-w-[30vh] rounded-xl border md:max-w-none"
         />
         <div className="min-w-0">
           <p className="text-ink-muted font-medium tracking-wide uppercase">{d.sku}</p>
@@ -123,8 +130,10 @@ function DetailBody({
         </div>
       </div>
 
-      <h3 className="text-ink-muted mx-4 mb-1.5 text-sm font-semibold md:mx-6">Tất cả cửa hàng</h3>
-      <div className="border-line mx-4 mb-4 max-h-[min(50vh,28rem)] overflow-auto rounded-xl border md:mx-6 md:mb-6">
+      <h3 className="text-ink-muted mx-4 mb-1.5 shrink-0 text-sm font-semibold md:mx-6">
+        Tất cả cửa hàng
+      </h3>
+      <div className="border-line mx-4 mb-4 overflow-x-auto rounded-xl border md:mx-6 md:mb-6 md:min-h-0 md:flex-1 md:overflow-y-auto">
         <table
           data-testid="store-qty-table"
           className="w-full border-collapse text-[13px] md:text-[15px]"
@@ -157,7 +166,7 @@ function DetailBody({
                 % Bán
               </th>
               <th scope="col" className={`${th} text-left`}>
-                TT
+                Trạng thái
               </th>
             </tr>
           </thead>
@@ -173,7 +182,7 @@ function DetailBody({
                   aria-current={hl ? "true" : undefined}
                   className={cn("border-line border-t", hl && "bg-gold-soft font-semibold")}
                 >
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-2 whitespace-nowrap">
                     <span className="font-medium">{s.code}</span> {s.name}
                   </td>
                   <td className={`px-3 py-2 ${num}`}>{formatInt(s.metrics.ordered)}</td>

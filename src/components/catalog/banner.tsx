@@ -30,7 +30,7 @@ export function Banner() {
           style={{ "--d": "150ms" } as React.CSSProperties}
           className="anim-rise font-display text-festive-text mt-[0.5vw] text-[3.4vw] italic [text-shadow:0_1px_8px_rgb(90_5_5/0.8)] sm:mt-3 sm:text-lg md:text-2xl"
         >
-          Khởi vận hanh thông - tài lộc như ý
+          Khởi vận hanh thông - Tài lộc như ý
         </p>
         <p className="text-festive-text mx-auto mt-4 hidden max-w-2xl text-[15px] md:text-base lg:block">
           Theo dõi số lượng đặt và hàng đã về của các bộ sưu tập Xuân Thần Tài

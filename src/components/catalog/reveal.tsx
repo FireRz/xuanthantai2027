@@ -29,7 +29,9 @@ export function RevealItem({
           io.disconnect();
         }
       },
-      { rootMargin: "0px 0px -6% 0px", threshold: 0.05 },
+      // Mép trên nới rất xa: thẻ bị cuộn nhảy qua (kéo thanh cuộn, phím End) đã nằm phía trên
+      // màn hình vẫn tính là "đã thấy", không bị kẹt ở trạng thái trong suốt.
+      { rootMargin: "100000px 0px -6% 0px", threshold: 0.05 },
     );
     io.observe(el);
     return () => io.disconnect();

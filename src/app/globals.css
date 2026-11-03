@@ -208,6 +208,11 @@
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
+/* Playfair mặc định dùng số kiểu cổ (0 trông như "o": "AK0001" → "AKooo1"); ép số thẳng hàng. */
+.font-display {
+  font-feature-settings: "lnum" 1;
+}
+
 /* Hiện dần khi cuộn tới (Reveal). */
 .reveal {
   opacity: 0;

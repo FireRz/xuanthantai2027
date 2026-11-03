@@ -58,8 +58,9 @@ export function ProductCard({
             >
               <div className="bg-gold anim-grow h-full rounded-full" style={{ width: `${pct}%` }} />
             </div>
-            <div className="mt-1.5 flex items-baseline justify-between gap-2 text-[13px] tabular-nums">
-              <span>
+            {/* Thẻ hẹp (2 cột điện thoại): "Còn thiếu" xuống dòng riêng thay vì tràn khỏi thẻ. */}
+            <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-2 text-[13px] tabular-nums">
+              <span className="whitespace-nowrap">
                 Về{" "}
                 <b className="text-navy font-semibold">
                   {formatInt(m.received)}/{formatInt(m.ordered)}
