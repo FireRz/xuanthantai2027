@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { prisma } from "@/server/db";
 import { DomainError } from "@/server/errors";
@@ -34,15 +35,18 @@ export async function requireAdmin(): Promise<AdminIdentity> {
   return { id: user.id, username: user.username };
 }
 
-/** Dùng trong trang/layout quản trị: chưa hợp lệ thì chuyển về /login. */
-export async function requireAdminPage(): Promise<AdminIdentity> {
+/**
+ * Dùng trong trang/layout quản trị: chưa hợp lệ thì chuyển về /login.
+ * Bọc cache để layout và page trong cùng một request chỉ kiểm tra (và truy vấn DB) một lần.
+ */
+export const requireAdminPage = cache(async (): Promise<AdminIdentity> => {
   try {
     return await requireAdmin();
   } catch (e) {
     if (e instanceof UnauthorizedError) redirect("/login");
     throw e;
   }
-}
+});
 
 /** Phản hồi 401 chuẩn cho Route Handler. */
 export function unauthorizedResponse(): Response {
