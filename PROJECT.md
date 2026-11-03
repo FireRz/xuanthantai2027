@@ -1,6 +1,6 @@
 # PROJECT — Website Bộ Sưu Tập Trang Sức Xuân Thần Tài
 
-> Trạng thái: **PLANNING HOÀN TẤT — sẵn sàng Coding** (mọi câu hỏi đã được trả lời 2026-10-30)
+> Trạng thái: **DỰ ÁN HOÀN THÀNH (2026-11-03)** — chủ dự án bỏ T10.7, T10.9, T10.10; tinh chỉnh sau khi test trên production làm ở các phiên sau
 > Tài liệu liên quan: [ARCHITECTURE.md](ARCHITECTURE.md) · [TASKS.md](TASKS.md) · [features/](features/) · [docs/decisions/](docs/decisions/) · [docs/UI-DESIGN.md](docs/UI-DESIGN.md)
 
 ---

@@ -1,6 +1,6 @@
 # TASKS — Danh sách công việc & Phụ thuộc
 
-> Trạng thái: **PLANNING HOÀN TẤT** — mọi câu hỏi đã được trả lời (2026-10-30). Không còn task bị chặn.
+> Trạng thái: **DỰ ÁN HOÀN THÀNH (2026-11-03)** — T10.7, T10.9, T10.10 được chủ dự án bỏ; T10.6 còn phần ảnh sản phẩm do chủ dự án tải sau. Tinh chỉnh sau khi test trên production làm ở các phiên sau.
 > Chi tiết cách kiểm thử từng task: file feature tương ứng ở [features/](features/).
 > Ký hiệu: ⬜ Chưa làm · 🟨 Đang làm · ✅ Xong · ✂️ Bỏ
 > Kích thước: **S** ≤ 0,5 ngày · **M** 1–2 ngày · **L** 3–5 ngày
@@ -151,10 +151,10 @@
 | T10.4 | Sao lưu + diễn tập khôi phục (2026-11-03: Backup chạy được, Restore drill ĐẠT, số dòng mọi bảng khớp production) | T10.2 | M | ✅ |
 | T10.5 | Giám sát lỗi (2026-11-03: gây lỗi giả trên Vercel Preview, thấy request_error trong Logs) | T10.2 | S | ✅ |
 | T10.6 | Nhập dữ liệu thật (2026-11-03: đã nạp production 68 CH, 3.000 SP, 21 dòng SL, khớp file; còn ảnh) | F06, T07.8, T08.9 | M | 🟨 |
-| T10.7 | E2E + thiết bị thật | F03–F08, F11, T10.6 | M | ⬜ |
+| T10.7 | E2E + thiết bị thật — chủ dự án bỏ (2026-11-03) | — | — | ✂️ |
 | T10.8 | Tài liệu hướng dẫn | F03–F08, F11 | S | ✅ |
-| T10.9 | UAT | T10.7, T10.8 | M | ⬜ |
-| T10.10 | Checklist go-live (Vercel Pro) | T10.9 | M | ⬜ |
+| T10.9 | UAT — chủ dự án bỏ (2026-11-03) | — | — | ✂️ |
+| T10.10 | Checklist go-live — chủ dự án bỏ (2026-11-03) | — | — | ✂️ |
 
 ### F11 — Xuất Excel ([chi tiết](features/F11-export.md))
 | ID | Task | Phụ thuộc | Size | TT |

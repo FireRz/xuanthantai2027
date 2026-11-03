@@ -21,15 +21,15 @@
 | T10.4 | Sao lưu: GitHub Action `pg_dump` hằng ngày → Blob, giữ 7 bản; **diễn tập khôi phục** | T10.2 | Khôi phục bản dump vào DB trống, dữ liệu đầy đủ |
 | T10.5 | Giám sát lỗi (Vercel logs + cảnh báo lỗi 5xx) | T10.2 | Gây lỗi giả → thấy trong log/cảnh báo |
 | T10.6 | Nhập dữ liệu thật: cửa hàng, danh mục → mẫu Excel → nhập → ảnh | F06, T07.8, T08.9 | Đối chiếu số SP, tổng Đặt/Về theo từng CH với file nguồn |
-| T10.7 | E2E toàn luồng trên Preview + kiểm thử trên **điện thoại và máy tính thật** | F03–F08, F11, T10.6 | Bộ E2E xanh; checklist thiết bị đạt |
+| T10.7 | ✂️ Bỏ (chủ dự án, 2026-11-03) | — | — |
 | T10.8 | Hướng dẫn: (a) người xem: lọc theo cửa hàng mình, tìm mã, xuất Excel; (b) quản trị: thứ tự nhập, điền mẫu, đặt tên ảnh, xuất–sửa–nhập lại, đặt lại mật khẩu | F03–F08, F11 | Người mới làm theo được |
-| T10.9 | UAT với đại diện cửa hàng và quản trị; biên bản | T10.7, T10.8 | Biên bản ký duyệt |
-| T10.10 | Checklist go-live: **nâng Vercel Pro**, **ảnh banner Tết đã ghi nguồn/quyền sử dụng trong `docs/brand/LICENSE.txt`** (ADR-009 U18'), logo thật, tên miền, mật khẩu quản trị mạnh, `noindex` kiểm tra, sao lưu chạy; go-live; theo dõi 2 tuần | T10.9 | Mọi mục checklist đạt |
+| T10.9 | ✂️ Bỏ (chủ dự án, 2026-11-03) | — | — |
+| T10.10 | ✂️ Bỏ (chủ dự án, 2026-11-03) | — | — |
 
 ## Tiêu chí nghiệm thu
-- **AC1.** Production chạy HTTPS trên Vercel **gói Pro**.
+- ~~**AC1.** Production chạy HTTPS trên Vercel **gói Pro**.~~ (bỏ cùng T10.10)
 - **AC2.** Sao lưu chạy tự động hằng ngày; đã khôi phục thử thành công.
 - **AC3.** Dữ liệu ban đầu khớp file nguồn (số SP, tổng Đặt/Về theo từng cửa hàng).
-- **AC4.** Biên bản UAT ký bởi đại diện cửa hàng và quản trị.
+- ~~**AC4.** Biên bản UAT ký bởi đại diện cửa hàng và quản trị.~~ (bỏ cùng T10.9)
 - **AC5.** Có hướng dẫn cho người xem và quản trị.
-- **AC6.** Go-live không muộn hơn 2026-12-25.
+- ~~**AC6.** Go-live không muộn hơn 2026-12-25.~~ (bỏ cùng T10.10)
