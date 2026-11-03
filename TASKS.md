@@ -138,7 +138,7 @@
 | T08.7 | Validate & phân loại | T08.6, T07.1, T06.1, T06.2, T06.3 | L | ✅ |
 | T08.8 | Màn hình xem trước | T08.7 | M | ✅ |
 | T08.9 | Áp dụng trong transaction | T08.7, T08.2 | M | ✅ |
-| T08.10 | Đo hiệu năng import | T08.9, T01.11 | S | 🟨 |
+| T08.10 | Đo hiệu năng import | T08.9, T01.11 | S | ✅ |
 
 ### F09 — ✂️ Bỏ (Q-17)
 
