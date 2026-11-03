@@ -16,6 +16,8 @@ async function seedCatalog() {
   await prisma.productLine.create({ data: { brandId: a.id, name: "Nhẫn" } });
   await prisma.collection.create({ data: { brandId: a.id, name: "Xuân 2027" } });
   await prisma.material.create({ data: { name: "Vàng 24K" } });
+  await prisma.productType.createMany({ data: [{ name: "Nhẫn trơn" }, { name: "Dây chuyền" }] });
+  await prisma.productType.create({ data: { name: "Đã ẩn", active: false } });
   await prisma.priceRange.createMany({
     data: [
       { name: "2tr < 5tr", sortOrder: 2 },
@@ -56,6 +58,7 @@ describe("T08.5 — file mẫu Excel", () => {
       line: ["Nhẫn"],
       collection: ["Xuân 2027"],
       material: ["Vàng 24K"],
+      productType: ["Dây chuyền", "Nhẫn trơn"],
       priceRange: ["< 1tr", "2tr < 5tr"],
       store: ["CH01", "CH02"],
     });
@@ -63,8 +66,9 @@ describe("T08.5 — file mẫu Excel", () => {
     const wb = new ExcelJS.Workbook();
     await wb.xlsx.load(buf as unknown as ArrayBuffer);
     const dm = wb.getWorksheet("DanhMuc")!;
-    expect(dm.getColumn(5).values).toContain("2tr < 5tr");
-    expect(dm.getRow(2).getCell(6).value).toBe("CH01");
+    expect(dm.getColumn(5).values).toContain("Nhẫn trơn");
+    expect(dm.getColumn(6).values).toContain("2tr < 5tr");
+    expect(dm.getRow(2).getCell(7).value).toBe("CH01");
   });
 
   it("ô chọn (data validation) trỏ đúng vào sheet danh mục ở các cột cần thiết", async () => {
@@ -77,14 +81,15 @@ describe("T08.5 — file mẫu Excel", () => {
     ];
     const spRules = rules(sp).map((m) => [m[1], m[2]]);
     expect(spRules.map((r) => r[0].replace(/\d+$/, "").replace(/:[A-Z]/, ":"))).toEqual(
-      expect.arrayContaining(["C2:", "D2:", "E2:", "F2:", "G2:"]),
+      expect.arrayContaining(["C2:", "D2:", "E2:", "F2:", "G2:", "H2:"]),
     );
     expect(spRules.find((r) => r[0].startsWith("C2"))![1]).toBe("DanhMuc!$A$2:$A$2");
     expect(spRules.find((r) => r[0].startsWith("G2"))![1]).toBe("DanhMuc!$E$2:$E$3");
+    expect(spRules.find((r) => r[0].startsWith("H2"))![1]).toBe("DanhMuc!$F$2:$F$3");
     const slRules = rules(sl).map((m) => [m[1], m[2]]);
     expect(slRules).toHaveLength(1);
     expect(slRules[0][0].startsWith("B2")).toBe(true);
-    expect(slRules[0][1]).toBe("DanhMuc!$F$2:$F$3");
+    expect(slRules[0][1]).toBe("DanhMuc!$G$2:$G$3");
   });
 
   it("DB trống: vẫn tạo được file mẫu (không có ô chọn)", async () => {

@@ -26,21 +26,25 @@ export interface FacetCounts {
   line: FacetOption[];
   col: FacetOption[];
   mat: FacetOption[];
+  /** Chủng loại. */
+  typ: FacetOption[];
   /** Khung giá, theo thứ tự khoảng giá (ADR-010). */
   pr: FacetOption[];
   store: FacetOption[];
   /** Số SP khớp mọi bộ lọc đang áp dụng (cho nút "Xem N SP"). */
   total: number;
+  /** Số SP khi bỏ riêng bộ lọc chủng loại — số trên chip "Tất cả". */
+  typTotal: number;
 }
 
 export type FacetParams = Pick<CatalogParams, "store" | "all" | "q"> &
-  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "pr">>;
+  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "typ" | "pr">>;
 
 type CountRow = { id: string | null; n: number };
 const toMap = (rows: CountRow[]) => new Map<string | null, number>(rows.map((r) => [r.id, r.n]));
 
 /**
- * Số SP cho từng lựa chọn của 5 bộ lọc (B3, B4).
+ * Số SP cho từng lựa chọn của 6 bộ lọc (B3, B4).
  * - Mỗi bộ lọc được đếm với MỌI bộ lọc khác + tìm mã + phạm vi cửa hàng, bỏ chính nó
  *   (nên số đếm = số SP nhận được khi chỉ chọn lựa chọn đó trong bộ lọc ấy).
  * - Dòng và BST chỉ liệt kê giá trị thuộc các nhãn đang chọn (không chọn nhãn → mọi nhãn).
@@ -56,6 +60,7 @@ export async function getFacetCounts(params: FacetParams): Promise<FacetCounts> 
     line: params.line,
     col: params.col,
     mat: params.mat,
+    typ: params.typ,
     pr: params.pr,
   };
   const scope = { store, all: params.all };
@@ -81,54 +86,83 @@ export async function getFacetCounts(params: FacetParams): Promise<FacetCounts> 
       FROM product p ${visibleProductJoinsSql} ${qtyJoinSql(store)}
       WHERE ${Prisma.join(buildWhere(filters, scope), " AND ")}`.then((r) => r[0]?.n ?? 0);
 
-  const [brands, lines, cols, mats, stores, cBrand, cLine, cCol, cMat, cStore, total, ranges, cPr] =
-    await Promise.all([
-      prisma.brand.findMany({
-        where: { active: true },
-        select: { id: true, name: true },
-        orderBy: { name: "asc" },
-      }),
-      prisma.productLine.findMany({
-        where: {
-          active: true,
-          brand: { active: true },
-          ...(brandIds.length ? { brandId: { in: brandIds } } : {}),
-        },
-        select: { id: true, name: true, brandId: true, brand: { select: { name: true } } },
-        orderBy: [{ brand: { name: "asc" } }, { name: "asc" }],
-      }),
-      prisma.collection.findMany({
-        where: {
-          active: true,
-          brand: { active: true },
-          ...(brandIds.length ? { brandId: { in: brandIds } } : {}),
-        },
-        select: { id: true, name: true, brandId: true, brand: { select: { name: true } } },
-        orderBy: [{ brand: { name: "asc" } }, { name: "asc" }],
-      }),
-      prisma.material.findMany({
-        where: { active: true },
-        select: { id: true, name: true },
-        orderBy: { name: "asc" },
-      }),
-      prisma.store.findMany({
-        where: { active: true },
-        select: { id: true, code: true, name: true },
-        orderBy: { code: "asc" },
-      }),
-      countBy("brand", Prisma.sql`p.brand_id`),
-      countBy("line", Prisma.sql`p.product_line_id`),
-      countBy("col", Prisma.sql`p.collection_id`),
-      countBy("mat", Prisma.sql`p.material_id`),
-      storeCounts,
-      totalCount,
-      prisma.priceRange.findMany({
-        where: { active: true },
-        select: { id: true, name: true },
-        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-      }),
-      countBy("pr", Prisma.sql`p.price_range_id`),
-    ]);
+  const typTotalCount = prisma.$queryRaw<{ n: number }[]>`
+      SELECT COUNT(*)::int AS n
+      FROM product p ${visibleProductJoinsSql} ${qtyJoinSql(store)}
+      WHERE ${Prisma.join(buildWhere(filters, { ...scope, omit: "typ" }), " AND ")}`.then(
+    (r) => r[0]?.n ?? 0,
+  );
+
+  const [
+    brands,
+    lines,
+    cols,
+    mats,
+    stores,
+    cBrand,
+    cLine,
+    cCol,
+    cMat,
+    cStore,
+    total,
+    ranges,
+    cPr,
+    types,
+    cTyp,
+  ] = await Promise.all([
+    prisma.brand.findMany({
+      where: { active: true },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.productLine.findMany({
+      where: {
+        active: true,
+        brand: { active: true },
+        ...(brandIds.length ? { brandId: { in: brandIds } } : {}),
+      },
+      select: { id: true, name: true, brandId: true, brand: { select: { name: true } } },
+      orderBy: [{ brand: { name: "asc" } }, { name: "asc" }],
+    }),
+    prisma.collection.findMany({
+      where: {
+        active: true,
+        brand: { active: true },
+        ...(brandIds.length ? { brandId: { in: brandIds } } : {}),
+      },
+      select: { id: true, name: true, brandId: true, brand: { select: { name: true } } },
+      orderBy: [{ brand: { name: "asc" } }, { name: "asc" }],
+    }),
+    prisma.material.findMany({
+      where: { active: true },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.store.findMany({
+      where: { active: true },
+      select: { id: true, code: true, name: true },
+      orderBy: { code: "asc" },
+    }),
+    countBy("brand", Prisma.sql`p.brand_id`),
+    countBy("line", Prisma.sql`p.product_line_id`),
+    countBy("col", Prisma.sql`p.collection_id`),
+    countBy("mat", Prisma.sql`p.material_id`),
+    storeCounts,
+    totalCount,
+    prisma.priceRange.findMany({
+      where: { active: true },
+      select: { id: true, name: true },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    }),
+    countBy("pr", Prisma.sql`p.price_range_id`),
+    prisma.productType.findMany({
+      where: { active: true },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+    countBy("typ", Prisma.sql`p.product_type_id`),
+  ]);
+  const typTotal = await typTotalCount;
 
   return {
     brand: brands.map((o) => ({ id: o.id, name: o.name, count: cBrand.get(o.id) ?? 0 })),
@@ -150,8 +184,10 @@ export async function getFacetCounts(params: FacetParams): Promise<FacetCounts> 
       })),
     ],
     mat: mats.map((o) => ({ id: o.id, name: o.name, count: cMat.get(o.id) ?? 0 })),
+    typ: types.map((o) => ({ id: o.id, name: o.name, count: cTyp.get(o.id) ?? 0 })),
     pr: ranges.map((o) => ({ id: o.id, name: o.name, count: cPr.get(o.id) ?? 0 })),
     store: stores.map((o) => ({ id: o.code, name: o.name, count: cStore.get(o.id) ?? 0 })),
     total,
+    typTotal,
   };
 }

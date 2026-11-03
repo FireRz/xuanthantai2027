@@ -10,10 +10,11 @@ export async function loadFormOptions(current?: {
   productLineId: string;
   collectionId: string | null;
   materialId: string | null;
+  productTypeId: string | null;
   priceRangeId: string | null;
 }): Promise<FormOptions> {
   const keep = (id: string | null | undefined) => (id ? [{ id }] : []);
-  const [brands, materials, priceRanges] = await Promise.all([
+  const [brands, materials, productTypes, priceRanges] = await Promise.all([
     prisma.brand.findMany({
       where: { OR: [{ active: true }, ...keep(current?.brandId)] },
       orderBy: { name: "asc" },
@@ -37,11 +38,16 @@ export async function loadFormOptions(current?: {
       orderBy: { name: "asc" },
       select: { id: true, name: true },
     }),
+    prisma.productType.findMany({
+      where: { OR: [{ active: true }, ...keep(current?.productTypeId)] },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
     prisma.priceRange.findMany({
       where: { OR: [{ active: true }, ...keep(current?.priceRangeId)] },
       orderBy: { sortOrder: "asc" },
       select: { id: true, name: true },
     }),
   ]);
-  return { brands, materials, priceRanges };
+  return { brands, materials, productTypes, priceRanges };
 }

@@ -506,22 +506,84 @@ test.describe("Khớp mockup (docs/mockups)", () => {
   });
 });
 
-test.describe("Điện thoại: chip Dòng nhanh (mockup)", () => {
-  test("chip Dòng ▾ cạnh nút Lọc, chọn được ngay không cần mở bảng lọc", async ({
+test.describe("Điện thoại: hàng Lọc + Sắp xếp gọn", () => {
+  test("Lọc và Sắp xếp cùng một dòng; không còn nút thả xuống; Lưới/Bảng ngang tiêu đề", async ({
     page,
     isMobile,
   }) => {
     test.skip(!isMobile, "Chỉ điện thoại");
     await page.goto("/");
-    await expect(page.getByRole("button", { name: /^Bộ sưu tập/ })).toHaveCount(0); // chỉ chip Dòng
-    await page.getByRole("button", { name: /^Dòng hàng/ }).click();
-    const panel = page.getByRole("group", { name: "Dòng hàng" });
-    await expect(panel).toBeVisible();
-    const box = (await panel.boundingBox())!;
-    expect(box.x).toBeGreaterThanOrEqual(0);
-    expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width);
-    await panel.getByRole("checkbox").first().check();
-    await expect(page).toHaveURL(/line=/);
+    await expect(page.getByRole("button", { name: /^Dòng hàng/ })).toBeHidden();
+    await expect(page.getByTestId("type-chips")).toBeHidden();
+    const top = async (loc: import("@playwright/test").Locator) =>
+      Math.round((await loc.boundingBox())!.y);
+    const filterBtn = page.getByTestId("open-filter-sheet");
+    const sortPill = page.getByTestId("sort-menu").locator("xpath=..");
+    expect(await top(filterBtn)).toBe(await top(sortPill));
+    const heading = page.getByRole("heading", { name: "Tất cả sản phẩm" });
+    expect(
+      Math.abs((await top(heading)) - (await top(page.getByRole("link", { name: "Bảng" })))),
+    ).toBeLessThan(20);
+  });
+
+  test("Chủng loại chọn trong bảng lọc; hiện chip đã chọn và tính vào Lọc (n)", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "Chỉ điện thoại");
+    const type = await prisma.productType.upsert({
+      where: { name: "Chủng loại thử" },
+      update: {},
+      create: { name: "Chủng loại thử" },
+    });
+    await prisma.product.updateMany({ where: { sku: "AK0001" }, data: { productTypeId: type.id } });
+    await page.goto("/");
+    await page.getByTestId("open-filter-sheet").click();
+    const sheet = page.getByTestId("filter-sheet");
+    await sheet.getByRole("button", { name: /^Chủng loại thử/ }).click();
+    await expect(page).toHaveURL(/typ=/);
     await expect(page.getByTestId("filter-count")).toHaveText("(1)");
+    await sheet.getByTestId("sheet-apply").click();
+    await expect(
+      page.getByRole("button", { name: /^Bỏ lọc Chủng loại: Chủng loại thử/ }),
+    ).toBeVisible();
+    await prisma.product.updateMany({ where: { sku: "AK0001" }, data: { productTypeId: null } });
+    await prisma.productType.deleteMany({ where: { id: type.id } });
+  });
+});
+
+test.describe("Máy tính: hàng chip Chủng loại", () => {
+  test("Tất cả + chip có số đếm, chọn nhiều loại cùng lúc, Tất cả bỏ lọc", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "Chỉ máy tính");
+    const types = await Promise.all(
+      ["Loại thử A", "Loại thử B"].map((name) =>
+        prisma.productType.upsert({ where: { name }, update: {}, create: { name } }),
+      ),
+    );
+    await prisma.product.updateMany({
+      where: { sku: "AK0002" },
+      data: { productTypeId: types[0].id },
+    });
+    await prisma.product.updateMany({
+      where: { sku: "AK0003" },
+      data: { productTypeId: types[1].id },
+    });
+    await page.goto("/");
+    const chips = page.getByTestId("type-chips");
+    await expect(chips.getByTestId("type-chip-all")).toHaveAttribute("aria-pressed", "true");
+    await chips.getByTestId("type-chip").filter({ hasText: "Loại thử A" }).click();
+    await chips.getByTestId("type-chip").filter({ hasText: "Loại thử B" }).click();
+    await expect(page).toHaveURL(/typ=/);
+    await expect(scope(page)).toContainText("2 SP");
+    await chips.getByTestId("type-chip-all").click();
+    await expect(page).not.toHaveURL(/typ=/);
+    await prisma.product.updateMany({
+      where: { sku: { in: ["AK0002", "AK0003"] } },
+      data: { productTypeId: null },
+    });
+    await prisma.productType.deleteMany({ where: { id: { in: types.map((t) => t.id) } } });
   });
 });

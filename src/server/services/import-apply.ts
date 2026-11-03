@@ -85,6 +85,11 @@ export async function applyImport(buffer: Buffer, opts: ApplyOptions = {}): Prom
           data: newCatalog.materials.map((m) => ({ id: fresh(m.tempId), name: m.name })),
         });
       }
+      if (newCatalog.productTypes.length) {
+        await tx.productType.createMany({
+          data: newCatalog.productTypes.map((t) => ({ id: fresh(t.tempId), name: t.name })),
+        });
+      }
       if (newCatalog.priceRanges.length) {
         const max = await tx.priceRange.aggregate({ _max: { sortOrder: true } });
         const base = max._max.sortOrder ?? 0;
@@ -102,6 +107,7 @@ export async function applyImport(buffer: Buffer, opts: ApplyOptions = {}): Prom
           productLineId: string;
           collectionId: string | null;
           materialId: string | null;
+          productTypeId: string | null;
           priceRangeId: string | null;
         },
       >(
@@ -112,6 +118,7 @@ export async function applyImport(buffer: Buffer, opts: ApplyOptions = {}): Prom
         productLineId: real(p.productLineId),
         collectionId: realOrNull(p.collectionId),
         materialId: realOrNull(p.materialId),
+        productTypeId: realOrNull(p.productTypeId),
         priceRangeId: realOrNull(p.priceRangeId),
       });
       const newProducts = analysis.plan.newProducts.map(resolve);
@@ -132,6 +139,7 @@ export async function applyImport(buffer: Buffer, opts: ApplyOptions = {}): Prom
               productLineId: p.productLineId,
               collectionId: p.collectionId,
               materialId: p.materialId,
+              productTypeId: p.productTypeId,
               priceRangeId: p.priceRangeId,
               priceVnd: p.priceVnd,
             };
@@ -147,13 +155,13 @@ export async function applyImport(buffer: Buffer, opts: ApplyOptions = {}): Prom
           UPDATE product p SET
             name = v.name, brand_id = v.brand_id, product_line_id = v.line_id,
             collection_id = v.collection_id::uuid, material_id = v.material_id::uuid,
-            price_range_id = v.price_range_id::uuid, price_vnd = v.price_vnd, updated_at = now()
+            product_type_id = v.product_type_id::uuid, price_range_id = v.price_range_id::uuid, price_vnd = v.price_vnd, updated_at = now()
           FROM unnest(
             ${part.map((p) => p.id)}::uuid[], ${part.map((p) => p.name)}::text[],
             ${part.map((p) => p.brandId)}::uuid[], ${part.map((p) => p.productLineId)}::uuid[],
             ${part.map((p) => p.collectionId)}::text[], ${part.map((p) => p.materialId)}::text[],
-            ${part.map((p) => p.priceRangeId)}::text[], ${part.map((p) => p.priceVnd)}::int[]
-          ) AS v(id, name, brand_id, line_id, collection_id, material_id, price_range_id, price_vnd)
+            ${part.map((p) => p.productTypeId)}::text[], ${part.map((p) => p.priceRangeId)}::text[], ${part.map((p) => p.priceVnd)}::int[]
+          ) AS v(id, name, brand_id, line_id, collection_id, material_id, product_type_id, price_range_id, price_vnd)
           WHERE p.id = v.id`;
       }
       opts.onStep?.("products-updated");

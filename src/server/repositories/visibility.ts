@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 
 /**
  * SP "hiển thị được" trên trang xem (ARCHITECTURE §4.2, ADR-008 M2):
- * SP, nhãn, dòng đang hiện; BST và tuổi vàng (nếu có) đang hiện.
+ * SP, nhãn, dòng đang hiện; BST, tuổi vàng, chủng loại và khung giá (nếu có) đang hiện.
  * Ẩn danh mục cha → SP ẩn theo mà không đổi product.active.
  */
 export const visibleProductWhere = {
@@ -12,6 +12,7 @@ export const visibleProductWhere = {
   AND: [
     { OR: [{ collectionId: null }, { collection: { active: true } }] },
     { OR: [{ materialId: null }, { material: { active: true } }] },
+    { OR: [{ productTypeId: null }, { productType: { active: true } }] },
     { OR: [{ priceRangeId: null }, { priceRange: { active: true } }] },
   ],
 } satisfies Prisma.ProductWhereInput;
@@ -19,12 +20,13 @@ export const visibleProductWhere = {
 /**
  * Cùng điều kiện ở dạng SQL cho truy vấn thô (product_totals, lọc, đếm).
  * Yêu cầu đã JOIN với bí danh: p (product), b (brand), l (product_line),
- * c (collection, LEFT JOIN), m (material, LEFT JOIN), pr (price_range, LEFT JOIN).
+ * c (collection, LEFT JOIN), m (material, LEFT JOIN), pt (product_type, LEFT JOIN), pr (price_range, LEFT JOIN).
  */
 export const visibleProductSql = Prisma.sql`(
   p.active AND b.active AND l.active
   AND (p.collection_id IS NULL OR c.active)
   AND (p.material_id IS NULL OR m.active)
+  AND (p.product_type_id IS NULL OR pt.active)
   AND (p.price_range_id IS NULL OR pr.active)
 )`;
 
@@ -34,5 +36,6 @@ export const visibleProductJoinsSql = Prisma.sql`
   JOIN product_line l ON l.id = p.product_line_id
   LEFT JOIN collection c ON c.id = p.collection_id
   LEFT JOIN material m ON m.id = p.material_id
+  LEFT JOIN product_type pt ON pt.id = p.product_type_id
   LEFT JOIN price_range pr ON pr.id = p.price_range_id
 `;

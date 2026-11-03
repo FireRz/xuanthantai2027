@@ -32,12 +32,6 @@ export function Banner() {
         </p>
         <div className="mt-[2vw] flex flex-wrap items-center justify-center gap-2 sm:mt-6 sm:gap-3">
           <a
-            href="#bo-suu-tap"
-            className="bg-gold text-gold-fg inline-flex min-h-7 items-center rounded-full px-4 text-xs font-semibold shadow-md hover:bg-white sm:min-h-11 sm:px-6 sm:text-base"
-          >
-            Bộ sưu tập
-          </a>
-          <a
             href="#san-pham"
             className="text-festive-text border-gold bg-brand-dark/40 hover:bg-brand-dark/70 inline-flex min-h-7 items-center rounded-full border-2 px-4 text-xs font-semibold hover:text-white sm:min-h-11 sm:px-6 sm:text-base"
           >

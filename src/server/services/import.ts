@@ -14,27 +14,30 @@ type Db = PrismaClient | Prisma.TransactionClient;
 
 /** Dữ liệu hiện có cần cho việc đối chiếu; SL chỉ đọc cho những SP có trong sheet SoLuong. */
 export async function loadReference(file: WorkbookData, db: Db = prisma): Promise<ReferenceData> {
-  const [brands, lines, collections, materials, priceRanges, stores, products] = await Promise.all([
-    db.brand.findMany({ select: { id: true, name: true } }),
-    db.productLine.findMany({ select: { id: true, brandId: true, name: true } }),
-    db.collection.findMany({ select: { id: true, brandId: true, name: true } }),
-    db.material.findMany({ select: { id: true, name: true } }),
-    db.priceRange.findMany({ select: { id: true, name: true } }),
-    db.store.findMany({ select: { id: true, code: true } }),
-    db.product.findMany({
-      select: {
-        id: true,
-        sku: true,
-        name: true,
-        brandId: true,
-        productLineId: true,
-        collectionId: true,
-        materialId: true,
-        priceRangeId: true,
-        priceVnd: true,
-      },
-    }),
-  ]);
+  const [brands, lines, collections, materials, productTypes, priceRanges, stores, products] =
+    await Promise.all([
+      db.brand.findMany({ select: { id: true, name: true } }),
+      db.productLine.findMany({ select: { id: true, brandId: true, name: true } }),
+      db.collection.findMany({ select: { id: true, brandId: true, name: true } }),
+      db.material.findMany({ select: { id: true, name: true } }),
+      db.productType.findMany({ select: { id: true, name: true } }),
+      db.priceRange.findMany({ select: { id: true, name: true } }),
+      db.store.findMany({ select: { id: true, code: true } }),
+      db.product.findMany({
+        select: {
+          id: true,
+          sku: true,
+          name: true,
+          brandId: true,
+          productLineId: true,
+          collectionId: true,
+          materialId: true,
+          productTypeId: true,
+          priceRangeId: true,
+          priceVnd: true,
+        },
+      }),
+    ]);
 
   const idBySku = new Map(products.map((p) => [normalizeCode(p.sku), p.id]));
   const wantedIds = new Set<string>();
@@ -57,7 +60,17 @@ export async function loadReference(file: WorkbookData, db: Db = prisma): Promis
           received: q.qty_received,
         }));
 
-  return { brands, lines, collections, materials, priceRanges, stores, products, quantities };
+  return {
+    brands,
+    lines,
+    collections,
+    materials,
+    productTypes,
+    priceRanges,
+    stores,
+    products,
+    quantities,
+  };
 }
 
 /** Đọc + đối chiếu + phân loại: dùng chung cho xem trước và áp dụng. */

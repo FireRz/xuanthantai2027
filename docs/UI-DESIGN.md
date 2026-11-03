@@ -70,7 +70,7 @@ Ví dụ: Đặt 120, Về 90 → "Còn thiếu" (cam); Đặt 5, Về 7 → "Đ
 
 > **Cập nhật sau mockup v1 (ADR-009 U2'–U16):** trang xem là **một trang web cuộn**, theo thứ tự:
 > 1. **Banner Tết** đỏ: thanh điều hướng (logo, tên web, liên kết Bộ sưu tập / Sản phẩm) → nhãn "XUÂN ĐINH MÙI · 2027", tiêu đề "Xuân Thần Tài" cỡ 72px màu vàng cam, câu chúc in nghiêng, đoạn mô tả, **ô Cửa hàng của bạn + Tìm mã SP + nút Xem hàng**; bên phải cành mai + đồng xu; viền lượn vàng ở đáy.
-> 2. **Bộ sưu tập mùa này**: lưới thẻ BST (ảnh 4:3, nhãn hàng, tên BST, số SP, "Xem bộ sưu tập →"); bấm thẻ → lọc BST, cuộn tới danh sách và hiện dải "Đang xem bộ sưu tập: X · N SP [Bỏ lọc ✕]" (điều chỉnh 2026-11-02); thẻ cuối "Ngoài bộ sưu tập". Ảnh thẻ BST = ảnh SP đầu tiên theo mã trong BST *(mặc định kỹ thuật)*.
+> 2. ~~Bộ sưu tập mùa này~~ — đã bỏ (2026-11-03); lọc BST vẫn có trong hàng bộ lọc và hiện dải "Đang xem bộ sưu tập: X · N SP [Bỏ lọc ✕]".
 > 3. **Tất cả sản phẩm**: một hàng nút thả xuống Nhãn hàng / Dòng / BST / Chất liệu / Khung giá, Sắp xếp, chuyển Lưới/Bảng, Xuất Excel → lưới thẻ gọn (4 cột máy tính, 2 cột điện thoại) → "Xem thêm".
 > 4. **Chân trang** đỏ đậm.
 >

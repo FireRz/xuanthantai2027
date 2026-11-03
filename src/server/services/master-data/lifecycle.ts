@@ -3,8 +3,9 @@ import { prisma } from "@/server/db";
 import { DomainError } from "@/server/errors";
 import { visibleProductJoinsSql, visibleProductSql } from "@/server/repositories/visibility";
 
-/** Sáu danh mục quản lý ở F06 (kèm Khung giá, ADR-010). */
-export type MasterKind = "brand" | "line" | "collection" | "material" | "priceRange" | "store";
+/** Bảy danh mục quản lý ở F06 (kèm Khung giá, ADR-010, và Chủng loại). */
+export type MasterKind =
+  "brand" | "line" | "collection" | "material" | "productType" | "priceRange" | "store";
 
 type Db = Prisma.TransactionClient | typeof prisma;
 
@@ -29,6 +30,9 @@ async function loadItem(db: Db, kind: MasterKind, id: string): Promise<Item> {
     case "material":
       row = await db.material.findUnique({ where: { id }, select });
       break;
+    case "productType":
+      row = await db.productType.findUnique({ where: { id }, select });
+      break;
     case "priceRange":
       row = await db.priceRange.findUnique({ where: { id }, select });
       break;
@@ -42,7 +46,7 @@ async function loadItem(db: Db, kind: MasterKind, id: string): Promise<Item> {
 
 /**
  * Số SP đang hiển thị trên trang xem mà bị tác động bởi mục này:
- * - nhãn/dòng/BST/tuổi vàng: SP đang hiện thuộc mục đó (ẩn mục → các SP này ẩn theo);
+ * - nhãn/dòng/BST/tuổi vàng/chủng loại/khung giá: SP đang hiện thuộc mục đó (ẩn mục → các SP này ẩn theo);
  * - cửa hàng: SP đang hiện có SL (đặt hoặc về > 0) ở cửa hàng đó (ẩn → số tổng của các SP này đổi).
  */
 async function countAffected(db: Db, kind: MasterKind, id: string): Promise<number> {
@@ -60,7 +64,9 @@ async function countAffected(db: Db, kind: MasterKind, id: string): Promise<numb
             ? Prisma.sql`p.collection_id = ${id}::uuid`
             : kind === "priceRange"
               ? Prisma.sql`p.price_range_id = ${id}::uuid`
-              : Prisma.sql`p.material_id = ${id}::uuid`;
+              : kind === "productType"
+                ? Prisma.sql`p.product_type_id = ${id}::uuid`
+                : Prisma.sql`p.material_id = ${id}::uuid`;
   const rows = await db.$queryRaw<{ n: bigint }[]>`
     SELECT COUNT(*) AS n FROM product p ${visibleProductJoinsSql}
     WHERE ${visibleProductSql} AND ${cond}`;
@@ -98,6 +104,8 @@ async function writeActive(db: Db, kind: MasterKind, id: string, active: boolean
       return db.collection.update(args);
     case "material":
       return db.material.update(args);
+    case "productType":
+      return db.productType.update(args);
     case "priceRange":
       return db.priceRange.update(args);
     case "store":
@@ -155,6 +163,9 @@ async function listReferences(kind: MasterKind, id: string): Promise<string[]> {
     case "material":
       add(await prisma.product.count({ where: { materialId: id } }), "sản phẩm");
       break;
+    case "productType":
+      add(await prisma.product.count({ where: { productTypeId: id } }), "sản phẩm");
+      break;
     case "priceRange":
       add(await prisma.product.count({ where: { priceRangeId: id } }), "sản phẩm");
       break;
@@ -176,6 +187,8 @@ async function removeRow(kind: MasterKind, id: string) {
       return prisma.collection.delete(args);
     case "material":
       return prisma.material.delete(args);
+    case "productType":
+      return prisma.productType.delete(args);
     case "priceRange":
       return prisma.priceRange.delete(args);
     case "store":

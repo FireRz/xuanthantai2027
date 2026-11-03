@@ -68,7 +68,11 @@ export function AllProductsSwitch() {
 export function CatalogToolbar({ storeSelected }: { storeSelected: boolean }) {
   return (
     <>
-      {storeSelected && <AllProductsSwitch />}
+      {storeSelected && (
+        <div className="hidden md:block">
+          <AllProductsSwitch />
+        </div>
+      )}
       <SortMenu />
     </>
   );

@@ -14,6 +14,7 @@ export interface FormOptions {
     collections: { id: string; name: string }[];
   }[];
   materials: { id: string; name: string }[];
+  productTypes: { id: string; name: string }[];
   priceRanges: { id: string; name: string }[];
 }
 
@@ -25,6 +26,7 @@ export interface ProductFormValues {
   productLineId: string;
   collectionId: string;
   materialId: string;
+  productTypeId: string;
   priceRangeId: string;
   priceVnd: string;
 }
@@ -37,6 +39,7 @@ const EMPTY: ProductFormValues = {
   productLineId: "",
   collectionId: "",
   materialId: "",
+  productTypeId: "",
   priceRangeId: "",
   priceVnd: "",
 };
@@ -76,6 +79,7 @@ export function ProductForm({
       productLineId: v.productLineId,
       collectionId: v.collectionId,
       materialId: v.materialId,
+      productTypeId: v.productTypeId,
       priceRangeId: v.priceRangeId,
       priceVnd: v.priceVnd,
     };
@@ -187,6 +191,22 @@ export function ProductForm({
             {options.materials.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-sm font-medium">
+          Chủng loại
+          <select
+            name="productTypeId"
+            value={v.productTypeId}
+            onChange={(e) => set({ productTypeId: e.target.value })}
+            className={inputCls}
+          >
+            <option value="">—</option>
+            {options.productTypes.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
               </option>
             ))}
           </select>

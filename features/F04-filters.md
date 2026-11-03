@@ -36,6 +36,7 @@ Lọc theo nhãn hàng, dòng hàng, bộ sưu tập (Yêu cầu 3), chất li�
 | T04.11 | ✅ Chỉ mục & đo hiệu năng lọc + đếm + sắp xếp trên seed lớn | T04.3, T04.4, T01.11 | ≤ 1s mỗi yêu cầu |
 
 | T04.12 | ✅ Bộ lọc Khung giá: danh mục + migration, lọc/đếm, nút thả xuống | T04.4, T04.5 | Integration + E2E 375px & 1280px |
+| T04.13 | ✅ Bộ lọc Chủng loại (2026-11-03): danh mục `product_type` + migration, cột Chủng loại trong Excel (tự tạo khi thiếu), nút thả xuống giữa Tuổi vàng và Khung giá, tham số URL `typ` | T04.4, T04.5 | Integration + unit |
 
 ## Tiêu chí nghiệm thu
 - **AC1.** Chọn nhiều nhãn → SP thuộc bất kỳ nhãn nào đã chọn; danh sách Dòng/BST chỉ còn giá trị của các nhãn đó.

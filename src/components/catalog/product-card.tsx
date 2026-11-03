@@ -41,7 +41,7 @@ export function ProductCard({
           <p className="text-ink-muted text-[13px] font-medium tracking-wide uppercase md:text-[14px]">
             {item.sku} · {orDash(item.materialName)}
           </p>
-          <h3 className="line-clamp-2 min-h-[2.6em] text-[15px] leading-snug font-semibold md:text-base">
+          <h3 className="text-navy line-clamp-2 min-h-[2.6em] text-[15px] leading-snug font-semibold md:text-base">
             {orDash(item.name)}
           </h3>
           <p className="font-semibold whitespace-nowrap tabular-nums">{formatVnd(item.priceVnd)}</p>
@@ -59,7 +59,7 @@ export function ProductCard({
             <div className="mt-1.5 flex items-baseline justify-between gap-2 text-[13px] tabular-nums">
               <span>
                 Về{" "}
-                <b className="font-semibold">
+                <b className="text-navy font-semibold">
                   {formatInt(m.received)}/{formatInt(m.ordered)}
                 </b>{" "}
                 <span className="text-ink-muted">({formatPercent(m.rate)})</span>

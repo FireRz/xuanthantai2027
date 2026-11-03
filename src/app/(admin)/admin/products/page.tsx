@@ -143,6 +143,7 @@ export default async function AdminProductsPage({
           line: r.productLine.name,
           collection: r.collection?.name ?? null,
           material: r.material?.name ?? null,
+          productType: r.productType?.name ?? null,
         }))}
       />
 

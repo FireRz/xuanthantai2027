@@ -12,6 +12,7 @@ describe("T07.1 — schema sản phẩm", () => {
       name: null,
       collectionId: null,
       materialId: null,
+      productTypeId: null,
       priceRangeId: null,
       priceVnd: null,
     });

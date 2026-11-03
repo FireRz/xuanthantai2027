@@ -48,6 +48,7 @@ export interface RefProduct {
   productLineId: string;
   collectionId: string | null;
   materialId: string | null;
+  productTypeId: string | null;
   priceRangeId: string | null;
   priceVnd: number | null;
 }
@@ -62,6 +63,7 @@ export interface ReferenceData {
   lines: RefClassification[];
   collections: RefClassification[];
   materials: RefNamed[];
+  productTypes: RefNamed[];
   priceRanges: RefNamed[];
   stores: RefStore[];
   products: RefProduct[];
@@ -76,6 +78,7 @@ export interface ProductValues {
   productLineId: string;
   collectionId: string | null;
   materialId: string | null;
+  productTypeId: string | null;
   priceRangeId: string | null;
   priceVnd: number | null;
 }
@@ -99,6 +102,7 @@ export interface NewCatalogPlan {
   lines: { tempId: string; brandId: string; name: string }[];
   collections: { tempId: string; brandId: string; name: string }[];
   materials: { tempId: string; name: string }[];
+  productTypes: { tempId: string; name: string }[];
   priceRanges: { tempId: string; name: string }[];
 }
 export const isTempId = (id: string | null): id is string => !!id && id.startsWith("new:");
@@ -160,7 +164,14 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
     issues.push({ sheet, row, column, key, reason });
 
   const plan: ImportPlan = {
-    newCatalog: { brands: [], lines: [], collections: [], materials: [], priceRanges: [] },
+    newCatalog: {
+      brands: [],
+      lines: [],
+      collections: [],
+      materials: [],
+      productTypes: [],
+      priceRanges: [],
+    },
     newProducts: [],
     productUpdates: [],
     quantityWrites: [],
@@ -203,6 +214,8 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
   const collectionById = new Map(ref.collections.map((c) => [c.id, c]));
   const materials = byName(ref.materials);
   const materialById = new Map(ref.materials.map((m) => [m.id, m]));
+  const types = byName(ref.productTypes);
+  const typeById = new Map(ref.productTypes.map((t) => [t.id, t]));
   const ranges = byName(ref.priceRanges);
   const rangeById = new Map(ref.priceRanges.map((r) => [r.id, r]));
 
@@ -245,9 +258,28 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
     }
     return it;
   };
-  const ensureSimple = (kind: "material" | "priceRange", raw: string): RefNamed => {
-    const map = kind === "material" ? materials : ranges;
-    const byId = kind === "material" ? materialById : rangeById;
+  const SIMPLE = {
+    material: {
+      map: materials,
+      byId: materialById,
+      list: plan.newCatalog.materials,
+      label: "Tuổi vàng",
+    },
+    productType: {
+      map: types,
+      byId: typeById,
+      list: plan.newCatalog.productTypes,
+      label: "Chủng loại",
+    },
+    priceRange: {
+      map: ranges,
+      byId: rangeById,
+      list: plan.newCatalog.priceRanges,
+      label: "Khung giá",
+    },
+  };
+  const ensureSimple = (kind: keyof typeof SIMPLE, raw: string): RefNamed => {
+    const { map, byId, list, label } = SIMPLE[kind];
     const key = normalizeText(raw);
     let it = map.get(key);
     if (!it) {
@@ -255,11 +287,8 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
       it = { id: `new:${kind}:${key}`, name };
       map.set(key, it);
       byId.set(it.id, it);
-      (kind === "material" ? plan.newCatalog.materials : plan.newCatalog.priceRanges).push({
-        tempId: it.id,
-        name,
-      });
-      newCatalogLabels.push(`${kind === "material" ? "Tuổi vàng" : "Khung giá"}: ${name}`);
+      list.push({ tempId: it.id, name });
+      newCatalogLabels.push(`${label}: ${name}`);
     }
     return it;
   };
@@ -347,10 +376,14 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
         }
       }
 
-      // Tuổi vàng, Khung giá
+      // Tuổi vàng, Chủng loại, Khung giá
       let materialId: string | undefined;
       if (c.material !== undefined) {
         materialId = ensureSimple("material", c.material).id;
+      }
+      let productTypeId: string | undefined;
+      if (c.productType !== undefined) {
+        productTypeId = ensureSimple("productType", c.productType).id;
       }
       let priceRangeId: string | undefined;
       if (c.priceRange !== undefined) {
@@ -393,6 +426,7 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
             productLineId: lineId ?? existing.productLineId,
             collectionId: collectionId ?? existing.collectionId,
             materialId: materialId ?? existing.materialId,
+            productTypeId: productTypeId ?? existing.productTypeId,
             priceRangeId: priceRangeId ?? existing.priceRangeId,
             priceVnd: price ?? existing.priceVnd,
           }
@@ -402,6 +436,7 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
             productLineId: lineId!,
             collectionId: collectionId ?? null,
             materialId: materialId ?? null,
+            productTypeId: productTypeId ?? null,
             priceRangeId: priceRangeId ?? null,
             priceVnd: price ?? null,
           };
@@ -412,6 +447,7 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
         line: (id: string | null) => (id ? (lineById.get(id)?.name ?? EMPTY) : EMPTY),
         collection: (id: string | null) => (id ? (collectionById.get(id)?.name ?? EMPTY) : EMPTY),
         material: (id: string | null) => (id ? (materialById.get(id)?.name ?? EMPTY) : EMPTY),
+        type: (id: string | null) => (id ? (typeById.get(id)?.name ?? EMPTY) : EMPTY),
         range: (id: string | null) => (id ? (rangeById.get(id)?.name ?? EMPTY) : EMPTY),
         price: (v: number | null) => (v === null ? EMPTY : formatInt(v)),
       };
@@ -449,6 +485,12 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
         display.material(old?.materialId ?? null),
         display.material(next.materialId),
         (old?.materialId ?? null) === next.materialId,
+      );
+      add(
+        "productType",
+        display.type(old?.productTypeId ?? null),
+        display.type(next.productTypeId),
+        (old?.productTypeId ?? null) === next.productTypeId,
       );
       add(
         "priceRange",

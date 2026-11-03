@@ -50,6 +50,7 @@ export default async function EditProductPage({
           productLineId: product.productLineId,
           collectionId: product.collectionId ?? "",
           materialId: product.materialId ?? "",
+          productTypeId: product.productTypeId ?? "",
           priceRangeId: product.priceRangeId ?? "",
           priceVnd: product.priceVnd == null ? "" : String(product.priceVnd),
         }}

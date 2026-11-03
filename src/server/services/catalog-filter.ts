@@ -3,11 +3,11 @@ import { NO_COLLECTION, type CatalogParams, type Sort } from "@/lib/catalog-para
 import { prisma } from "@/server/db";
 import { visibleProductSql } from "@/server/repositories/visibility";
 
-/** Bốn bộ lọc nhiều lựa chọn (B2). Cửa hàng chọn một nên xử lý riêng. */
-export type GroupFilter = "brand" | "line" | "col" | "mat" | "pr";
+/** Các bộ lọc nhiều lựa chọn (B2). Cửa hàng chọn một nên xử lý riêng. */
+export type GroupFilter = "brand" | "line" | "col" | "mat" | "typ" | "pr";
 
 export type FilterInput = Pick<CatalogParams, "q"> &
-  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "pr">>;
+  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "typ" | "pr">>;
 
 export interface ScopeStore {
   id: string;
@@ -52,6 +52,11 @@ export function buildWhere(
   const mat = f.mat ?? [];
   if (opts.omit !== "mat" && mat.length > 0)
     where.push(Prisma.sql`p.material_id IN (${uuids(mat)})`);
+
+  const typ = f.typ ?? [];
+  // SP chưa có chủng loại không khớp khi đang lọc chủng loại.
+  if (opts.omit !== "typ" && typ.length > 0)
+    where.push(Prisma.sql`p.product_type_id IN (${uuids(typ)})`);
 
   const pr = f.pr ?? [];
   // SP chưa có khung giá không khớp khi đang lọc khung giá.

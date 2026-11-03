@@ -19,6 +19,7 @@ export interface ProductRow {
   line: string;
   collection: string | null;
   material: string | null;
+  productType: string | null;
 }
 
 /** Bảng SP có chọn nhiều dòng để ẩn / hiện cùng lúc (không có nút xóa — ADR-008 P2). */
@@ -119,6 +120,7 @@ export function ProductTable({ rows }: { rows: ProductRow[] }) {
               <th className="p-3">Dòng</th>
               <th className="p-3">BST</th>
               <th className="p-3">Tuổi vàng</th>
+              <th className="p-3">Chủng loại</th>
               <th className="p-3 text-right">Giá</th>
               <th className="p-3">Trạng thái</th>
               <th className="p-3">
@@ -166,6 +168,7 @@ export function ProductTable({ rows }: { rows: ProductRow[] }) {
                 <td className="p-3">{r.line}</td>
                 <td className="p-3">{r.collection ?? "—"}</td>
                 <td className="p-3">{r.material ?? "—"}</td>
+                <td className="p-3">{r.productType ?? "—"}</td>
                 <td className="p-3 text-right">
                   {r.priceVnd == null ? "—" : formatVnd(r.priceVnd)}
                 </td>

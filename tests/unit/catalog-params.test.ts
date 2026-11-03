@@ -15,6 +15,7 @@ describe("parseCatalogParams", () => {
       line: [],
       col: [],
       mat: [],
+      typ: [],
       pr: [],
       store: null,
       all: false,
@@ -83,13 +84,14 @@ describe("T04.2 — bộ đọc/ghi URL cho đủ 5 bộ lọc", () => {
   const B2 = "22222222-2222-4222-8222-222222222222";
 
   it("quay vòng URL ↔ object với mọi tham số", () => {
-    const url = `?brand=${B1},${B2}&line=${ID}&col=${ID},none&mat=${B1}&pr=${B2},rác&store=CH01&all=1&q=ntt&sort=shortage&view=list&sp=NTT001&n=48`;
+    const url = `?brand=${B1},${B2}&line=${ID}&col=${ID},none&mat=${B1}&typ=${ID},rác&pr=${B2},rác&store=CH01&all=1&q=ntt&sort=shortage&view=list&sp=NTT001&n=48`;
     const p = parseCatalogParams(Object.fromEntries(new URLSearchParams(url)));
     expect(p).toEqual({
       brand: [B1, B2],
       line: [ID],
       col: [ID, "none"],
       mat: [B1],
+      typ: [ID],
       pr: [B2],
       store: "CH01",
       all: true,

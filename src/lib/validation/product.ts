@@ -77,6 +77,7 @@ const editableFields = {
   productLineId: requiredId("Vui lòng chọn dòng hàng"),
   collectionId: optionalId,
   materialId: optionalId,
+  productTypeId: optionalId,
   priceRangeId: optionalId,
   priceVnd: optionalPrice,
 };

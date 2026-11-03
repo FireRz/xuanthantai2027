@@ -15,6 +15,8 @@ import { toggleId, useCatalogNav } from "./catalog-nav";
 import { SORT_LABELS } from "./catalog-toolbar";
 
 type GroupKey = "brand" | "line" | "col" | "mat" | "pr";
+/** Điện thoại gom cả Chủng loại vào bảng lọc; máy tính có hàng chip riêng. */
+type SheetKey = GroupKey | "typ";
 
 const GROUPS: { key: GroupKey; label: string }[] = [
   { key: "brand", label: "Nhãn hàng" },
@@ -22,6 +24,12 @@ const GROUPS: { key: GroupKey; label: string }[] = [
   { key: "col", label: "Bộ sưu tập" },
   { key: "mat", label: "Tuổi vàng" },
   { key: "pr", label: "Khung giá" },
+];
+
+/** Thứ tự trong bảng lọc điện thoại: Chủng loại (hay dùng nhất) đứng đầu. */
+const SHEET_GROUPS: { key: SheetKey; label: string }[] = [
+  { key: "typ", label: "Chủng loại" },
+  ...GROUPS,
 ];
 
 /** Mọi lựa chọn đều hiện (cửa hàng có thể chưa đặt nhưng vẫn cần biết có SP); số đếm 0 thì làm mờ. */
@@ -43,10 +51,13 @@ function labelOf(o: FacetOption, options: FacetOption[]) {
 export function FilterBar({
   facets,
   toolbar,
+  sheetExtra,
 }: {
   facets: FacetCounts;
-  /** Sắp xếp + công tắc "Xem tất cả SP" (T04.7, T04.8). */
+  /** Sắp xếp + công tắc "Xem tất cả SP" (T04.7, T04.8); điện thoại chỉ còn nút sắp xếp. */
   toolbar?: React.ReactNode;
+  /** Mục thêm trong bảng lọc điện thoại (công tắc "Xem tất cả SP"). */
+  sheetExtra?: React.ReactNode;
 }) {
   const owned = (xs: FacetOption[]) =>
     xs.filter((o) => o.brandId).map((o) => ({ id: o.id, brandId: o.brandId as string }));
@@ -55,16 +66,26 @@ export function FilterBar({
     navigate(patch, { owned: { lines: owned(facets.line), cols: owned(facets.col) } });
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const toggle = (key: GroupKey, id: string) => go({ [key]: toggleId(state[key], id) });
+  const toggle = (key: SheetKey, id: string) => go({ [key]: toggleId(state[key], id) });
   const groupCount = countGroupFilters(state);
   const options = (key: GroupKey) => facets[key];
 
-  const selectedChips = GROUPS.flatMap(({ key, label }) =>
-    state[key].map((id) => {
-      const o = options(key).find((x) => x.id === id);
-      return { key, id, group: label, name: o ? labelOf(o, options(key)) : id };
-    }),
-  );
+  const selectedChips = [
+    ...GROUPS.flatMap(({ key, label }) =>
+      state[key].map((id) => {
+        const o = options(key).find((x) => x.id === id);
+        return { key: key as SheetKey, id, group: label, name: o ? labelOf(o, options(key)) : id };
+      }),
+    ),
+    // Máy tính thấy lựa chọn ngay trên hàng chip Chủng loại; điện thoại thì hiện ở dải này.
+    ...state.typ.map((id) => ({
+      key: "typ" as SheetKey,
+      id,
+      group: "Chủng loại",
+      name: facets.typ.find((x) => x.id === id)?.name ?? id,
+      phoneOnly: true,
+    })),
+  ];
 
   return (
     <div
@@ -72,8 +93,8 @@ export function FilterBar({
       aria-busy={pending}
       className={cn("relative space-y-3", pending && "opacity-90")}
     >
-      {/* Một hàng cho cả hai cỡ màn hình: 5 nút thả xuống (máy tính) hoặc nút Lọc (điện thoại) + sắp xếp, công tắc */}
-      <div className="flex flex-wrap items-center gap-2">
+      {/* Máy tính: 5 nút thả xuống + công tắc + sắp xếp. Điện thoại: một hàng Lọc + Sắp xếp, mọi bộ lọc nằm trong bảng Lọc. */}
+      <div className="flex items-center gap-2 md:flex-wrap">
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
@@ -85,8 +106,7 @@ export function FilterBar({
           Lọc{groupCount > 0 && <span data-testid="filter-count"> ({groupCount})</span>}
         </button>
         {GROUPS.map(({ key, label }) => (
-          // Điện thoại có sẵn chip "Dòng" cạnh nút Lọc (mockup); các nhóm còn lại nằm trong bảng lọc.
-          <div key={key} className={key === "line" ? "block" : "hidden md:block"}>
+          <div key={key} className="hidden md:block">
             <FilterDropdown
               label={label}
               options={options(key)}
@@ -97,11 +117,19 @@ export function FilterBar({
           </div>
         ))}
         {toolbar && (
-          <div className="ml-auto flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
+          <div className="ml-auto flex items-center justify-end gap-x-4 gap-y-2 md:flex-wrap">
             {toolbar}
           </div>
         )}
       </div>
+
+      <TypeChips
+        options={facets.typ}
+        total={facets.typTotal}
+        selected={state.typ}
+        onToggle={(id) => go({ typ: toggleId(state.typ, id) })}
+        onAll={() => go({ typ: [] })}
+      />
 
       {(selectedChips.length > 0 || hasActiveFilter(state)) && (
         <div className="flex flex-wrap items-center gap-2" data-testid="active-filters">
@@ -111,7 +139,10 @@ export function FilterBar({
               type="button"
               onClick={() => toggle(c.key, c.id)}
               aria-label={`Bỏ lọc ${c.group}: ${c.name}`}
-              className="bg-gold-soft border-gold text-ink focus-visible:outline-brand inline-flex min-h-8 items-center gap-1 rounded-full border px-3 text-sm focus-visible:outline-2"
+              className={cn(
+                "bg-gold-soft border-gold text-ink focus-visible:outline-brand inline-flex min-h-8 items-center gap-1 rounded-full border px-3 text-sm focus-visible:outline-2",
+                "phoneOnly" in c && "md:hidden",
+              )}
             >
               {c.name}
               <X className="size-3.5" aria-hidden />
@@ -127,6 +158,7 @@ export function FilterBar({
                   line: [],
                   col: [],
                   mat: [],
+                  typ: [],
                   pr: [],
                   q: "",
                   store: null,
@@ -149,8 +181,73 @@ export function FilterBar({
         pending={pending}
         onToggle={toggle}
         onSort={(sort) => go({ sort })}
-        onClear={() => go({ brand: [], line: [], col: [], mat: [], pr: [] })}
+        onClear={() => go({ brand: [], line: [], col: [], mat: [], typ: [], pr: [] })}
+        extra={sheetExtra}
       />
+    </div>
+  );
+}
+
+/**
+ * Hàng chip Chủng loại: "Tất cả (N)" rồi từng loại kèm số đếm, chọn nhiều loại cùng lúc.
+ * Chỉ hiện trên máy tính (xuống dòng khi dài); điện thoại chọn trong bảng Lọc. Tên loại màu xanh navy.
+ */
+function TypeChips({
+  options,
+  total,
+  selected,
+  onToggle,
+  onAll,
+}: {
+  options: FacetOption[];
+  total: number;
+  selected: string[];
+  onToggle: (id: string) => void;
+  onAll: () => void;
+}) {
+  if (options.length === 0) return null;
+  const chip = (active: boolean, dim: boolean) =>
+    cn(
+      "focus-visible:outline-brand inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-5 whitespace-nowrap focus-visible:outline-2",
+      active ? "bg-brand border-brand text-white" : "border-line bg-white",
+      dim && !active && "opacity-55",
+    );
+  const label = (active: boolean) => (active ? "font-bold" : "text-navy font-bold");
+  const count = (active: boolean) =>
+    cn("tabular-nums", active ? "text-white/90" : "text-ink-muted");
+  return (
+    <div
+      data-testid="type-chips"
+      role="group"
+      aria-label="Chủng loại"
+      className="hidden flex-wrap gap-2 md:flex"
+    >
+      <button
+        type="button"
+        aria-pressed={selected.length === 0}
+        onClick={onAll}
+        data-testid="type-chip-all"
+        className={chip(selected.length === 0, false)}
+      >
+        <span className={label(selected.length === 0)}>Tất cả</span>
+        <span className={count(selected.length === 0)}>({formatInt(total)})</span>
+      </button>
+      {options.map((o) => {
+        const active = selected.includes(o.id);
+        return (
+          <button
+            key={o.id}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onToggle(o.id)}
+            data-testid="type-chip"
+            className={chip(active, o.count === 0)}
+          >
+            <span className={label(active)}>{o.name}</span>
+            <span className={count(active)}>({formatInt(o.count)})</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -284,15 +381,17 @@ function FilterSheet({
   onToggle,
   onSort,
   onClear,
+  extra,
 }: {
   open: boolean;
   onClose: () => void;
   facets: FacetCounts;
   state: CatalogParams;
   pending: boolean;
-  onToggle: (key: GroupKey, id: string) => void;
+  onToggle: (key: SheetKey, id: string) => void;
   onSort: (sort: CatalogParams["sort"]) => void;
   onClear: () => void;
+  extra?: React.ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
 
@@ -326,7 +425,8 @@ function FilterSheet({
         </button>
       </div>
       <div className="flex-1 space-y-5 overflow-y-auto px-4 py-4">
-        {GROUPS.map(({ key, label }) => {
+        {extra}
+        {SHEET_GROUPS.map(({ key, label }) => {
           const all = facets[key];
           const list = shown(all);
           return (

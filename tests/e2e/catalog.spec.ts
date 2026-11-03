@@ -13,7 +13,6 @@ test.describe("T03.3–T03.4 trang danh mục", () => {
   test("thấy banner, SP seed, không cuộn ngang", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Xuân Đinh Mùi · 2027");
-    await expect(page.getByRole("heading", { name: "Bộ sưu tập mùa này" })).toBeVisible();
     await expect(cards(page).first()).toBeVisible();
     expect(await cards(page).count()).toBe(24);
     expect(await noHorizontalScroll(page)).toBe(true);
@@ -106,50 +105,6 @@ test.describe("T03.11 Lưới ↔ Bảng", () => {
     expect(await noHorizontalScroll(page)).toBe(true);
     await page.getByRole("link", { name: "Lưới" }).click();
     await expect(page.getByTestId("product-grid")).toBeVisible();
-  });
-});
-
-test.describe("T03.13 Bộ sưu tập", () => {
-  test("bấm thẻ BST → chỉ còn SP của BST đó; bấm lại → bỏ lọc", async ({ page }) => {
-    await page.goto("/");
-    const card = page.getByTestId("collection-card").first();
-    const count = Number(/(\d[\d.]*) SP/.exec(await card.innerText())![1].replace(/\./g, ""));
-    await card.click();
-    await expect(page).toHaveURL(/col=/);
-    await expect(page.getByTestId("scope-label")).toContainText(
-      `${count.toLocaleString("vi-VN")} SP`,
-    );
-    await expect(page.getByTestId("collection-card").first()).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
-    await page.getByTestId("collection-card").first().click();
-    await expect(page).not.toHaveURL(/col=/);
-  });
-
-  test("bấm thẻ BST → cuộn tới danh sách và hiện dải 'Đang xem bộ sưu tập' có nút Bỏ lọc", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const card = page.getByTestId("collection-card").first();
-    const name = (await card.locator("h3").innerText()).trim();
-    expect(await page.evaluate(() => window.scrollY)).toBe(0);
-    await card.click();
-    const banner = page.getByTestId("collection-banner");
-    await expect(banner).toContainText(`Đang xem bộ sưu tập: ${name}`);
-    await expect(banner).toBeInViewport();
-    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(200);
-
-    await banner.getByRole("link", { name: "Bỏ lọc" }).click();
-    await expect(page).not.toHaveURL(/col=/);
-    await expect(banner).toHaveCount(0);
-  });
-
-  test("thẻ Ngoài bộ sưu tập lọc SP không thuộc BST", async ({ page }) => {
-    await page.goto("/");
-    await page.locator('[data-collection="none"]').click();
-    await expect(page).toHaveURL(/col=none/);
-    await expect(cards(page).first()).toBeVisible();
   });
 });
 

@@ -12,6 +12,7 @@ export type CreateProductData = {
   productLineId: string;
   collectionId?: string | null;
   materialId?: string | null;
+  productTypeId?: string | null;
   priceRangeId?: string | null;
   priceVnd?: number | null;
 };

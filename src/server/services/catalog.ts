@@ -49,7 +49,7 @@ type Row = {
 };
 
 type ListParams = Pick<CatalogParams, "store" | "all" | "q"> &
-  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "pr" | "sort">> & {
+  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "typ" | "pr" | "sort">> & {
     /** Số SP lấy về (mặc định 24); `null` = không giới hạn (dùng khi xuất Excel). */
     limit?: number | null;
     offset?: number;
@@ -115,58 +115,6 @@ export async function listOwnedOptions() {
     }),
   ]);
   return { lines, cols };
-}
-
-export interface CollectionCard {
-  /** Id BST; null = thẻ "Ngoài bộ sưu tập". */
-  id: string | null;
-  name: string;
-  brandName: string | null;
-  productCount: number;
-  /** Ảnh = thumbnail của SP đầu tiên theo mã trong BST (mặc định kỹ thuật, UI-DESIGN §5). */
-  thumbUrl: string | null;
-}
-
-type CardRow = {
-  id: string | null;
-  name: string | null;
-  brand_name: string | null;
-  n: number;
-  thumb_url: string | null;
-};
-
-/**
- * Thẻ Bộ sưu tập mùa này: số SP hiển thị được theo từng BST đang hiện + thẻ "Ngoài bộ sưu tập".
- * Đếm theo cùng phạm vi cửa hàng với danh sách (chọn CH, không bật `all` → chỉ SP CH đó đặt > 0).
- * BST không có SP nào trong phạm vi thì không hiện thẻ.
- */
-export async function listCollectionCards(
-  params: Pick<CatalogParams, "store" | "all">,
-): Promise<CollectionCard[]> {
-  const store = await findActiveStore(params.store);
-  const where: Prisma.Sql[] = [visibleProductSql];
-  if (store && !params.all) where.push(Prisma.sql`COALESCE(q.qty_ordered, 0) > 0`);
-  const qtyJoin = store
-    ? Prisma.sql`LEFT JOIN store_product_qty q ON q.product_id = p.id AND q.store_id = ${store.id}::uuid`
-    : Prisma.sql`LEFT JOIN product_totals q ON q.product_id = p.id`;
-
-  const rows = await prisma.$queryRaw<CardRow[]>`
-    SELECT c.id, c.name, cb.name AS brand_name, COUNT(*)::int AS n,
-           (ARRAY_AGG(p.thumb_url ORDER BY p.sku))[1] AS thumb_url
-    FROM product p ${visibleProductJoinsSql}
-    LEFT JOIN brand cb ON cb.id = c.brand_id
-    ${qtyJoin}
-    WHERE ${Prisma.join(where, " AND ")}
-    GROUP BY c.id, c.name, cb.name
-    ORDER BY (c.id IS NULL), cb.name, c.name`;
-
-  return rows.map((r) => ({
-    id: r.id,
-    name: r.id ? (r.name ?? "") : "Ngoài bộ sưu tập",
-    brandName: r.brand_name,
-    productCount: r.n,
-    thumbUrl: r.thumb_url,
-  }));
 }
 
 /**

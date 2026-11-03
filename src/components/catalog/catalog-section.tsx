@@ -1,4 +1,4 @@
-import { LayoutGrid, List, X } from "lucide-react";
+import { X } from "lucide-react";
 import Link from "next/link";
 import {
   buildCatalogQuery,
@@ -8,14 +8,13 @@ import {
   type CatalogParams,
 } from "@/lib/catalog-params";
 import { formatInt } from "@/lib/format";
-import { cn } from "@/lib/utils";
 import { prisma } from "@/server/db";
 import { listProducts } from "@/server/services/catalog";
 import { ExportButton } from "./export-button";
 import { ProductGrid } from "./product-grid";
 import { ProductTable } from "./product-table";
 
-/** Phần "Tất cả sản phẩm": nhãn phạm vi, chuyển Lưới/Bảng, danh sách, Xem thêm. */
+/** Phần "Tất cả sản phẩm": nhãn phạm vi, xuất Excel, danh sách, Xem thêm (nút Lưới/Bảng ở ViewToggle). */
 export async function CatalogSection({ params }: { params: CatalogParams }) {
   const { items, total, scope } = await listProducts({
     ...params,
@@ -24,7 +23,6 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
 
   const scopeLabel =
     scope.kind === "total" ? "Tổng hệ thống" : `Cửa hàng: ${scope.name} (${scope.code})`;
-  const viewHref = (view: CatalogParams["view"]) => buildCatalogQuery({ ...params, view }) || "?";
 
   const collectionNames = await selectedCollectionNames(params.col);
 
@@ -54,33 +52,6 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
           <b className="text-ink font-semibold">{scopeLabel}</b> · {formatInt(total)} SP
         </p>
         <div className="flex items-center gap-2">
-          <div
-            role="group"
-            aria-label="Kiểu hiển thị"
-            className="border-line inline-flex rounded-full border bg-white p-0.5 text-sm font-medium"
-          >
-            {(
-              [
-                ["grid", "Lưới", LayoutGrid],
-                ["list", "Bảng", List],
-              ] as const
-            ).map(([view, label, Icon]) => (
-              <Link
-                key={view}
-                href={viewHref(view)}
-                scroll={false}
-                replace
-                aria-current={params.view === view ? "true" : undefined}
-                className={cn(
-                  "inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5",
-                  params.view === view ? "bg-brand text-white" : "text-ink-muted hover:text-ink",
-                )}
-              >
-                <Icon className="size-4" aria-hidden />
-                {label}
-              </Link>
-            ))}
-          </div>
           <ExportButton params={params} />
         </div>
       </div>

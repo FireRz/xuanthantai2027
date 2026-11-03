@@ -7,10 +7,10 @@ import {
   ProductDetailFallback,
   ProductDetailSection,
 } from "@/components/catalog/product-detail-section";
-import { CollectionsSection } from "@/components/catalog/collections-section";
 import { ProductGridSkeleton } from "@/components/catalog/product-grid";
 import { SiteFooter } from "@/components/catalog/site-footer";
 import { StoreBar } from "@/components/catalog/store-bar";
+import { ViewToggle } from "@/components/catalog/view-toggle";
 import {
   buildCatalogQuery,
   parseCatalogParams,
@@ -48,13 +48,16 @@ export default async function HomePage({
       <Banner />
       <StoreBar stores={stores} />
       <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
-        <Suspense key={`c${key}`} fallback={null}>
-          <CollectionsSection params={params} />
-        </Suspense>
         <section id="san-pham" className="scroll-mt-24 pt-8 md:pt-10" aria-labelledby="sp-heading">
-          <h2 id="sp-heading" className="font-display mb-4 text-xl font-semibold md:text-2xl">
-            Tất cả sản phẩm
-          </h2>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2
+              id="sp-heading"
+              className="font-display text-navy text-xl font-semibold md:text-2xl"
+            >
+              Tất cả sản phẩm
+            </h2>
+            <ViewToggle params={params} />
+          </div>
           <div className="mb-5 min-h-24">
             <Suspense fallback={null}>
               <FilterSection params={params} />

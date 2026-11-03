@@ -16,6 +16,7 @@ const duplicateSku = (sku: string) =>
 /** Kiểm các id tùy chọn có tồn tại để báo lỗi dễ hiểu thay vì lỗi khóa ngoại. */
 async function assertRefsExist(input: {
   materialId: string | null;
+  productTypeId: string | null;
   priceRangeId: string | null;
 }): Promise<void> {
   if (
@@ -23,6 +24,12 @@ async function assertRefsExist(input: {
     !(await prisma.material.findUnique({ where: { id: input.materialId } }))
   ) {
     throw new DomainError("MATERIAL_NOT_FOUND", "Tuổi vàng không tồn tại");
+  }
+  if (
+    input.productTypeId &&
+    !(await prisma.productType.findUnique({ where: { id: input.productTypeId } }))
+  ) {
+    throw new DomainError("PRODUCT_TYPE_NOT_FOUND", "Chủng loại không tồn tại");
   }
   if (
     input.priceRangeId &&

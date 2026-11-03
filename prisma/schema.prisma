@@ -57,6 +57,17 @@ model Collection {
   @@map("collection")
 }
 
+model ProductType {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @unique
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  products  Product[]
+
+  @@map("product_type")
+}
+
 model Material {
   id        String    @id @default(uuid()) @db.Uuid
   name      String    @unique
@@ -103,6 +114,7 @@ model Product {
   productLineId String            @map("product_line_id") @db.Uuid
   collectionId  String?           @map("collection_id") @db.Uuid
   materialId    String?           @map("material_id") @db.Uuid
+  productTypeId String?           @map("product_type_id") @db.Uuid
   priceRangeId  String?           @map("price_range_id") @db.Uuid
   /// Giá bán lẻ VND, ≥ 0 (CHECK).
   priceVnd      Int?              @map("price_vnd")
@@ -118,6 +130,7 @@ model Product {
   // collection_id NULL → khóa ngoại không kiểm tra (MATCH SIMPLE) = SP không thuộc BST.
   collection    Collection?       @relation(fields: [collectionId, brandId], references: [id, brandId], onDelete: Restrict, onUpdate: Restrict)
   material      Material?         @relation(fields: [materialId], references: [id], onDelete: Restrict)
+  productType   ProductType?      @relation(fields: [productTypeId], references: [id], onDelete: Restrict)
   priceRange    PriceRange?       @relation(fields: [priceRangeId], references: [id], onDelete: Restrict)
   quantities    StoreProductQty[]
 
@@ -125,6 +138,7 @@ model Product {
   @@index([productLineId])
   @@index([collectionId])
   @@index([materialId])
+  @@index([productTypeId])
   @@index([priceRangeId])
   @@index([updatedAt])
   @@index([priceVnd])

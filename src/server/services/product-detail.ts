@@ -19,6 +19,7 @@ export interface ProductDetail {
   lineName: string;
   collectionName: string | null;
   materialName: string | null;
+  productTypeName: string | null;
   /** Mọi cửa hàng đang hoạt động theo mã, kể cả cửa hàng chưa có số liệu (hiện 0). */
   stores: StoreQtyRow[];
   /** Tính trên số tổng của các cửa hàng đang hoạt động (ADR-007). */
@@ -41,6 +42,7 @@ export async function getProductDetail(sku: string): Promise<ProductDetail | nul
         productLine: { select: { name: true } },
         collection: { select: { name: true } },
         material: { select: { name: true } },
+        productType: { select: { name: true } },
         quantities: { select: { storeId: true, qtyOrdered: true, qtyReceived: true } },
       },
     }),
@@ -73,6 +75,7 @@ export async function getProductDetail(sku: string): Promise<ProductDetail | nul
     lineName: product.productLine.name,
     collectionName: product.collection?.name ?? null,
     materialName: product.material?.name ?? null,
+    productTypeName: product.productType?.name ?? null,
     stores: rows.map((r) => ({
       code: r.code,
       name: r.name,

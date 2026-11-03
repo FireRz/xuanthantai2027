@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic";
 const TABS = [
   { key: "brands", label: "Nhãn hàng" },
   { key: "materials", label: "Tuổi vàng" },
+  { key: "productTypes", label: "Chủng loại" },
   { key: "priceRanges", label: "Khung giá" },
   { key: "stores", label: "Cửa hàng" },
 ] as const;
@@ -40,8 +41,8 @@ export default async function MasterDataPage({
       <div>
         <h1 className="text-xl font-semibold">Danh mục</h1>
         <p className="mt-1 text-sm text-neutral-600">
-          Nhãn hàng, dòng hàng, bộ sưu tập, tuổi vàng và cửa hàng. Mục đang được dùng không xóa
-          được, chỉ ẩn.
+          Nhãn hàng, dòng hàng, bộ sưu tập, tuổi vàng, chủng loại, khung giá và cửa hàng. Mục đang
+          được dùng không xóa được, chỉ ẩn.
         </p>
       </div>
 
@@ -66,6 +67,7 @@ export default async function MasterDataPage({
 
       {tab === "brands" && <BrandsTab />}
       {tab === "materials" && <MaterialsTab />}
+      {tab === "productTypes" && <ProductTypesTab />}
       {tab === "priceRanges" && <PriceRangesTab />}
       {tab === "stores" && <StoresTab />}
     </div>
@@ -189,6 +191,41 @@ async function MaterialsTab() {
                 key={m.id}
                 kind="material"
                 item={{ id: m.id, name: m.name, active: m.active, usage: m._count.products }}
+              />
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  );
+}
+
+async function ProductTypesTab() {
+  const types = await prisma.productType.findMany({
+    orderBy: { name: "asc" },
+    include: { _count: { select: { products: true } } },
+  });
+  return (
+    <div className="space-y-4">
+      <section className={card} aria-labelledby="add-product-type">
+        <h2 id="add-product-type" className="mb-2 font-semibold">
+          Thêm chủng loại
+        </h2>
+        <p className="mb-2 text-sm text-neutral-600">
+          Tên phải khớp với cột Chủng loại trong file Excel (chưa có thì import sẽ tự tạo).
+        </p>
+        <AddForm kind="productType" label="Thêm chủng loại" />
+      </section>
+      <section className={card} aria-label="Danh sách chủng loại">
+        {types.length === 0 ? (
+          <p className="text-sm text-neutral-600">Chưa có chủng loại nào.</p>
+        ) : (
+          <ul className="divide-y divide-neutral-100">
+            {types.map((t) => (
+              <ItemRow
+                key={t.id}
+                kind="productType"
+                item={{ id: t.id, name: t.name, active: t.active, usage: t._count.products }}
               />
             ))}
           </ul>

@@ -27,6 +27,7 @@ export interface ProductSheetRow {
   line: string;
   collection: string | null;
   material: string | null;
+  productType: string | null;
   priceRange: string | null;
   price: number | null;
 }
@@ -50,6 +51,7 @@ export const EMPTY_LISTS: WorkbookLists = {
   line: [],
   collection: [],
   material: [],
+  productType: [],
   priceRange: [],
   store: [],
 };
@@ -69,6 +71,7 @@ const PRODUCT_LIST_COLUMNS: Partial<Record<(typeof PRODUCT_COLUMNS)[number]["key
   line: "line",
   collection: "collection",
   material: "material",
+  productType: "productType",
   priceRange: "priceRange",
 };
 
@@ -136,7 +139,7 @@ function guideLines(): string[][] {
     ["• SL đã về được phép lớn hơn SL đặt."],
     ["• SP chưa có trên web → được tạo mới (bắt buộc Mã SP, Nhãn hàng, Dòng hàng)."],
     [
-      "• Nhãn hàng, Dòng hàng, Bộ sưu tập, Tuổi vàng, Khung giá chưa có trên web → được tự tạo khi áp dụng (xem trước sẽ liệt kê). Chỉ Cửa hàng chưa có thì báo lỗi, phải tạo ở trang Danh mục.",
+      "• Nhãn hàng, Dòng hàng, Bộ sưu tập, Tuổi vàng, Chủng loại, Khung giá chưa có trên web → được tự tạo khi áp dụng (xem trước sẽ liệt kê). Chỉ Cửa hàng chưa có thì báo lỗi, phải tạo ở trang Danh mục.",
     ],
     [
       "• Dòng hàng và Bộ sưu tập phải cùng nhãn với SP. Không đổi nhãn của SP nếu dòng/BST hiện có không thuộc nhãn mới.",
@@ -201,6 +204,8 @@ export async function writeAdminWorkbook(
             return p.collection ?? "";
           case "material":
             return p.material ?? "";
+          case "productType":
+            return p.productType ?? "";
           case "priceRange":
             return p.priceRange ?? "";
           case "price":

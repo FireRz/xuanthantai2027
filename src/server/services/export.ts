@@ -14,7 +14,7 @@ export interface ViewerExport {
  */
 export async function viewerList(
   params: Pick<CatalogParams, "store" | "all" | "q"> &
-    Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "pr" | "sort">>,
+    Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "typ" | "pr" | "sort">>,
   now: Date = new Date(),
 ): Promise<ViewerExport> {
   const { items, scope } = await listProducts({ ...params, limit: null, offset: 0 });

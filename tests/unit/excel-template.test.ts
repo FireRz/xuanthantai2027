@@ -28,6 +28,7 @@ describe("T08.3 — định nghĩa mẫu Excel", () => {
       "Dòng hàng",
       "Bộ sưu tập",
       "Tuổi vàng",
+      "Chủng loại",
       "Khung giá",
       "Giá bán lẻ",
     ]);
@@ -53,12 +54,13 @@ describe("T08.3 — định nghĩa mẫu Excel", () => {
     ]);
   });
 
-  it("danh sách chọn: nhãn, dòng, BST, tuổi vàng, khung giá, mã cửa hàng", () => {
+  it("danh sách chọn: nhãn, dòng, BST, tuổi vàng, chủng loại, khung giá, mã cửa hàng", () => {
     expect(LIST_COLUMNS.map((c) => c.key)).toEqual([
       "brand",
       "line",
       "collection",
       "material",
+      "productType",
       "priceRange",
       "store",
     ]);

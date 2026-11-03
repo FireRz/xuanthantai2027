@@ -15,11 +15,12 @@ const distinctSorted = (names: string[]) =>
   [...new Set(names)].sort((a, b) => a.localeCompare(b, "vi"));
 
 export async function loadWorkbookLists(): Promise<WorkbookLists> {
-  const [brands, lines, collections, materials, ranges, stores] = await Promise.all([
+  const [brands, lines, collections, materials, types, ranges, stores] = await Promise.all([
     prisma.brand.findMany({ where: { active: true }, select: { name: true } }),
     prisma.productLine.findMany({ where: { active: true }, select: { name: true } }),
     prisma.collection.findMany({ where: { active: true }, select: { name: true } }),
     prisma.material.findMany({ where: { active: true }, select: { name: true } }),
+    prisma.productType.findMany({ where: { active: true }, select: { name: true } }),
     prisma.priceRange.findMany({
       where: { active: true },
       orderBy: { sortOrder: "asc" },
@@ -36,6 +37,7 @@ export async function loadWorkbookLists(): Promise<WorkbookLists> {
     line: distinctSorted(lines.map((x) => x.name)),
     collection: distinctSorted(collections.map((x) => x.name)),
     material: distinctSorted(materials.map((x) => x.name)),
+    productType: distinctSorted(types.map((x) => x.name)),
     // Khung giá giữ thứ tự theo khoảng giá (ADR-010 K3), không xếp chữ cái.
     priceRange: ranges.map((x) => x.name),
     store: stores.map((x) => x.code),
@@ -67,6 +69,7 @@ async function* exportProducts(): AsyncGenerator<ProductSheetRow> {
         productLine: { select: { name: true } },
         collection: { select: { name: true } },
         material: { select: { name: true } },
+        productType: { select: { name: true } },
         priceRange: { select: { name: true } },
       },
     });
@@ -80,6 +83,7 @@ async function* exportProducts(): AsyncGenerator<ProductSheetRow> {
         line: p.productLine.name,
         collection: p.collection?.name ?? null,
         material: p.material?.name ?? null,
+        productType: p.productType?.name ?? null,
         priceRange: p.priceRange?.name ?? null,
         price: p.priceVnd,
       };

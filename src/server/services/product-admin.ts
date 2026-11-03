@@ -51,6 +51,7 @@ export async function listAdminProducts(query: AdminProductQuery) {
       productLine: { select: { name: true } },
       collection: { select: { name: true } },
       material: { select: { name: true } },
+      productType: { select: { name: true } },
     },
   });
   return { rows, total, page, pages, pageSize };

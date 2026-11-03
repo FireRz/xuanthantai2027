@@ -21,7 +21,15 @@ export interface TemplateColumn<K extends string> {
 }
 
 export type ProductKey =
-  "sku" | "name" | "brand" | "line" | "collection" | "material" | "priceRange" | "price";
+  | "sku"
+  | "name"
+  | "brand"
+  | "line"
+  | "collection"
+  | "material"
+  | "productType"
+  | "priceRange"
+  | "price";
 export type QuantityKey = "sku" | "store" | "ordered" | "received";
 
 export const PRODUCT_COLUMNS: readonly TemplateColumn<ProductKey>[] = [
@@ -66,6 +74,13 @@ export const PRODUCT_COLUMNS: readonly TemplateColumn<ProductKey>[] = [
     width: 16,
     requiredColumn: false,
     help: "Tùy chọn. Phải là tuổi vàng đã có trên web. Để trống = giữ nguyên.",
+  },
+  {
+    key: "productType",
+    header: "Chủng loại",
+    width: 16,
+    requiredColumn: false,
+    help: "Tùy chọn. Chủng loại chưa có trên web sẽ được tự tạo khi áp dụng. Để trống = giữ nguyên.",
   },
   {
     key: "priceRange",
@@ -120,6 +135,7 @@ export const LIST_COLUMNS = [
   { key: "line", header: "Dòng hàng" },
   { key: "collection", header: "Bộ sưu tập" },
   { key: "material", header: "Tuổi vàng" },
+  { key: "productType", header: "Chủng loại" },
   { key: "priceRange", header: "Khung giá" },
   { key: "store", header: "Mã cửa hàng" },
 ] as const;

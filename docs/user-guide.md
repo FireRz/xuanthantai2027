@@ -23,7 +23,7 @@ Không cần đăng nhập. Mở đường link được gửi; dùng được t
 
 ### A3. Lọc, tìm, sắp xếp
 
-- **Bộ lọc**: Nhãn hàng, Dòng hàng, Bộ sưu tập (có mục "Không thuộc BST"), Tuổi vàng, Khung giá. Chọn được nhiều giá trị; bên cạnh mỗi lựa chọn có số SP. Trên điện thoại bấm **Bộ lọc** để mở bảng lọc.
+- **Bộ lọc**: Nhãn hàng, Dòng hàng, Bộ sưu tập (có mục "Không thuộc BST"), Tuổi vàng, Chủng loại, Khung giá. Chọn được nhiều giá trị; bên cạnh mỗi lựa chọn có số SP. Trên điện thoại bấm **Bộ lọc** để mở bảng lọc.
 - **Tìm mã SP**: gõ mã (không phân biệt hoa thường) vào ô **Tìm mã SP**.
 - **Sắp xếp**: Mã SP A→Z (mặc định), Mới cập nhật, Giá thấp → cao, Giá cao → thấp, Còn thiếu nhiều nhất.
 
@@ -50,7 +50,7 @@ Làm đúng thứ tự, vì file Excel chỉ chọn được những giá trị 
 1. **Danh mục → Cửa hàng**: nhập mã (duy nhất) và tên từng cửa hàng.
 2. **Danh mục → Nhãn hàng**: tạo nhãn.
 3. Dưới từng nhãn: tạo **Dòng hàng** (bắt buộc, mỗi SP thuộc một dòng) và **Bộ sưu tập** (không bắt buộc).
-4. **Tuổi vàng** và **Khung giá** (không bắt buộc, dùng để lọc).
+4. **Tuổi vàng**, **Chủng loại** và **Khung giá** (không bắt buộc, dùng để lọc). Chủng loại (nhẫn, dây chuyền, lắc tay…) gõ đúng tên ở cột "Chủng loại" trong Excel; chưa có thì import tự tạo.
 5. **Nhập Excel**: tải file mẫu → điền → nhập (B3).
 6. **Ảnh**: tải ảnh hàng loạt (B4).
 7. Đối chiếu số liệu trên trang xem với file nguồn.
@@ -67,9 +67,9 @@ Trang **Danh mục** có hướng dẫn từng bước và đánh dấu bước 
 ### B3. Nhập Excel
 
 1. Vào **Nhập Excel → Tải file mẫu**. File có sheet:
-   - **SanPham** — mỗi SP một dòng: Mã SP, Tên SP, Nhãn hàng, Dòng hàng, Bộ sưu tập, Tuổi vàng, Khung giá, Giá bán lẻ.
+   - **SanPham** — mỗi SP một dòng: Mã SP, Tên SP, Nhãn hàng, Dòng hàng, Bộ sưu tập, Tuổi vàng, Chủng loại, Khung giá, Giá bán lẻ.
    - **SoLuong** — mỗi cặp (SP, cửa hàng) một dòng: Mã SP, Mã cửa hàng, SL đặt, SL đã về.
-   - **HuongDan** — giải thích từng cột. Các cột Nhãn, Dòng, BST, Tuổi vàng, Khung giá, Mã cửa hàng có ô chọn từ danh sách.
+   - **HuongDan** — giải thích từng cột. Các cột Nhãn, Dòng, BST, Tuổi vàng, Chủng loại, Khung giá, Mã cửa hàng có ô chọn từ danh sách.
 2. Điền file, lưu dạng **.xlsx**. Quy tắc:
    - Mã SP không trùng, không có khoảng trắng; mã chưa có trên web → tạo SP mới (SP mới cần Nhãn hàng và Dòng hàng).
    - Dòng phải thuộc đúng nhãn của SP; BST cũng vậy.

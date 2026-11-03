@@ -22,6 +22,7 @@ function ref(): ReferenceData {
       { id: "c2", brandId: B2, name: "Hè 2027" },
     ],
     materials: [{ id: "m1", name: "Vàng 24K" }],
+    productTypes: [{ id: "t1", name: "Nhẫn trơn" }],
     priceRanges: [
       { id: "r1", name: "< 1tr" },
       { id: "r2", name: "2tr < 5tr" },
@@ -39,6 +40,7 @@ function ref(): ReferenceData {
         productLineId: "l1",
         collectionId: "c1",
         materialId: "m1",
+        productTypeId: "t1",
         priceRangeId: "r1",
         priceVnd: 38_100_000,
       },
@@ -50,6 +52,7 @@ function ref(): ReferenceData {
         productLineId: "l1",
         collectionId: null,
         materialId: null,
+        productTypeId: null,
         priceRangeId: null,
         priceVnd: null,
       },
@@ -124,6 +127,7 @@ describe("T08.7 — phân loại (AC4)", () => {
             line: "Nhẫn",
             collection: "Xuân 2027",
             material: "Vàng 24K",
+            productType: "nhẫn  TRƠN",
             priceRange: "< 1tr",
             price: "38100000",
           }),
@@ -171,9 +175,27 @@ describe("T08.7 — R3 ghi đè, R6 ô trống giữ nguyên, R4 về > đặt",
       id: "p1",
       collectionId: "c1",
       materialId: "m1",
+      productTypeId: "t1",
       priceRangeId: "r1",
       priceVnd: 38_100_000,
     });
+  });
+
+  it("Chủng loại: đổi sang loại có sẵn → ghi nhận thay đổi; loại chưa có → tự tạo, trùng tên chỉ tạo một lần", () => {
+    const a = run(
+      file([
+        prod(2, { sku: "AK0002", productType: "Nhẫn trơn" }),
+        prod(3, { sku: "N1", brand: "Phúc Lộc", line: "Nhẫn", productType: "Dây chuyền" }),
+        prod(4, { sku: "N2", brand: "Phúc Lộc", line: "Nhẫn", productType: "dây CHUYỀN" }),
+      ]),
+    );
+    expect(a.issues).toEqual([]);
+    expect(a.productItems[0].changes).toEqual([
+      { column: "Chủng loại", old: "—", new: "Nhẫn trơn" },
+    ]);
+    expect(a.plan.productUpdates[0]).toMatchObject({ id: "p2", productTypeId: "t1" });
+    expect(a.plan.newCatalog.productTypes).toHaveLength(1);
+    expect(a.newCatalogLabels).toEqual(["Chủng loại: Dây chuyền"]);
   });
 
   it("R6: SL ô trống = giữ nguyên; gõ 0 thì về 0", () => {
@@ -193,6 +215,7 @@ describe("T08.7 — R3 ghi đè, R6 ô trống giữ nguyên, R4 về > đặt",
       name: null,
       collectionId: null,
       materialId: null,
+      productTypeId: null,
       priceRangeId: null,
       priceVnd: null,
     });
