@@ -42,7 +42,9 @@ export default async function HomePage({
   const params = pruneInvalidSelections(parsed, owned.lines, owned.cols);
   // Đổi tham số thì hiện khung chờ (skeleton) trong lúc tải danh sách mới.
   // Mở/đóng popup (?sp=) không làm tải lại danh sách nên không đưa `sp` vào khóa.
-  const key = buildCatalogQuery({ ...params, sp: null });
+  // "Xem thêm" (`n`) cũng không đưa vào khóa: giữ danh sách cũ trên màn hình trong lúc tải thêm,
+  // nếu không khung chờ làm trang ngắn lại và trình duyệt kéo về đầu trang.
+  const key = buildCatalogQuery({ ...params, sp: null, n: undefined });
 
   return (
     <CatalogNavProvider params={params}>
