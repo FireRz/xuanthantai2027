@@ -222,6 +222,40 @@
   transform: none;
 }
 
+/* Lớp hiệu ứng banner (BannerFx): mây trôi qua lại, mây dính núi giãn ngang neo mép phải. */
+.fx-layer {
+  position: absolute;
+}
+.fx-fill {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.fx-cloud {
+  animation: fx-drift var(--fx-t, 7s) ease-in-out infinite alternate;
+  animation-delay: var(--fx-delay, 0s);
+}
+.fx-stretch {
+  transform-origin: 100% 50%;
+  animation-name: fx-stretch;
+}
+@keyframes fx-drift {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translate(var(--fx-dx, 1.2vw), 0);
+  }
+}
+@keyframes fx-stretch {
+  from {
+    transform: none;
+  }
+  to {
+    transform: scaleX(var(--fx-co, 1.06));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .shimmer::after {
     animation: none;

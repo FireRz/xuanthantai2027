@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { BannerFx } from "./banner-fx";
 
 /**
  * Banner Tết (ADR-009 U4', U14', U18'): ảnh tranh Tết làm nền toàn banner, chữ căn giữa trên
@@ -16,6 +17,7 @@ export function Banner() {
         sizes="100vw"
         className="object-cover object-center"
       />
+      <BannerFx />
       <div
         aria-hidden
         className="from-brand-dark/70 absolute inset-0 bg-gradient-to-b via-transparent to-transparent sm:hidden"
