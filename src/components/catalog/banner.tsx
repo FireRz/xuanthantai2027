@@ -2,7 +2,7 @@ import Image from "next/image";
 
 /**
  * Banner Tết (ADR-009 U4', U14', U18'): ảnh tranh Tết làm nền toàn banner, chữ căn giữa trên
- * phần nền đỏ trơn; chỉ còn nút dẫn xuống thanh "Cửa hàng của bạn". Viền lượn vàng ở đáy.
+ * phần nền đỏ trơn; Viền lượn vàng ở đáy.
  */
 export function Banner() {
   return (
@@ -25,19 +25,11 @@ export function Banner() {
           Xuân Đinh Mùi · 2027
         </h1>
         <p className="font-display text-festive-text mt-[0.5vw] text-[3.4vw] italic [text-shadow:0_1px_8px_rgb(90_5_5/0.8)] sm:mt-3 sm:text-lg md:text-2xl">
-          Vạn sự như ý — Tài lộc đầy nhà
+          Khởi vận hanh thông - tài lộc như ý
         </p>
         <p className="text-festive-text mx-auto mt-4 hidden max-w-2xl text-[15px] md:text-base lg:block">
           Theo dõi số lượng đặt và hàng đã về của các bộ sưu tập Xuân Thần Tài
         </p>
-        <div className="mt-[2vw] flex flex-wrap items-center justify-center gap-2 sm:mt-6 sm:gap-3">
-          <a
-            href="#san-pham"
-            className="text-festive-text border-gold bg-brand-dark/40 hover:bg-brand-dark/70 inline-flex min-h-7 items-center rounded-full border-2 px-4 text-xs font-semibold hover:text-white sm:min-h-11 sm:px-6 sm:text-base"
-          >
-            Sản phẩm
-          </a>
-        </div>
       </div>
       <svg
         aria-hidden

@@ -40,6 +40,8 @@ describe("T08.3 — định nghĩa mẫu Excel", () => {
       "Mã cửa hàng",
       "SL đặt",
       "SL đã về",
+      "Bán",
+      "Tồn",
     ]);
   });
 

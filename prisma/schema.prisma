@@ -151,6 +151,8 @@ model StoreProductQty {
   storeId     String   @map("store_id") @db.Uuid
   qtyOrdered  Int      @default(0) @map("qty_ordered")
   qtyReceived Int      @default(0) @map("qty_received")
+  qtySold     Int      @default(0) @map("qty_sold")
+  qtyStock    Int      @default(0) @map("qty_stock")
   updatedAt   DateTime @updatedAt @map("updated_at")
   product     Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
   store       Store    @relation(fields: [storeId], references: [id], onDelete: Restrict)

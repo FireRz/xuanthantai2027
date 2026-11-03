@@ -30,8 +30,8 @@ export interface QuantityItem {
   row: number;
   sku: string;
   store: string;
-  old: { ordered: number; received: number };
-  new: { ordered: number; received: number };
+  old: { ordered: number; received: number; sold: number; stock: number };
+  new: { ordered: number; received: number; sold: number; stock: number };
 }
 
 export interface ImportSummary {

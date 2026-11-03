@@ -63,7 +63,7 @@ export function StoreBar({ stores }: { stores: StoreOption[] }) {
             onChange={(e) => go({ store: e.target.value || null })}
             className="border-brand bg-gold-soft text-ink focus-visible:outline-brand min-h-11 min-w-0 flex-1 rounded-lg border-2 px-3 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 sm:w-64 sm:flex-none"
           >
-            <option value="">Tất cả cửa hàng (tổng hệ thống)</option>
+            <option value="">Tất cả cửa hàng</option>
             {stores.map((s) => (
               <option key={s.code} value={s.code}>
                 {s.code} — {s.name}

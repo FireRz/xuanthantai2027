@@ -30,7 +30,7 @@ export type ProductKey =
   | "productType"
   | "priceRange"
   | "price";
-export type QuantityKey = "sku" | "store" | "ordered" | "received";
+export type QuantityKey = "sku" | "store" | "ordered" | "received" | "sold" | "stock";
 
 export const PRODUCT_COLUMNS: readonly TemplateColumn<ProductKey>[] = [
   {
@@ -126,6 +126,20 @@ export const QUANTITY_COLUMNS: readonly TemplateColumn<QuantityKey>[] = [
     width: 10,
     requiredColumn: false,
     help: "Số nguyên ≥ 0, được phép lớn hơn SL đặt. Ghi đè số hiện có. Để trống = giữ nguyên.",
+  },
+  {
+    key: "sold",
+    header: "Bán",
+    width: 10,
+    requiredColumn: false,
+    help: "Tùy chọn. Số lượng đã bán, số nguyên ≥ 0. Ghi đè số hiện có. Để trống = giữ nguyên.",
+  },
+  {
+    key: "stock",
+    header: "Tồn",
+    width: 10,
+    requiredColumn: false,
+    help: "Tùy chọn. Số lượng tồn, số nguyên ≥ 0. Ghi đè số hiện có. Để trống = giữ nguyên.",
   },
 ];
 

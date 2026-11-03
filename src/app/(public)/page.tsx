@@ -1,3 +1,4 @@
+import { BackToTop } from "@/components/catalog/back-to-top";
 import { Suspense } from "react";
 import { Banner } from "@/components/catalog/banner";
 import { CatalogSection } from "@/components/catalog/catalog-section";
@@ -73,6 +74,7 @@ export default async function HomePage({
           <ProductDetailSection sku={params.sp} store={params.store} />
         </Suspense>
       )}
+      <BackToTop />
       <Suspense fallback={null}>
         <SiteFooter />
       </Suspense>

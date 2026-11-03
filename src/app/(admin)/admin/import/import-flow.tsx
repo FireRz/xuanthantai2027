@@ -91,6 +91,23 @@ function buildRows(p: ImportPreview): Row[] {
         reason: "Thay đổi",
       });
     }
+    for (const [f, label] of [
+      ["sold", "Bán"],
+      ["stock", "Tồn"],
+    ] as const) {
+      if (q.old[f] !== q.new[f]) {
+        rows.push({
+          kind: "changed",
+          sheet: "SoLuong",
+          line: q.row,
+          column: label,
+          key,
+          old: formatInt(q.old[f]),
+          next: formatInt(q.new[f]),
+          reason: "Thay đổi",
+        });
+      }
+    }
   }
   return rows;
 }

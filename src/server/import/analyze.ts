@@ -57,6 +57,8 @@ export interface RefQuantity {
   storeId: string;
   ordered: number;
   received: number;
+  sold: number;
+  stock: number;
 }
 export interface ReferenceData {
   brands: RefNamed[];
@@ -95,6 +97,8 @@ export interface QuantityWritePlan {
   storeId: string;
   ordered: number;
   received: number;
+  sold: number;
+  stock: number;
 }
 /** Danh mục có trong file nhưng chưa có trên web: sẽ được tạo trước khi ghi SP (id tạm bắt đầu bằng "new:"). */
 export interface NewCatalogPlan {
@@ -550,7 +554,7 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
         fail("store", `Mã cửa hàng "${c.store}" chưa có trên web`);
       }
 
-      const parseQty = (k: "ordered" | "received"): number | undefined => {
+      const parseQty = (k: "ordered" | "received" | "sold" | "stock"): number | undefined => {
         const raw = c[k];
         if (raw === undefined) return undefined;
         const n = parseCount(raw);
@@ -562,6 +566,8 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
       };
       const ordered = parseQty("ordered");
       const received = parseQty("received");
+      const sold = parseQty("sold");
+      const stock = parseQty("stock");
 
       if (normSku !== undefined && c.store !== undefined) {
         const pair = `${normSku}|${normalizeCode(c.store)}`;
@@ -573,9 +579,24 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
       if (!ok || !store || normSku === undefined) continue;
 
       const prev = existing ? qtyByPair.get(`${existing.id}|${store.id}`) : undefined;
-      const oldQ = { ordered: prev?.ordered ?? 0, received: prev?.received ?? 0 };
-      const newQ = { ordered: ordered ?? oldQ.ordered, received: received ?? oldQ.received };
-      if (newQ.ordered === oldQ.ordered && newQ.received === oldQ.received) {
+      const oldQ = {
+        ordered: prev?.ordered ?? 0,
+        received: prev?.received ?? 0,
+        sold: prev?.sold ?? 0,
+        stock: prev?.stock ?? 0,
+      };
+      const newQ = {
+        ordered: ordered ?? oldQ.ordered,
+        received: received ?? oldQ.received,
+        sold: sold ?? oldQ.sold,
+        stock: stock ?? oldQ.stock,
+      };
+      if (
+        newQ.ordered === oldQ.ordered &&
+        newQ.received === oldQ.received &&
+        newQ.sold === oldQ.sold &&
+        newQ.stock === oldQ.stock
+      ) {
         summary.unchangedQuantities++;
         continue;
       }

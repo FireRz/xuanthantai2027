@@ -37,6 +37,8 @@ export interface QuantitySheetRow {
   store: string;
   ordered: number;
   received: number;
+  sold: number;
+  stock: number;
 }
 
 export interface AdminWorkbookData {
@@ -125,7 +127,7 @@ function guideLines(): string[][] {
     ["HƯỚNG DẪN NHẬP EXCEL — Xuân Thần Tài"],
     [""],
     ["Cách làm"],
-    ["1. Điền sheet SanPham (thông tin SP) và SoLuong (SL đặt / SL đã về của từng cửa hàng)."],
+    ["1. Điền sheet SanPham (thông tin SP) và SoLuong (SL đặt / SL đã về / Bán / Tồn của từng cửa hàng)."],
     ["2. Vào trang Nhập Excel, chọn file, xem trước kết quả. Chỉ khi hết lỗi mới bấm Áp dụng."],
     [
       "3. Không sửa tên sheet và dòng tiêu đề (dòng 1). Thứ tự cột có thể đổi nhưng nên giữ nguyên.",
@@ -234,7 +236,7 @@ export async function writeAdminWorkbook(
     QUANTITY_COLUMNS.map((c) => c.header),
   );
   for await (const q of data.quantities) {
-    sl.addRow([q.sku, q.store, q.ordered, q.received]).commit();
+    sl.addRow([q.sku, q.store, q.ordered, q.received, q.sold, q.stock]).commit();
   }
   const storeCol = QUANTITY_COLUMNS.findIndex((c) => c.key === "store") + 1;
   addListValidation(sl, storeCol, "store", data.lists, "Chọn mã cửa hàng trong danh sách");

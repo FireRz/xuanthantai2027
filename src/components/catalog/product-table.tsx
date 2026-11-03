@@ -22,7 +22,7 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
       data-testid="product-table"
       className="border-line overflow-x-auto rounded-xl border bg-white lg:overflow-visible"
     >
-      <table className="w-full min-w-[640px] border-collapse text-[14px] md:text-[15px] lg:min-w-0">
+      <table className="w-full min-w-[760px] border-collapse text-[14px] md:text-[15px] lg:min-w-0">
         <thead>
           <tr>
             <th scope="col" className={`${th} w-16 rounded-tl-xl`}>
@@ -60,6 +60,12 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
             </th>
             <th scope="col" className={`${th} ${num}`}>
               %
+            </th>
+            <th scope="col" className={`${th} ${num}`}>
+              Bán
+            </th>
+            <th scope="col" className={`${th} ${num}`}>
+              Tồn
             </th>
             <th scope="col" className={`${th} rounded-tr-xl`}>
               Trạng thái
@@ -99,6 +105,8 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
                 <td className={`px-3 py-2 ${num}`}>{formatInt(m.received)}</td>
                 <td className={`px-3 py-2 ${num}`}>{formatInt(m.shortage)}</td>
                 <td className={`px-3 py-2 ${num}`}>{formatPercent(m.rate)}</td>
+                <td className={`px-3 py-2 ${num}`}>{formatInt(item.sold)}</td>
+                <td className={`px-3 py-2 ${num}`}>{formatInt(item.stock)}</td>
                 <td className="px-3 py-2">
                   <StatusBadge status={stockStatus(m)} />
                 </td>

@@ -24,6 +24,9 @@ export interface ProductListItem {
   collectionName: string | null;
   materialName: string | null;
   metrics: QtyMetrics;
+  /** SL bán / tồn trong phạm vi đang xem. */
+  sold: number;
+  stock: number;
 }
 
 export interface ProductListResult {
@@ -46,6 +49,8 @@ type Row = {
   material_name: string | null;
   qty_ordered: number;
   qty_received: number;
+  qty_sold: number;
+  qty_stock: number;
 };
 
 type ListParams = Pick<CatalogParams, "store" | "all" | "q"> &
@@ -73,7 +78,8 @@ export async function listProducts(params: ListParams): Promise<ProductListResul
     prisma.$queryRaw<Row[]>`
       SELECT p.id, p.sku, p.name, p.price_vnd, p.image_url, p.thumb_url,
              b.name AS brand_name, l.name AS line_name, c.name AS collection_name, m.name AS material_name,
-             COALESCE(q.qty_ordered, 0)::int AS qty_ordered, COALESCE(q.qty_received, 0)::int AS qty_received
+             COALESCE(q.qty_ordered, 0)::int AS qty_ordered, COALESCE(q.qty_received, 0)::int AS qty_received,
+             COALESCE(q.qty_sold, 0)::int AS qty_sold, COALESCE(q.qty_stock, 0)::int AS qty_stock
       ${from}
       ORDER BY ${orderBySql(params.sort ?? "sku")}
       LIMIT ${limit} OFFSET ${offset}`,
@@ -93,6 +99,8 @@ export async function listProducts(params: ListParams): Promise<ProductListResul
       collectionName: r.collection_name,
       materialName: r.material_name,
       metrics: computeMetrics(r.qty_ordered, r.qty_received),
+      sold: r.qty_sold,
+      stock: r.qty_stock,
     })),
     total: Number(count[0]?.n ?? 0),
     scope: store ? { kind: "store", code: store.code, name: store.name } : { kind: "total" },

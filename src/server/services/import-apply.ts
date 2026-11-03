@@ -170,18 +170,24 @@ export async function applyImport(buffer: Buffer, opts: ApplyOptions = {}): Prom
       const rows = quantityWrites.map((w) => {
         const productId = w.productId ?? idByNewSku.get(w.newSku ?? "");
         if (!productId) throw new DomainError("IMPORT_INTERNAL", "Không xác định được sản phẩm");
-        return { productId, storeId: w.storeId, ordered: w.ordered, received: w.received };
+        return { productId, storeId: w.storeId, ordered: w.ordered,
+          received: w.received,
+          sold: w.sold,
+          stock: w.stock,
+        };
       });
       for (const part of chunks(rows, QTY_CHUNK)) {
         await tx.$executeRaw`
-          INSERT INTO store_product_qty (product_id, store_id, qty_ordered, qty_received, updated_at)
-          SELECT product_id, store_id, ordered, received, now()
+          INSERT INTO store_product_qty (product_id, store_id, qty_ordered, qty_received, qty_sold, qty_stock, updated_at)
+          SELECT product_id, store_id, ordered, received, sold, stock, now()
           FROM unnest(
             ${part.map((r) => r.productId)}::uuid[], ${part.map((r) => r.storeId)}::uuid[],
-            ${part.map((r) => r.ordered)}::int[], ${part.map((r) => r.received)}::int[]
-          ) AS v(product_id, store_id, ordered, received)
+            ${part.map((r) => r.ordered)}::int[], ${part.map((r) => r.received)}::int[],
+            ${part.map((r) => r.sold)}::int[], ${part.map((r) => r.stock)}::int[]
+          ) AS v(product_id, store_id, ordered, received, sold, stock)
           ON CONFLICT (product_id, store_id) DO UPDATE SET
             qty_ordered = EXCLUDED.qty_ordered, qty_received = EXCLUDED.qty_received,
+            qty_sold = EXCLUDED.qty_sold, qty_stock = EXCLUDED.qty_stock,
             updated_at = now()`;
       }
       opts.onStep?.("quantities-written");

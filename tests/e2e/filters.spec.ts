@@ -365,7 +365,7 @@ test.describe("T04.10 số kết quả và trạng thái không có SP phù hợ
     page,
   }) => {
     await page.goto("/?q=ak00&sort=price_asc");
-    await expect(scope(page)).toContainText("Tổng hệ thống · 99 SP");
+    await expect(scope(page)).toContainText("Tất cả cửa hàng · 99 SP");
     await expect(scope(page)).toHaveAttribute("role", "status");
 
     await page.goto("/?q=zzz-khong-co&sort=price_asc");

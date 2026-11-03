@@ -60,7 +60,7 @@ test.describe("T03.6 trạng thái rỗng", () => {
 test.describe("T03.8, T03.12 cửa hàng và phạm vi", () => {
   test("chọn cửa hàng → nhãn phạm vi và số liệu đổi theo cửa hàng", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByTestId("scope-label")).toContainText("Tổng hệ thống");
+    await expect(page.getByTestId("scope-label")).toContainText("Tất cả cửa hàng");
     const total = await cards(page).first().innerText();
     await page.getByLabel("Cửa hàng của bạn").selectOption({ index: 1 });
     await expect(page).toHaveURL(/store=/);

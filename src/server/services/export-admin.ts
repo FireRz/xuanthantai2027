@@ -96,9 +96,9 @@ async function* exportProducts(): AsyncGenerator<ProductSheetRow> {
 async function* exportQuantities(): AsyncGenerator<QuantitySheetRow> {
   let after: { sku: string; code: string } | null = null;
   for (;;) {
-    const rows: { sku: string; code: string; qty_ordered: number; qty_received: number }[] = after
+    const rows: { sku: string; code: string; qty_ordered: number; qty_received: number; qty_sold: number; qty_stock: number }[] = after
       ? await prisma.$queryRaw`
-            SELECT p.sku, s.code, q.qty_ordered, q.qty_received
+            SELECT p.sku, s.code, q.qty_ordered, q.qty_received, q.qty_sold, q.qty_stock
             FROM store_product_qty q
             JOIN product p ON p.id = q.product_id
             JOIN store s ON s.id = q.store_id
@@ -106,7 +106,7 @@ async function* exportQuantities(): AsyncGenerator<QuantitySheetRow> {
             ORDER BY p.sku, s.code
             LIMIT ${QTY_BATCH}`
       : await prisma.$queryRaw`
-            SELECT p.sku, s.code, q.qty_ordered, q.qty_received
+            SELECT p.sku, s.code, q.qty_ordered, q.qty_received, q.qty_sold, q.qty_stock
             FROM store_product_qty q
             JOIN product p ON p.id = q.product_id
             JOIN store s ON s.id = q.store_id
@@ -114,7 +114,10 @@ async function* exportQuantities(): AsyncGenerator<QuantitySheetRow> {
             ORDER BY p.sku, s.code
             LIMIT ${QTY_BATCH}`;
     for (const r of rows) {
-      yield { sku: r.sku, store: r.code, ordered: r.qty_ordered, received: r.qty_received };
+      yield { sku: r.sku, store: r.code, ordered: r.qty_ordered, received: r.qty_received,
+        sold: r.qty_sold,
+        stock: r.qty_stock,
+      };
     }
     if (rows.length < QTY_BATCH) return;
     const last = rows[rows.length - 1];

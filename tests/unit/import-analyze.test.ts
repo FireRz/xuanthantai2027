@@ -57,7 +57,7 @@ function ref(): ReferenceData {
         priceVnd: null,
       },
     ],
-    quantities: [{ productId: "p1", storeId: "s1", ordered: 10, received: 2 }],
+    quantities: [{ productId: "p1", storeId: "s1", ordered: 10, received: 2, sold: 0, stock: 0 }],
   };
 }
 
@@ -111,8 +111,8 @@ describe("T08.7 — phân loại (AC4)", () => {
     expect(a.quantityItems[0]).toMatchObject({
       sku: "AK0001",
       store: "CH01",
-      old: { ordered: 10, received: 2 },
-      new: { ordered: 10, received: 5 },
+      old: { ordered: 10, received: 2, sold: 0, stock: 0 },
+      new: { ordered: 10, received: 5, sold: 0, stock: 0 },
     });
   });
 
@@ -158,11 +158,11 @@ describe("T08.7 — R3 ghi đè, R6 ô trống giữ nguyên, R4 về > đặt",
   it("R3: giá trị trong file ghi đè (AC2: đặt 10 → 15)", () => {
     const a = run(file(null, [qty(2, { sku: "AK0001", store: "CH01", ordered: "15" })]));
     expect(a.quantityItems[0]).toMatchObject({
-      old: { ordered: 10, received: 2 },
-      new: { ordered: 15, received: 2 },
+      old: { ordered: 10, received: 2, sold: 0, stock: 0 },
+      new: { ordered: 15, received: 2, sold: 0, stock: 0 },
     });
     expect(a.plan.quantityWrites).toEqual([
-      { productId: "p1", newSku: null, storeId: "s1", ordered: 15, received: 2 },
+      { productId: "p1", newSku: null, storeId: "s1", ordered: 15, received: 2, sold: 0, stock: 0 },
     ]);
   });
 

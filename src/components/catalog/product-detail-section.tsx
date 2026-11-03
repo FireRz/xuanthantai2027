@@ -8,7 +8,7 @@ import { StatusBadge } from "./status-badge";
 
 /** Popup chi tiết SP theo `?sp=` (F05). Mã không có / SP bị ẩn → thông báo "Không tìm thấy sản phẩm" (T05.6). */
 export async function ProductDetailSection({ sku, store }: { sku: string; store: string | null }) {
-  const detail = await getProductDetail(sku);
+  const detail = await getProductDetail(sku, store);
   if (!detail) {
     return (
       <ProductDialog title="Không tìm thấy sản phẩm">
@@ -79,6 +79,12 @@ function DetailBody({
             <span>
               Thiếu <b>{formatInt(t.shortage)}</b>
             </span>
+            <span>
+              Bán <b>{formatInt(d.totalSold)}</b>
+            </span>
+            <span>
+              Tồn <b>{formatInt(d.totalStock)}</b>
+            </span>
             <b>{formatPercent(t.rate)}</b>
             <StatusBadge status={stockStatus(t)} />
           </p>
@@ -108,6 +114,12 @@ function DetailBody({
               <th scope="col" className={`${th} ${num}`}>
                 %
               </th>
+              <th scope="col" className={`${th} ${num}`}>
+                Bán
+              </th>
+              <th scope="col" className={`${th} ${num}`}>
+                Tồn
+              </th>
               <th scope="col" className={`${th} text-left`}>
                 TT
               </th>
@@ -132,6 +144,8 @@ function DetailBody({
                   <td className={`px-3 py-2 ${num}`}>{formatInt(s.metrics.received)}</td>
                   <td className={`px-3 py-2 ${num}`}>{formatInt(s.metrics.shortage)}</td>
                   <td className={`px-3 py-2 ${num}`}>{formatPercent(s.metrics.rate)}</td>
+                  <td className={`px-3 py-2 ${num}`}>{formatInt(s.sold)}</td>
+                  <td className={`px-3 py-2 ${num}`}>{formatInt(s.stock)}</td>
                   <td className="px-3 py-2">
                     <StatusBadge status={stockStatus(s.metrics)} />
                   </td>
@@ -139,6 +153,7 @@ function DetailBody({
               );
             })}
           </tbody>
+          {!d.storeFiltered && (
           <tfoot>
             <tr data-testid="store-qty-total" className="font-bold">
               <th scope="row" className={`${totalCell} text-left`}>
@@ -148,11 +163,14 @@ function DetailBody({
               <td className={`${totalCell} ${num}`}>{formatInt(t.received)}</td>
               <td className={`${totalCell} ${num}`}>{formatInt(t.shortage)}</td>
               <td className={`${totalCell} ${num}`}>{formatPercent(t.rate)}</td>
+              <td className={`${totalCell} ${num}`}>{formatInt(d.totalSold)}</td>
+              <td className={`${totalCell} ${num}`}>{formatInt(d.totalStock)}</td>
               <td className={totalCell}>
                 <StatusBadge status={stockStatus(t)} />
               </td>
             </tr>
           </tfoot>
+          )}
         </table>
       </div>
     </div>

@@ -20,6 +20,8 @@ const item = (over: Partial<ProductListItem> = {}): ProductListItem => ({
   collectionName: "Phúc Lộc",
   materialName: "Vàng 18K",
   metrics: computeMetrics(120, 90),
+  sold: 0,
+  stock: 0,
   ...over,
 });
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }));

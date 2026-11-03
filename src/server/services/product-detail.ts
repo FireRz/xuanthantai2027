@@ -6,6 +6,8 @@ export interface StoreQtyRow {
   code: string;
   name: string;
   metrics: QtyMetrics;
+  sold: number;
+  stock: number;
 }
 
 export interface ProductDetail {
@@ -24,6 +26,10 @@ export interface ProductDetail {
   stores: StoreQtyRow[];
   /** Tính trên số tổng của các cửa hàng đang hoạt động (ADR-007). */
   total: QtyMetrics;
+  totalSold: number;
+  totalStock: number;
+  /** Đang lọc một cửa hàng: chỉ có đúng cửa hàng đó trong `stores`. */
+  storeFiltered: boolean;
 }
 
 /**
@@ -31,7 +37,10 @@ export interface ProductDetail {
  * SP không tồn tại hoặc không hiển thị được (ẩn SP/nhãn/dòng/BST/tuổi vàng/khung giá) → null.
  * Mã không phân biệt hoa/thường.
  */
-export async function getProductDetail(sku: string): Promise<ProductDetail | null> {
+export async function getProductDetail(
+  sku: string,
+  storeCode?: string | null,
+): Promise<ProductDetail | null> {
   const code = sku.trim();
   if (!code) return null;
   const [product, stores] = await Promise.all([
@@ -43,7 +52,13 @@ export async function getProductDetail(sku: string): Promise<ProductDetail | nul
         collection: { select: { name: true } },
         material: { select: { name: true } },
         productType: { select: { name: true } },
-        quantities: { select: { storeId: true, qtyOrdered: true, qtyReceived: true } },
+        quantities: { select: {
+            storeId: true,
+            qtyOrdered: true,
+            qtyReceived: true,
+            qtySold: true,
+            qtyStock: true,
+          } },
       },
     }),
     prisma.store.findMany({
@@ -55,13 +70,18 @@ export async function getProductDetail(sku: string): Promise<ProductDetail | nul
   if (!product) return null;
 
   const byStore = new Map(product.quantities.map((q) => [q.storeId, q]));
-  const rows = stores.map((s) => {
+  const wanted = storeCode?.trim().toUpperCase();
+  const only = wanted ? stores.filter((s) => s.code.toUpperCase() === wanted) : [];
+  const shown = only.length > 0 ? only : stores;
+  const rows = shown.map((s) => {
     const q = byStore.get(s.id);
     return {
       code: s.code,
       name: s.name,
       ordered: q?.qtyOrdered ?? 0,
       received: q?.qtyReceived ?? 0,
+      sold: q?.qtySold ?? 0,
+      stock: q?.qtyStock ?? 0,
     };
   });
 
@@ -80,7 +100,12 @@ export async function getProductDetail(sku: string): Promise<ProductDetail | nul
       code: r.code,
       name: r.name,
       metrics: computeMetrics(r.ordered, r.received),
+      sold: r.sold,
+      stock: r.stock,
     })),
     total: totalMetrics(rows.map((r) => ({ ...r, storeActive: true }))),
+    totalSold: rows.reduce((a, r) => a + r.sold, 0),
+    totalStock: rows.reduce((a, r) => a + r.stock, 0),
+    storeFiltered: only.length > 0,
   };
 }

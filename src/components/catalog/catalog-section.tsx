@@ -22,7 +22,7 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
   });
 
   const scopeLabel =
-    scope.kind === "total" ? "Tổng hệ thống" : `Cửa hàng: ${scope.name} (${scope.code})`;
+    scope.kind === "total" ? "Tất cả cửa hàng" : `Cửa hàng: ${scope.name} (${scope.code})`;
 
   const collectionNames = await selectedCollectionNames(params.col);
 
