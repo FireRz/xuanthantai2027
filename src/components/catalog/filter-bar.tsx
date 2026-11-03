@@ -1,7 +1,7 @@
 "use client";
 
-import { Check, ChevronDown, SlidersHorizontal, X } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { Check, SlidersHorizontal, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import {
   countGroupFilters,
   hasActiveFilter,
@@ -13,40 +13,24 @@ import { cn } from "@/lib/utils";
 import type { FacetCounts, FacetOption } from "@/server/services/catalog-facets";
 import { toggleId, useCatalogNav } from "./catalog-nav";
 import { SORT_LABELS } from "./catalog-toolbar";
-
-type GroupKey = "brand" | "line" | "col" | "mat" | "pr";
-/** Điện thoại gom cả Chủng loại vào bảng lọc; máy tính có hàng chip riêng. */
-type SheetKey = GroupKey | "typ";
-
-const GROUPS: { key: GroupKey; label: string }[] = [
-  { key: "brand", label: "Nhãn hàng" },
-  { key: "line", label: "Dòng hàng" },
-  { key: "col", label: "Bộ sưu tập" },
-  { key: "mat", label: "Tuổi vàng" },
-  { key: "pr", label: "Khung giá" },
-];
-
-/** Thứ tự trong bảng lọc điện thoại: Chủng loại (hay dùng nhất) đứng đầu. */
-const SHEET_GROUPS: { key: SheetKey; label: string }[] = [
-  { key: "typ", label: "Chủng loại" },
-  ...GROUPS,
-];
-
-/** Mọi lựa chọn đều hiện (cửa hàng có thể chưa đặt nhưng vẫn cần biết có SP); số đếm 0 thì làm mờ. */
-function shown(options: FacetOption[]) {
-  return options;
-}
-
-/** Thêm tên nhãn cạnh dòng/BST khi các lựa chọn thuộc nhiều nhãn (tránh trùng tên "Nhẫn"). */
-function labelOf(o: FacetOption, options: FacetOption[]) {
-  const many = new Set(options.map((x) => x.brandId).filter(Boolean)).size > 1;
-  return many && o.brandName ? `${o.name} · ${o.brandName}` : o.name;
-}
+import { FilterDock, scrollToResults, useDocked } from "./filter-dock";
+import {
+  ActiveFilters,
+  CLEAR_ALL,
+  FilterDropdown,
+  GROUPS,
+  labelOf,
+  selectedChips,
+  SHEET_GROUPS,
+  shown,
+  type SheetKey,
+} from "./filter-parts";
 
 /**
  * Bộ lọc (ADR-009 U8'): nút thả xuống Nhãn hàng / Dòng / BST / Tuổi vàng / Khung giá (chọn nhiều,
  * số đếm, nút "Xem N SP"); điện thoại: bảng lọc trượt từ dưới lên với các chip.
  * Chọn tới đâu áp dụng tới đó lên URL (B9); số đếm là của máy chủ (B4).
+ * Cuộn qua thanh này thì bộ lọc đi theo (FilterDock): cột trái trên màn rộng, thanh gọn dính trên màn hẹp.
  */
 export function FilterBar({
   facets,
@@ -62,33 +46,23 @@ export function FilterBar({
   const owned = (xs: FacetOption[]) =>
     xs.filter((o) => o.brandId).map((o) => ({ id: o.id, brandId: o.brandId as string }));
   const { state, go: navigate, pending } = useCatalogNav();
-  const go = (patch: Partial<CatalogParams>) =>
+  const root = useRef<HTMLDivElement>(null);
+  const dock = useRef<HTMLDivElement>(null);
+  const docked = useDocked(root, dock);
+  const go = (patch: Partial<CatalogParams>) => {
+    if (docked) scrollToResults(dock);
     navigate(patch, { owned: { lines: owned(facets.line), cols: owned(facets.col) } });
+  };
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const toggle = (key: SheetKey, id: string) => go({ [key]: toggleId(state[key], id) });
   const groupCount = countGroupFilters(state);
-  const options = (key: GroupKey) => facets[key];
-
-  const selectedChips = [
-    ...GROUPS.flatMap(({ key, label }) =>
-      state[key].map((id) => {
-        const o = options(key).find((x) => x.id === id);
-        return { key: key as SheetKey, id, group: label, name: o ? labelOf(o, options(key)) : id };
-      }),
-    ),
-    // Máy tính thấy lựa chọn ngay trên hàng chip Chủng loại; điện thoại thì hiện ở dải này.
-    ...state.typ.map((id) => ({
-      key: "typ" as SheetKey,
-      id,
-      group: "Chủng loại",
-      name: facets.typ.find((x) => x.id === id)?.name ?? id,
-      phoneOnly: true,
-    })),
-  ];
+  const chips = selectedChips(facets, state);
+  const clearAll = () => go(CLEAR_ALL);
 
   return (
     <div
+      ref={root}
       data-testid="filter-bar"
       aria-busy={pending}
       className={cn("relative space-y-3", pending && "opacity-90")}
@@ -109,7 +83,7 @@ export function FilterBar({
           <div key={key} className="hidden md:block">
             <FilterDropdown
               label={label}
-              options={options(key)}
+              options={facets[key]}
               selected={state[key]}
               total={facets.total}
               onToggle={(id) => toggle(key, id)}
@@ -131,47 +105,28 @@ export function FilterBar({
         onAll={() => go({ typ: [] })}
       />
 
-      {(selectedChips.length > 0 || hasActiveFilter(state)) && (
-        <div className="flex flex-wrap items-center gap-2" data-testid="active-filters">
-          {selectedChips.map((c) => (
-            <button
-              key={`${c.key}-${c.id}`}
-              type="button"
-              onClick={() => toggle(c.key, c.id)}
-              aria-label={`Bỏ lọc ${c.group}: ${c.name}`}
-              className={cn(
-                "bg-gold-soft border-gold text-ink focus-visible:outline-brand inline-flex min-h-8 items-center gap-1 rounded-full border px-3 text-sm focus-visible:outline-2",
-                "phoneOnly" in c && "md:hidden",
-              )}
-            >
-              {c.name}
-              <X className="size-3.5" aria-hidden />
-            </button>
-          ))}
-          {hasActiveFilter(state) && (
-            <button
-              type="button"
-              data-testid="clear-filters"
-              onClick={() =>
-                go({
-                  brand: [],
-                  line: [],
-                  col: [],
-                  mat: [],
-                  typ: [],
-                  pr: [],
-                  q: "",
-                  store: null,
-                  all: false,
-                })
-              }
-              className="text-brand focus-visible:outline-brand min-h-8 rounded-full px-2 text-sm font-semibold underline-offset-2 hover:underline focus-visible:outline-2"
-            >
-              Xóa lọc
-            </button>
-          )}
-        </div>
-      )}
+      {/* Máy tính thấy Chủng loại ngay trên hàng chip; điện thoại thì hiện ở dải này. */}
+      <ActiveFilters
+        chips={chips.map((c) => (c.key === "typ" ? { ...c, className: "md:hidden" } : c))}
+        showClear={hasActiveFilter(state)}
+        onRemove={(c) => toggle(c.key, c.id)}
+        onClear={clearAll}
+        testId="active-filters"
+        clearTestId="clear-filters"
+      />
+
+      <FilterDock
+        dockRef={dock}
+        docked={docked}
+        facets={facets}
+        state={state}
+        pending={pending}
+        chips={chips}
+        onToggle={toggle}
+        onClear={clearAll}
+        onOpenSheet={() => setSheetOpen(true)}
+        extra={sheetExtra}
+      />
 
       <FilterSheet
         open={sheetOpen}
@@ -248,125 +203,6 @@ function TypeChips({
           </button>
         );
       })}
-    </div>
-  );
-}
-
-/** Nút thả xuống chọn nhiều có số đếm; nhóm > 8 lựa chọn có ô tìm (UI-DESIGN §5.1). */
-function FilterDropdown({
-  label,
-  options,
-  selected,
-  total,
-  onToggle,
-}: {
-  label: string;
-  options: FacetOption[];
-  selected: string[];
-  total: number;
-  onToggle: (id: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [term, setTerm] = useState("");
-  const root = useRef<HTMLDivElement>(null);
-  const button = useRef<HTMLButtonElement>(null);
-  const panelId = useId();
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (!root.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        button.current?.focus();
-      }
-    };
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-
-  const list = shown(options);
-  const q = term.trim().toLowerCase();
-  const visible = q ? list.filter((o) => labelOf(o, options).toLowerCase().includes(q)) : list;
-
-  return (
-    <div ref={root} className="md:relative" data-testid={`dropdown-${label}`}>
-      <button
-        ref={button}
-        type="button"
-        aria-haspopup="true"
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={() => setOpen((v) => !v)}
-        className={cn(
-          "focus-visible:outline-brand inline-flex min-h-10 items-center gap-2 rounded-full border bg-white px-4 text-[15px] font-medium focus-visible:outline-2 focus-visible:outline-offset-2",
-          selected.length > 0 ? "border-brand text-brand border-2" : "border-line text-ink",
-        )}
-      >
-        {label}
-        {selected.length > 0 && (
-          <span className="bg-brand rounded-full px-2 text-xs leading-5 text-white">
-            {selected.length}
-          </span>
-        )}
-        <ChevronDown className={cn("size-4 transition", open && "rotate-180")} aria-hidden />
-      </button>
-      {open && (
-        <div
-          id={panelId}
-          role="group"
-          aria-label={label}
-          className="border-line absolute left-0 z-40 mt-2 w-80 rounded-xl border bg-white p-2 shadow-lg max-md:inset-x-0 max-md:w-auto"
-        >
-          {list.length > 8 && (
-            <input
-              type="search"
-              aria-label={`Tìm trong ${label}`}
-              placeholder="Tìm…"
-              value={term}
-              onChange={(e) => setTerm(e.target.value)}
-              className="border-line focus-visible:outline-brand mb-2 min-h-10 w-full rounded-lg border px-3 focus-visible:outline-2"
-            />
-          )}
-          <ul className="max-h-64 overflow-y-auto">
-            {visible.length === 0 && (
-              <li className="text-ink-muted px-3 py-2 text-sm">Không có lựa chọn phù hợp</li>
-            )}
-            {visible.map((o) => (
-              <li key={o.id}>
-                <label
-                  className={cn(
-                    "hover:bg-gold-soft flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-3",
-                    o.count === 0 && !selected.includes(o.id) && "opacity-55",
-                  )}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(o.id)}
-                    onChange={() => onToggle(o.id)}
-                    className="accent-brand size-4"
-                  />
-                  <span className="min-w-0 flex-1 leading-snug">{labelOf(o, options)}</span>
-                  <span className="text-ink-muted text-sm tabular-nums">{formatInt(o.count)}</span>
-                </label>
-              </li>
-            ))}
-          </ul>
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="bg-gold text-gold-fg hover:bg-gold-dark mt-2 min-h-10 w-full rounded-full font-semibold hover:text-white"
-          >
-            Xem {formatInt(total)} SP
-          </button>
-        </div>
-      )}
     </div>
   );
 }

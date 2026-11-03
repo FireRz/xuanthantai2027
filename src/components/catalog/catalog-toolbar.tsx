@@ -2,6 +2,7 @@
 
 import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { SORTS, type Sort } from "@/lib/catalog-params";
+import { cn } from "@/lib/utils";
 import { useCatalogNav } from "./catalog-nav";
 
 export const SORT_LABELS: Record<Sort, string> = {
@@ -14,17 +15,29 @@ export const SORT_LABELS: Record<Sort, string> = {
 };
 
 /** Menu sắp xếp (B8, T04.7): 6 kiểu, mặc định Mã A→Z; "Còn thiếu" tính theo phạm vi đang xem. */
-export function SortMenu() {
+export function SortMenu({
+  testId = "sort-menu",
+  compact = false,
+}: {
+  testId?: string;
+  /** Bỏ chữ "Sắp xếp:" và giãn hết bề ngang (cột lọc hẹp bên trái). */
+  compact?: boolean;
+}) {
   const { state, go } = useCatalogNav();
   return (
-    <label className="border-line focus-within:outline-brand relative inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border bg-white px-4 text-[15px] font-medium focus-within:outline-2 focus-within:outline-offset-2 md:min-h-10">
+    <label
+      className={cn(
+        "border-line focus-within:outline-brand relative inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border bg-white px-4 text-[15px] font-medium whitespace-nowrap focus-within:outline-2 focus-within:outline-offset-2 md:min-h-10",
+        compact && "w-full",
+      )}
+    >
       <ArrowUpDown className="size-4 shrink-0" aria-hidden />
-      <span className="text-ink-muted hidden md:inline">Sắp xếp:</span>
-      <span>{SORT_LABELS[state.sort]}</span>
+      {!compact && <span className="text-ink-muted hidden md:inline">Sắp xếp:</span>}
+      <span className={cn(compact && "flex-1")}>{SORT_LABELS[state.sort]}</span>
       <ChevronDown className="size-4 shrink-0" aria-hidden />
       <select
         aria-label="Sắp xếp"
-        data-testid="sort-menu"
+        data-testid={testId}
         value={state.sort}
         onChange={(e) => go({ sort: e.target.value as Sort })}
         className="absolute inset-0 size-full cursor-pointer opacity-0"

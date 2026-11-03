@@ -1,7 +1,7 @@
 "use client";
 
 import { Search, Store } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CatalogParams } from "@/lib/catalog-params";
 import { useCatalogNav } from "./catalog-nav";
 
@@ -36,12 +36,26 @@ export function StoreBar({ stores }: { stores: StoreOption[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, params.q]);
 
+  // Chiều cao thật của thanh (điện thoại xuống 2 dòng) → `--store-bar-h`, để bộ lọc dính ngay bên dưới.
+  const bar = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = bar.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const ro = new ResizeObserver(() =>
+      root.style.setProperty("--store-bar-h", `${el.offsetHeight}px`),
+    );
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   // Đổi cửa hàng thêm mục vào lịch sử; gõ tìm mã chỉ thay mục hiện tại (Back không phải lùi từng chữ).
   const go = (patch: Partial<CatalogParams>, hash = "") =>
     navigate(patch, { hash, mode: patch.store !== undefined ? "push" : "replace" });
 
   return (
     <div
+      ref={bar}
       id="cua-hang"
       data-testid="store-bar"
       className="border-gold sticky top-0 z-30 scroll-mt-0 border-b-2 bg-white shadow-sm"

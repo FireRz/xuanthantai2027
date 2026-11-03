@@ -7,6 +7,7 @@ export function ResultsFade({ children }: { children: React.ReactNode }) {
   const { pending } = useCatalogNav();
   return (
     <div
+      id="ket-qua"
       aria-busy={pending}
       className={`transition-[opacity,filter] duration-200 motion-reduce:transition-none ${
         pending ? "pointer-events-none opacity-40 blur-[1px]" : ""
