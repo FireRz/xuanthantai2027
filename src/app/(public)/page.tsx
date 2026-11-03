@@ -8,6 +8,7 @@ import {
   ProductDetailFallback,
   ProductDetailSection,
 } from "@/components/catalog/product-detail-section";
+import { ResultsFade } from "@/components/catalog/results-fade";
 import { ProductGridSkeleton } from "@/components/catalog/product-grid";
 import { SiteFooter } from "@/components/catalog/site-footer";
 import { StoreBar } from "@/components/catalog/store-bar";
@@ -66,9 +67,11 @@ export default async function HomePage({
               <FilterSection params={params} />
             </Suspense>
           </div>
-          <Suspense key={`p${key}`} fallback={<ProductGridSkeleton />}>
-            <CatalogSection params={params} />
-          </Suspense>
+          <ResultsFade>
+            <Suspense key={`p${key}`} fallback={<ProductGridSkeleton />}>
+              <CatalogSection params={params} />
+            </Suspense>
+          </ResultsFade>
         </section>
       </main>
       {params.sp && (

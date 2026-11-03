@@ -29,9 +29,19 @@ export async function ProductDetailSection({ sku, store }: { sku: string; store:
 export function ProductDetailFallback() {
   return (
     <ProductDialog title="Đang tải…">
-      <p role="status" className="text-ink-muted px-4 py-8 text-center md:px-6">
-        Đang tải sản phẩm…
-      </p>
+      <div
+        role="status"
+        className="grid gap-4 p-4 md:grid-cols-[300px_1fr] md:gap-6 md:px-6 md:py-5"
+      >
+        <div className="shimmer bg-gold-soft aspect-square w-full rounded-xl" />
+        <div className="space-y-3">
+          <div className="shimmer bg-line h-4 w-1/3 rounded" />
+          <div className="shimmer bg-line h-4 w-4/5 rounded" />
+          <div className="shimmer bg-line h-7 w-1/2 rounded" />
+          <div className="shimmer bg-gold-soft h-24 rounded-xl" />
+        </div>
+        <span className="sr-only">Đang tải sản phẩm…</span>
+      </div>
     </ProductDialog>
   );
 }
