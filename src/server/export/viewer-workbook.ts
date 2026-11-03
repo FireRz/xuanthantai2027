@@ -14,7 +14,7 @@ export const VIEWER_COLUMNS = [
   { header: "Nhãn", key: "brand", width: 16 },
   { header: "Dòng", key: "line", width: 16 },
   { header: "BST", key: "collection", width: 22 },
-  { header: "Chất liệu", key: "material", width: 16 },
+  { header: "Tuổi vàng", key: "material", width: 16 },
   { header: "Giá (₫)", key: "price", width: 16 },
   { header: "SL đặt", key: "ordered", width: 10 },
   { header: "SL đã về", key: "received", width: 10 },

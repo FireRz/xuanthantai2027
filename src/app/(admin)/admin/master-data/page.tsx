@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 const TABS = [
   { key: "brands", label: "Nhãn hàng" },
-  { key: "materials", label: "Chất liệu" },
+  { key: "materials", label: "Tuổi vàng" },
   { key: "priceRanges", label: "Khung giá" },
   { key: "stores", label: "Cửa hàng" },
 ] as const;
@@ -40,7 +40,7 @@ export default async function MasterDataPage({
       <div>
         <h1 className="text-xl font-semibold">Danh mục</h1>
         <p className="mt-1 text-sm text-neutral-600">
-          Nhãn hàng, dòng hàng, bộ sưu tập, chất liệu và cửa hàng. Mục đang được dùng không xóa
+          Nhãn hàng, dòng hàng, bộ sưu tập, tuổi vàng và cửa hàng. Mục đang được dùng không xóa
           được, chỉ ẩn.
         </p>
       </div>
@@ -175,13 +175,13 @@ async function MaterialsTab() {
     <div className="space-y-4">
       <section className={card} aria-labelledby="add-material">
         <h2 id="add-material" className="mb-2 font-semibold">
-          Thêm chất liệu / tuổi vàng
+          Thêm tuổi vàng
         </h2>
-        <AddForm kind="material" label="Thêm chất liệu" />
+        <AddForm kind="material" label="Thêm tuổi vàng" />
       </section>
-      <section className={card} aria-label="Danh sách chất liệu">
+      <section className={card} aria-label="Danh sách tuổi vàng">
         {materials.length === 0 ? (
-          <p className="text-sm text-neutral-600">Chưa có chất liệu nào.</p>
+          <p className="text-sm text-neutral-600">Chưa có tuổi vàng nào.</p>
         ) : (
           <ul className="divide-y divide-neutral-100">
             {materials.map((m) => (

@@ -81,7 +81,7 @@ describe("T06.4 — ẩn / hiện và ẩn theo", () => {
     expect(await catalogSkus()).toEqual(["SP001", "SP002", "TRON"]);
   });
 
-  it("ẩn chất liệu: SP có chất liệu đó ẩn theo", async () => {
+  it("ẩn tuổi vàng: SP có tuổi vàng đó ẩn theo", async () => {
     const material = await prisma.material.create({ data: { name: "Vàng 18K" } });
     const { brand, line } = await makeProducts(2, { materialId: material.id });
     await createProduct({ sku: "KHONG", brandId: brand.id, productLineId: line.id });

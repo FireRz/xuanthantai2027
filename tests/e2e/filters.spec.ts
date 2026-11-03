@@ -67,7 +67,7 @@ test.describe("T04.5 FilterBar — máy tính", () => {
     await expect(page.getByTestId("active-filters")).toBeVisible();
   });
 
-  test("Bộ sưu tập có 'Không thuộc BST'; chất liệu lọc được; đổi nhãn tự bỏ dòng không còn hợp lệ", async ({
+  test("Bộ sưu tập có 'Không thuộc BST'; tuổi vàng lọc được; đổi nhãn tự bỏ dòng không còn hợp lệ", async ({
     page,
   }) => {
     await page.goto("/");
@@ -125,8 +125,8 @@ test.describe("T04.5 FilterBar — điện thoại (bảng lọc trượt từ d
     await sheet.getByRole("button", { name: /^An Khang/ }).click();
     await sheet.getByRole("button", { name: /^Phúc Lộc/ }).click();
     await expect(sheet.getByTestId("sheet-apply")).toHaveText("Xem 2.000 kết quả");
-    // Dòng/BST/chất liệu cùng nằm trong bảng
-    for (const name of ["Dòng hàng", "Bộ sưu tập", "Chất liệu"])
+    // Dòng/BST/tuổi vàng cùng nằm trong bảng
+    for (const name of ["Dòng hàng", "Bộ sưu tập", "Tuổi vàng"])
       await expect(sheet.getByText(name, { exact: true })).toBeVisible();
     await sheet.getByTestId("sheet-apply").click();
     await expect(sheet).toBeHidden();

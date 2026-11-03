@@ -62,10 +62,10 @@ export const PRODUCT_COLUMNS: readonly TemplateColumn<ProductKey>[] = [
   },
   {
     key: "material",
-    header: "Chất liệu",
+    header: "Tuổi vàng",
     width: 16,
     requiredColumn: false,
-    help: "Tùy chọn. Phải là chất liệu đã có trên web. Để trống = giữ nguyên.",
+    help: "Tùy chọn. Phải là tuổi vàng đã có trên web. Để trống = giữ nguyên.",
   },
   {
     key: "priceRange",
@@ -119,7 +119,7 @@ export const LIST_COLUMNS = [
   { key: "brand", header: "Nhãn hàng" },
   { key: "line", header: "Dòng hàng" },
   { key: "collection", header: "Bộ sưu tập" },
-  { key: "material", header: "Chất liệu" },
+  { key: "material", header: "Tuổi vàng" },
   { key: "priceRange", header: "Khung giá" },
   { key: "store", header: "Mã cửa hàng" },
 ] as const;

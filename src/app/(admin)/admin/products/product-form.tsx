@@ -176,7 +176,7 @@ export function ProductForm({
           </select>
         </label>
         <label className="block text-sm font-medium">
-          Chất liệu
+          Tuổi vàng
           <select
             name="materialId"
             value={v.materialId}

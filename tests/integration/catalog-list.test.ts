@@ -53,7 +53,7 @@ describe("T03.1 — catalog.listProducts", () => {
     expect(all.items[2].metrics).toEqual({ ordered: 0, received: 0, shortage: 0, rate: null });
   });
 
-  it("SP ẩn (SP, nhãn, dòng, BST, chất liệu) không trả về; CH ẩn không cộng vào tổng", async () => {
+  it("SP ẩn (SP, nhãn, dòng, BST, tuổi vàng) không trả về; CH ẩn không cộng vào tổng", async () => {
     const { brand, line, collection } = await makeBrandTree();
     const material = await prisma.material.create({ data: { name: "Vàng 18K" } });
     await createProduct({ sku: "OK1", brandId: brand.id, productLineId: line.id });

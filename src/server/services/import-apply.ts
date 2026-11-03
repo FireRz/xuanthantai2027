@@ -46,7 +46,76 @@ export async function applyImport(buffer: Buffer, opts: ApplyOptions = {}): Prom
           `File còn ${analysis.summary.errors} lỗi — sửa file rồi tải lại, không áp dụng được.`,
         );
       }
-      const { newProducts, productUpdates, quantityWrites } = analysis.plan;
+      const { newCatalog, productUpdates, quantityWrites } = analysis.plan;
+
+      // 0. Danh mục có trong file nhưng chưa có trên web: tạo trước, đổi id tạm → id thật
+      const realId = new Map<string, string>();
+      const fresh = (tempId: string) => {
+        const id = randomUUID();
+        realId.set(tempId, id);
+        return id;
+      };
+      const real = (id: string) => realId.get(id) ?? id;
+      const realOrNull = (id: string | null) => (id === null ? null : real(id));
+      if (newCatalog.brands.length) {
+        await tx.brand.createMany({
+          data: newCatalog.brands.map((b) => ({ id: fresh(b.tempId), name: b.name })),
+        });
+      }
+      if (newCatalog.lines.length) {
+        await tx.productLine.createMany({
+          data: newCatalog.lines.map((l) => ({
+            id: fresh(l.tempId),
+            brandId: real(l.brandId),
+            name: l.name,
+          })),
+        });
+      }
+      if (newCatalog.collections.length) {
+        await tx.collection.createMany({
+          data: newCatalog.collections.map((c) => ({
+            id: fresh(c.tempId),
+            brandId: real(c.brandId),
+            name: c.name,
+          })),
+        });
+      }
+      if (newCatalog.materials.length) {
+        await tx.material.createMany({
+          data: newCatalog.materials.map((m) => ({ id: fresh(m.tempId), name: m.name })),
+        });
+      }
+      if (newCatalog.priceRanges.length) {
+        const max = await tx.priceRange.aggregate({ _max: { sortOrder: true } });
+        const base = max._max.sortOrder ?? 0;
+        await tx.priceRange.createMany({
+          data: newCatalog.priceRanges.map((r, i) => ({
+            id: fresh(r.tempId),
+            name: r.name,
+            sortOrder: base + i + 1,
+          })),
+        });
+      }
+      const resolve = <
+        T extends {
+          brandId: string;
+          productLineId: string;
+          collectionId: string | null;
+          materialId: string | null;
+          priceRangeId: string | null;
+        },
+      >(
+        p: T,
+      ): T => ({
+        ...p,
+        brandId: real(p.brandId),
+        productLineId: real(p.productLineId),
+        collectionId: realOrNull(p.collectionId),
+        materialId: realOrNull(p.materialId),
+        priceRangeId: realOrNull(p.priceRangeId),
+      });
+      const newProducts = analysis.plan.newProducts.map(resolve);
+      const updates = productUpdates.map(resolve);
 
       // 1. SP mới (id sinh sẵn để dòng SL tham chiếu được trong cùng lô)
       const idByNewSku = new Map<string, string>();
@@ -72,7 +141,7 @@ export async function applyImport(buffer: Buffer, opts: ApplyOptions = {}): Prom
       opts.onStep?.("products-created");
 
       // 2. SP đã có: ghi đè các trường (ô trống đã được gộp giữ nguyên ở bước phân tích)
-      for (const part of chunks(productUpdates, PRODUCT_CHUNK)) {
+      for (const part of chunks(updates, PRODUCT_CHUNK)) {
         // Các cột có thể rỗng truyền dạng text[] rồi ép kiểu từng phần tử: Prisma gán mảng toàn null là int[].
         await tx.$executeRaw`
           UPDATE product p SET
@@ -111,7 +180,7 @@ export async function applyImport(buffer: Buffer, opts: ApplyOptions = {}): Prom
 
       return {
         newProducts: newProducts.length,
-        updatedProducts: productUpdates.length,
+        updatedProducts: updates.length,
         quantityRows: rows.length,
       } satisfies ApplyResult;
     },

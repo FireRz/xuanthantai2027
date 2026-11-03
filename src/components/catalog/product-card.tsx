@@ -6,7 +6,7 @@ import { ProductLink } from "./product-link";
 import { StatusBadge } from "./status-badge";
 
 /**
- * Thẻ SP gọn, ảnh to (ADR-009 U5'): nhãn trạng thái ở góc ảnh; mã · chất liệu; tên; giá;
+ * Thẻ SP gọn, ảnh to (ADR-009 U5'): nhãn trạng thái ở góc ảnh; mã · tuổi vàng; tên; giá;
  * thanh tiến độ "Về X/Y" và "Còn thiếu N". Bảng số đầy đủ chỉ ở dạng Bảng và popup.
  */
 export function ProductCard({

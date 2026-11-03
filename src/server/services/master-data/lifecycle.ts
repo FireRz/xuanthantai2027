@@ -42,7 +42,7 @@ async function loadItem(db: Db, kind: MasterKind, id: string): Promise<Item> {
 
 /**
  * Số SP đang hiển thị trên trang xem mà bị tác động bởi mục này:
- * - nhãn/dòng/BST/chất liệu: SP đang hiện thuộc mục đó (ẩn mục → các SP này ẩn theo);
+ * - nhãn/dòng/BST/tuổi vàng: SP đang hiện thuộc mục đó (ẩn mục → các SP này ẩn theo);
  * - cửa hàng: SP đang hiện có SL (đặt hoặc về > 0) ở cửa hàng đó (ẩn → số tổng của các SP này đổi).
  */
 async function countAffected(db: Db, kind: MasterKind, id: string): Promise<number> {

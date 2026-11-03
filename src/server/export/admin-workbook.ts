@@ -104,7 +104,7 @@ function addListValidation(
     errorStyle: "warning",
     errorTitle: "Giá trị chưa có trong danh sách",
     error:
-      "Giá trị này chưa có trên web. Khi nhập file sẽ báo lỗi nếu không tạo trước ở trang Danh mục.",
+      "Giá trị này chưa có trên web. Khi nhập file, hệ thống sẽ tự tạo mới (xem ở bước xem trước).",
     showInputMessage: true,
     prompt,
   });
@@ -136,7 +136,7 @@ function guideLines(): string[][] {
     ["• SL đã về được phép lớn hơn SL đặt."],
     ["• SP chưa có trên web → được tạo mới (bắt buộc Mã SP, Nhãn hàng, Dòng hàng)."],
     [
-      "• Cửa hàng, Nhãn hàng, Dòng hàng, Bộ sưu tập, Chất liệu, Khung giá chưa có trên web → báo lỗi, KHÔNG tự tạo. Tạo ở trang Danh mục trước.",
+      "• Nhãn hàng, Dòng hàng, Bộ sưu tập, Tuổi vàng, Khung giá chưa có trên web → được tự tạo khi áp dụng (xem trước sẽ liệt kê). Chỉ Cửa hàng chưa có thì báo lỗi, phải tạo ở trang Danh mục.",
     ],
     [
       "• Dòng hàng và Bộ sưu tập phải cùng nhãn với SP. Không đổi nhãn của SP nếu dòng/BST hiện có không thuộc nhãn mới.",

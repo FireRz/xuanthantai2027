@@ -29,7 +29,7 @@ async function fixture() {
 const skus = async () => (await findVisibleProducts()).map((p) => p.sku);
 
 describe("T01.6 — SP visible (ARCHITECTURE §4.2)", () => {
-  it("mặc định mọi SP đều hiển thị, kể cả SP không BST / không chất liệu", async () => {
+  it("mặc định mọi SP đều hiển thị, kể cả SP không BST / không tuổi vàng", async () => {
     await fixture();
     expect(await skus()).toEqual(["BARE", "FULL"]);
   });
@@ -54,7 +54,7 @@ describe("T01.6 — SP visible (ARCHITECTURE §4.2)", () => {
     expect(await skus()).toEqual(["BARE"]);
   });
 
-  it("ẩn chất liệu → chỉ SP có chất liệu đó ẩn", async () => {
+  it("ẩn tuổi vàng → chỉ SP có tuổi vàng đó ẩn", async () => {
     const { material } = await fixture();
     await prisma.material.update({ where: { id: material.id }, data: { active: false } });
     expect(await skus()).toEqual(["BARE"]);

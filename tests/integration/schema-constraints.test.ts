@@ -38,7 +38,7 @@ describe("T01.5 — ràng buộc unique", () => {
     );
   });
 
-  it("từ chối nhãn trùng tên và chất liệu trùng tên", async () => {
+  it("từ chối nhãn trùng tên và tuổi vàng trùng tên", async () => {
     await prisma.brand.create({ data: { name: "PNJ" } });
     await expectDbError(prisma.brand.create({ data: { name: "PNJ" } }), /P2002|unique/i);
     await prisma.material.create({ data: { name: "Vàng 18K" } });

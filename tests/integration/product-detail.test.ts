@@ -48,7 +48,7 @@ describe("T05.2 — catalog.getProductDetail", () => {
     expect(await getProductDetail("  ")).toBeNull();
   });
 
-  it("SP ẩn, hoặc nhãn/dòng/BST/chất liệu của nó bị ẩn → null", async () => {
+  it("SP ẩn, hoặc nhãn/dòng/BST/tuổi vàng của nó bị ẩn → null", async () => {
     const { brand, line, collection } = await makeBrandTree();
     const material = await prisma.material.create({ data: { name: "Vàng" } });
     const mk = (sku: string) =>

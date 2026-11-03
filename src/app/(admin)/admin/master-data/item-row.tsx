@@ -25,7 +25,7 @@ const KIND_LABEL: Record<MasterKind, string> = {
   brand: "nhãn hàng",
   line: "dòng hàng",
   collection: "bộ sưu tập",
-  material: "chất liệu",
+  material: "tuổi vàng",
   priceRange: "khung giá",
   store: "cửa hàng",
 };

@@ -69,7 +69,7 @@ describe("T03.14 — formatDateTime", () => {
 });
 
 describe("T03.2 — ProductCard", () => {
-  it("đủ trường: mã, chất liệu, tên, giá, Về X/Y, thiếu, trạng thái, ảnh thumbnail lười", () => {
+  it("đủ trường: mã, tuổi vàng, tên, giá, Về X/Y, thiếu, trạng thái, ảnh thumbnail lười", () => {
     const out = html(item());
     expect(out).toContain("NTT001 · Vàng 18K");
     expect(out).toContain("Nhẫn Kim Tiền");

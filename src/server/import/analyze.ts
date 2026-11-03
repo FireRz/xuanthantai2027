@@ -93,7 +93,18 @@ export interface QuantityWritePlan {
   ordered: number;
   received: number;
 }
+/** Danh mục có trong file nhưng chưa có trên web: sẽ được tạo trước khi ghi SP (id tạm bắt đầu bằng "new:"). */
+export interface NewCatalogPlan {
+  brands: { tempId: string; name: string }[];
+  lines: { tempId: string; brandId: string; name: string }[];
+  collections: { tempId: string; brandId: string; name: string }[];
+  materials: { tempId: string; name: string }[];
+  priceRanges: { tempId: string; name: string }[];
+}
+export const isTempId = (id: string | null): id is string => !!id && id.startsWith("new:");
+
 export interface ImportPlan {
+  newCatalog: NewCatalogPlan;
   newProducts: NewProductPlan[];
   productUpdates: ProductUpdatePlan[];
   quantityWrites: QuantityWritePlan[];
@@ -104,6 +115,8 @@ export interface ImportAnalysis {
   issues: ImportIssue[];
   productItems: ProductItem[];
   quantityItems: QuantityItem[];
+  /** Danh mục sẽ được tạo mới, dạng "Tuổi vàng: Bạc" — để hiện ở bản xem trước. */
+  newCatalogLabels: string[];
   plan: ImportPlan;
   sheets: { products: boolean; quantities: boolean };
 }
@@ -146,7 +159,13 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
   const issue = (sheet: ImportSheet, row: number, column: string, key: string, reason: string) =>
     issues.push({ sheet, row, column, key, reason });
 
-  const plan: ImportPlan = { newProducts: [], productUpdates: [], quantityWrites: [] };
+  const plan: ImportPlan = {
+    newCatalog: { brands: [], lines: [], collections: [], materials: [], priceRanges: [] },
+    newProducts: [],
+    productUpdates: [],
+    quantityWrites: [],
+  };
+  const newCatalogLabels: string[] = [];
   const productItems: ProductItem[] = [];
   const quantityItems: QuantityItem[] = [];
   const summary: ImportSummary = {
@@ -186,6 +205,64 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
   const materialById = new Map(ref.materials.map((m) => [m.id, m]));
   const ranges = byName(ref.priceRanges);
   const rangeById = new Map(ref.priceRanges.map((r) => [r.id, r]));
+
+  // Danh mục chưa có thì tạo ảo (id tạm) để dòng SP tham chiếu; áp dụng sẽ tạo thật trước khi ghi SP.
+  const ensureBrand = (raw: string): RefNamed => {
+    const key = normalizeText(raw);
+    let b = brands.get(key);
+    if (!b) {
+      const name = collapse(raw);
+      b = { id: `new:brand:${key}`, name };
+      brands.set(key, b);
+      brandById.set(b.id, b);
+      plan.newCatalog.brands.push({ tempId: b.id, name });
+      newCatalogLabels.push(`Nhãn hàng: ${name}`);
+    }
+    return b;
+  };
+  const ensureClassified = (
+    kind: "line" | "collection",
+    brand: RefNamed,
+    raw: string,
+  ): RefClassification => {
+    const map = kind === "line" ? lines : collections;
+    const byId = kind === "line" ? lineById : collectionById;
+    const key = `${brand.id}|${normalizeText(raw)}`;
+    let it = map.get(key);
+    if (!it) {
+      const name = collapse(raw);
+      it = { id: `new:${kind}:${key}`, brandId: brand.id, name };
+      map.set(key, it);
+      byId.set(it.id, it);
+      (kind === "line" ? plan.newCatalog.lines : plan.newCatalog.collections).push({
+        tempId: it.id,
+        brandId: brand.id,
+        name,
+      });
+      newCatalogLabels.push(
+        `${kind === "line" ? "Dòng hàng" : "Bộ sưu tập"}: ${name} (${brand.name})`,
+      );
+    }
+    return it;
+  };
+  const ensureSimple = (kind: "material" | "priceRange", raw: string): RefNamed => {
+    const map = kind === "material" ? materials : ranges;
+    const byId = kind === "material" ? materialById : rangeById;
+    const key = normalizeText(raw);
+    let it = map.get(key);
+    if (!it) {
+      const name = collapse(raw);
+      it = { id: `new:${kind}:${key}`, name };
+      map.set(key, it);
+      byId.set(it.id, it);
+      (kind === "material" ? plan.newCatalog.materials : plan.newCatalog.priceRanges).push({
+        tempId: it.id,
+        name,
+      });
+      newCatalogLabels.push(`${kind === "material" ? "Tuổi vàng" : "Khung giá"}: ${name}`);
+    }
+    return it;
+  };
   const storeByCode = new Map(ref.stores.map((s) => [normalizeCode(s.code), s]));
   const productBySku = new Map(ref.products.map((p) => [normalizeCode(p.sku), p]));
   const qtyByPair = new Map(ref.quantities.map((q) => [`${q.productId}|${q.storeId}`, q]));
@@ -241,9 +318,7 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
       // Nhãn
       let brandId: string | undefined;
       if (c.brand !== undefined) {
-        const b = brands.get(normalizeText(c.brand));
-        if (!b) fail("brand", `Nhãn hàng "${c.brand}" chưa có trên web`);
-        else brandId = b.id;
+        brandId = ensureBrand(c.brand).id;
       }
       const effectiveBrandId = brandId ?? existing?.brandId;
       const effectiveBrandName = effectiveBrandId
@@ -254,44 +329,32 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
       // Dòng
       let lineId: string | undefined;
       if (c.line !== undefined && (brandId !== undefined || c.brand === undefined)) {
-        const l = effectiveBrandId
-          ? lines.get(`${effectiveBrandId}|${normalizeText(c.line)}`)
-          : undefined;
-        if (!effectiveBrandId) {
-          // Chưa biết nhãn (SP mới thiếu nhãn): lỗi thiếu nhãn được báo ở dưới.
-        } else if (!l) {
-          fail("line", `Dòng hàng "${c.line}" chưa có trong nhãn ${effectiveBrandName}`);
-        } else lineId = l.id;
+        // Chưa biết nhãn (SP mới thiếu nhãn): lỗi thiếu nhãn được báo ở dưới.
+        if (effectiveBrandId) {
+          lineId = ensureClassified("line", brandById.get(effectiveBrandId)!, c.line).id;
+        }
       }
 
       // Bộ sưu tập
       let collectionId: string | undefined;
       if (c.collection !== undefined && (brandId !== undefined || c.brand === undefined)) {
-        const col = effectiveBrandId
-          ? collections.get(`${effectiveBrandId}|${normalizeText(c.collection)}`)
-          : undefined;
         if (effectiveBrandId) {
-          if (!col) {
-            fail(
-              "collection",
-              `Bộ sưu tập "${c.collection}" chưa có trong nhãn ${effectiveBrandName}`,
-            );
-          } else collectionId = col.id;
+          collectionId = ensureClassified(
+            "collection",
+            brandById.get(effectiveBrandId)!,
+            c.collection,
+          ).id;
         }
       }
 
-      // Chất liệu, Khung giá
+      // Tuổi vàng, Khung giá
       let materialId: string | undefined;
       if (c.material !== undefined) {
-        const m = materials.get(normalizeText(c.material));
-        if (!m) fail("material", `Chất liệu "${c.material}" chưa có trên web`);
-        else materialId = m.id;
+        materialId = ensureSimple("material", c.material).id;
       }
       let priceRangeId: string | undefined;
       if (c.priceRange !== undefined) {
-        const pr = ranges.get(normalizeText(c.priceRange));
-        if (!pr) fail("priceRange", `Khung giá "${c.priceRange}" chưa có trên web`);
-        else priceRangeId = pr.id;
+        priceRangeId = ensureSimple("priceRange", c.priceRange).id;
       }
 
       // Giá
@@ -497,6 +560,7 @@ export function analyzeImport(file: WorkbookData, ref: ReferenceData): ImportAna
     issues,
     productItems,
     quantityItems,
+    newCatalogLabels,
     plan,
     sheets: { products: !!file.products, quantities: !!file.quantities },
   };

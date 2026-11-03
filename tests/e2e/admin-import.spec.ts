@@ -63,7 +63,7 @@ test.describe("nhập Excel — xem trước và áp dụng (T08.8)", () => {
     const buffer = await xlsx(
       [
         [`IM${t}1`, "SP một", brand.name, "Nhẫn", "Xuân 2027", 100000],
-        [`IM${t}2`, "SP hai", brand.name, "Nhẫn", "Xuân 2028", null], // dòng 3: BST chưa có
+        [`IM${t}2`, "SP hai", brand.name, "Nhẫn", "Xuân 2027", "abc"], // dòng 3: giá sai
       ],
       [
         [`IM${t}1`, store.code, 5, 1],
@@ -87,10 +87,8 @@ test.describe("nhập Excel — xem trước và áp dụng (T08.8)", () => {
     await expect(errors).toHaveCount(2);
     await expect(errors.nth(0)).toContainText("SanPham");
     await expect(errors.nth(0)).toContainText("3");
-    await expect(errors.nth(0)).toContainText("Bộ sưu tập");
-    await expect(errors.nth(0)).toContainText(
-      `Bộ sưu tập "Xuân 2028" chưa có trong nhãn ${brand.name}`,
-    );
+    await expect(errors.nth(0)).toContainText("Giá bán lẻ");
+    await expect(errors.nth(0)).toContainText("Giá bán lẻ phải là số nguyên VND ≥ 0");
     await expect(errors.nth(1)).toContainText("SoLuong");
     await expect(errors.nth(1)).toContainText("Mã cửa hàng");
     await expect(errors.nth(1)).toContainText('Mã cửa hàng "CH99X" chưa có trên web');

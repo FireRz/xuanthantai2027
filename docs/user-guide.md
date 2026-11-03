@@ -10,7 +10,7 @@ Không cần đăng nhập. Mở đường link được gửi; dùng được t
 
 ### A1. Xem danh mục
 
-- Trang chủ hiện các sản phẩm (SP): ảnh, mã, tên, chất liệu, giá bán lẻ, số lượng **Đặt / Về / Còn thiếu**, tỷ lệ về và nhãn trạng thái màu.
+- Trang chủ hiện các sản phẩm (SP): ảnh, mã, tên, tuổi vàng, giá bán lẻ, số lượng **Đặt / Về / Còn thiếu**, tỷ lệ về và nhãn trạng thái màu.
 - Nút **Lưới** / **Bảng** đổi cách hiển thị. Cuối danh sách bấm **Xem thêm** để tải tiếp.
 - Bấm vào một SP để mở cửa sổ chi tiết: ảnh lớn và bảng số lượng **theo từng cửa hàng**. Bấm **Đóng** để quay lại.
 
@@ -23,7 +23,7 @@ Không cần đăng nhập. Mở đường link được gửi; dùng được t
 
 ### A3. Lọc, tìm, sắp xếp
 
-- **Bộ lọc**: Nhãn hàng, Dòng hàng, Bộ sưu tập (có mục "Không thuộc BST"), Chất liệu, Khung giá. Chọn được nhiều giá trị; bên cạnh mỗi lựa chọn có số SP. Trên điện thoại bấm **Bộ lọc** để mở bảng lọc.
+- **Bộ lọc**: Nhãn hàng, Dòng hàng, Bộ sưu tập (có mục "Không thuộc BST"), Tuổi vàng, Khung giá. Chọn được nhiều giá trị; bên cạnh mỗi lựa chọn có số SP. Trên điện thoại bấm **Bộ lọc** để mở bảng lọc.
 - **Tìm mã SP**: gõ mã (không phân biệt hoa thường) vào ô **Tìm mã SP**.
 - **Sắp xếp**: Mã SP A→Z (mặc định), Mới cập nhật, Giá thấp → cao, Giá cao → thấp, Còn thiếu nhiều nhất.
 
@@ -50,7 +50,7 @@ Làm đúng thứ tự, vì file Excel chỉ chọn được những giá trị 
 1. **Danh mục → Cửa hàng**: nhập mã (duy nhất) và tên từng cửa hàng.
 2. **Danh mục → Nhãn hàng**: tạo nhãn.
 3. Dưới từng nhãn: tạo **Dòng hàng** (bắt buộc, mỗi SP thuộc một dòng) và **Bộ sưu tập** (không bắt buộc).
-4. **Chất liệu** và **Khung giá** (không bắt buộc, dùng để lọc).
+4. **Tuổi vàng** và **Khung giá** (không bắt buộc, dùng để lọc).
 5. **Nhập Excel**: tải file mẫu → điền → nhập (B3).
 6. **Ảnh**: tải ảnh hàng loạt (B4).
 7. Đối chiếu số liệu trên trang xem với file nguồn.
@@ -61,21 +61,21 @@ Trang **Danh mục** có hướng dẫn từng bước và đánh dấu bước 
 
 - Thêm bằng ô "Thêm …" ở mỗi mục; sửa tên ngay trên dòng.
 - **Xóa** chỉ được khi chưa có SP hay số lượng nào dùng. Nếu đang dùng, hãy **Ẩn**.
-- **Ẩn** nhãn / dòng / BST / chất liệu → các SP thuộc nó cũng ẩn khỏi trang xem (hộp thoại cho biết bao nhiêu SP bị ảnh hưởng). **Ẩn cửa hàng** → số của cửa hàng đó không còn cộng vào tổng. Hiện lại là trở về như cũ.
+- **Ẩn** nhãn / dòng / BST / tuổi vàng → các SP thuộc nó cũng ẩn khỏi trang xem (hộp thoại cho biết bao nhiêu SP bị ảnh hưởng). **Ẩn cửa hàng** → số của cửa hàng đó không còn cộng vào tổng. Hiện lại là trở về như cũ.
 - Hệ thống không xóa dữ liệu vĩnh viễn; SP cũng chỉ ẩn/hiện, và **mã SP không sửa được** sau khi tạo.
 
 ### B3. Nhập Excel
 
 1. Vào **Nhập Excel → Tải file mẫu**. File có sheet:
-   - **SanPham** — mỗi SP một dòng: Mã SP, Tên SP, Nhãn hàng, Dòng hàng, Bộ sưu tập, Chất liệu, Khung giá, Giá bán lẻ.
+   - **SanPham** — mỗi SP một dòng: Mã SP, Tên SP, Nhãn hàng, Dòng hàng, Bộ sưu tập, Tuổi vàng, Khung giá, Giá bán lẻ.
    - **SoLuong** — mỗi cặp (SP, cửa hàng) một dòng: Mã SP, Mã cửa hàng, SL đặt, SL đã về.
-   - **HuongDan** — giải thích từng cột. Các cột Nhãn, Dòng, BST, Chất liệu, Khung giá, Mã cửa hàng có ô chọn từ danh sách.
+   - **HuongDan** — giải thích từng cột. Các cột Nhãn, Dòng, BST, Tuổi vàng, Khung giá, Mã cửa hàng có ô chọn từ danh sách.
 2. Điền file, lưu dạng **.xlsx**. Quy tắc:
    - Mã SP không trùng, không có khoảng trắng; mã chưa có trên web → tạo SP mới (SP mới cần Nhãn hàng và Dòng hàng).
    - Dòng phải thuộc đúng nhãn của SP; BST cũng vậy.
    - Số lượng là số nguyên ≥ 0; SL về được phép lớn hơn SL đặt.
    - **Ô để trống = giữ nguyên**. Muốn về 0 thì gõ 0. Giá trị có trong file **ghi đè** số cũ.
-   - Cửa hàng, nhãn, dòng, BST, chất liệu, khung giá chưa có trên web sẽ báo lỗi → tạo ở **Danh mục** trước.
+   - Cửa hàng chưa có trên web sẽ báo lỗi → tạo ở **Danh mục** trước. Nhãn, dòng, BST, tuổi vàng, khung giá chưa có sẽ được tự tạo khi áp dụng (bản xem trước liệt kê sẵn).
 3. **Chọn file Excel**. Hệ thống hiện bản **xem trước**: thẻ tổng hợp (SP mới, SP thay đổi, dòng SL thay đổi, lỗi), các tab Tất cả / SP mới / Thay đổi / Lỗi, từng thay đổi dạng **cũ → mới**.
 4. Có lỗi: bảng lỗi ghi rõ **sheet, dòng, cột, lý do**. Sửa file rồi chọn lại (**Nhập file khác**). Nút **Áp dụng** bị khóa cho tới khi hết lỗi.
 5. Hết lỗi, kiểm tra lại số liệu → bấm **Áp dụng**. Áp dụng là "tất cả hoặc không": nếu lỗi giữa chừng, dữ liệu không đổi.
@@ -117,5 +117,5 @@ Trang **Danh mục** có hướng dẫn từng bước và đánh dấu bước 
 | Báo dòng không thuộc nhãn                      | Kiểm tra cột Nhãn hàng và Dòng hàng của SP có khớp nhau           |
 | Không chọn được file                           | Lưu lại dạng .xlsx (không dùng .xls / .csv)                       |
 | Ảnh "Không khớp mã SP nào"                     | Tên file chưa đúng mã, hoặc SP chưa được tạo (nhập Excel trước)   |
-| SP không hiện ở trang xem                      | Kiểm tra SP / nhãn / dòng / BST / chất liệu có đang bị ẩn         |
+| SP không hiện ở trang xem                      | Kiểm tra SP / nhãn / dòng / BST / tuổi vàng có đang bị ẩn         |
 | Số tổng ít hơn dự kiến                         | Có thể một cửa hàng đang bị ẩn (số của nó không cộng vào tổng)    |

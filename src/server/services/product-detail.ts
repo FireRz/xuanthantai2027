@@ -27,7 +27,7 @@ export interface ProductDetail {
 
 /**
  * Chi tiết một SP cho popup (F05): thông tin + số liệu từng cửa hàng đang hoạt động + dòng tổng.
- * SP không tồn tại hoặc không hiển thị được (ẩn SP/nhãn/dòng/BST/chất liệu/khung giá) → null.
+ * SP không tồn tại hoặc không hiển thị được (ẩn SP/nhãn/dòng/BST/tuổi vàng/khung giá) → null.
  * Mã không phân biệt hoa/thường.
  */
 export async function getProductDetail(sku: string): Promise<ProductDetail | null> {

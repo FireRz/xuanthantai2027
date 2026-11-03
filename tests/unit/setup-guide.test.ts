@@ -9,7 +9,7 @@ const html = (c: MasterDataCounts) =>
   renderToStaticMarkup(createElement(SetupGuide, { counts: c }));
 
 describe("T06.6 — hướng dẫn thứ tự nhập", () => {
-  it("thứ tự: cửa hàng → nhãn → dòng → BST → chất liệu → mẫu Excel", () => {
+  it("thứ tự: cửa hàng → nhãn → dòng → BST → tuổi vàng → mẫu Excel", () => {
     expect(getSetupSteps(empty).map((s) => s.key)).toEqual([
       "stores",
       "brands",
@@ -31,7 +31,7 @@ describe("T06.6 — hướng dẫn thứ tự nhập", () => {
     expect(isSetupComplete(empty)).toBe(false);
   });
 
-  it("BST và chất liệu không bắt buộc: đủ cửa hàng + nhãn + dòng là coi như sẵn sàng", () => {
+  it("BST và tuổi vàng không bắt buộc: đủ cửa hàng + nhãn + dòng là coi như sẵn sàng", () => {
     const ready = { ...empty, stores: 2, brands: 1, lines: 3 };
     expect(isSetupComplete(ready)).toBe(true);
     const out = html(ready);

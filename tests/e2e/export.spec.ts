@@ -36,7 +36,7 @@ test.describe("T11.2 GET /api/export", () => {
       "Nhãn",
       "Dòng",
       "BST",
-      "Chất liệu",
+      "Tuổi vàng",
       "Giá (₫)",
       "SL đặt",
       "SL đã về",

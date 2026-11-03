@@ -20,7 +20,7 @@ export interface SetupStep {
 
 /**
  * Thứ tự nhập dữ liệu ban đầu (F06 T06.6, SESSIONS phiên 9): cửa hàng → nhãn → dòng / BST →
- * chất liệu → tải mẫu Excel. File Excel chỉ chọn được những giá trị đã có (ADR-008 R5).
+ * tuổi vàng → tải mẫu Excel. File Excel chỉ chọn được những giá trị đã có (ADR-008 R5).
  */
 export function getSetupSteps(c: MasterDataCounts): SetupStep[] {
   return [
@@ -55,7 +55,7 @@ export function getSetupSteps(c: MasterDataCounts): SetupStep[] {
     },
     {
       key: "materials",
-      title: "Tạo chất liệu / tuổi vàng",
+      title: "Tạo tuổi vàng",
       detail: "Không bắt buộc — dùng làm bộ lọc ở trang xem.",
       done: c.materials > 0,
       optional: true,

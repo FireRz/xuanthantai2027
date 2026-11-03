@@ -1,6 +1,6 @@
 import { prisma } from "@/server/db";
 
-/** 2 nhãn; mỗi nhãn 2 dòng, 2 BST; 2 chất liệu; 3 cửa hàng; SP phủ mọi tổ hợp. */
+/** 2 nhãn; mỗi nhãn 2 dòng, 2 BST; 2 tuổi vàng; 3 cửa hàng; SP phủ mọi tổ hợp. */
 export async function fixture() {
   const mats = [
     await prisma.material.create({ data: { name: "Vàng 18K" } }),

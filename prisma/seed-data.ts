@@ -122,7 +122,7 @@ export async function seed(prisma: PrismaClient, opts: SeedOptions) {
     return found.id;
   };
   log(
-    `Danh mục: ${brands.length} nhãn, ${materials.length} chất liệu, ${priceRanges.length} khung giá`,
+    `Danh mục: ${brands.length} nhãn, ${materials.length} tuổi vàng, ${priceRanges.length} khung giá`,
   );
 
   // Cửa hàng
@@ -137,7 +137,7 @@ export async function seed(prisma: PrismaClient, opts: SeedOptions) {
   });
   log(`Cửa hàng: ${stores.length}`);
 
-  // Sản phẩm: rải đều cho 3 nhãn; ~25% không BST, ~10% không giá, ~10% không chất liệu.
+  // Sản phẩm: rải đều cho 3 nhãn; ~25% không BST, ~10% không giá, ~10% không tuổi vàng.
   const productData = Array.from({ length: opts.products }, (_, i) => {
     const b = brands[i % brands.length];
     const line = b.lines[int(0, b.lines.length - 1)];

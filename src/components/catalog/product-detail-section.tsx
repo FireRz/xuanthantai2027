@@ -63,7 +63,7 @@ function DetailBody({
         <div className="min-w-0">
           <p className="text-ink-muted font-medium tracking-wide uppercase">{d.sku}</p>
           <p className="my-1.5">{classification}</p>
-          <p>Chất liệu: {orDash(d.materialName)}</p>
+          <p>Tuổi vàng: {orDash(d.materialName)}</p>
           <p className="my-2 text-xl font-bold tabular-nums">{formatVnd(d.priceVnd)}</p>
           <p
             data-testid="detail-summary"

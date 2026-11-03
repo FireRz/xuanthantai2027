@@ -122,7 +122,7 @@ describe("T04.4 — catalog.getFacetCounts", () => {
     expect(f.store).toHaveLength(3);
   });
 
-  it("tìm mã thu hẹp số đếm; ẩn nhãn/dòng/BST/chất liệu/cửa hàng thì không còn trong danh sách", async () => {
+  it("tìm mã thu hẹp số đếm; ẩn nhãn/dòng/BST/tuổi vàng/cửa hàng thì không còn trong danh sách", async () => {
     const fx = await fixture();
     const f = await getFacetCounts({ ...base, q: "P001" });
     expect(f.brand.map((o) => o.count)).toEqual([1, 0]);
@@ -142,7 +142,7 @@ describe("T04.4 — catalog.getFacetCounts", () => {
     expect(g.col.find((o) => o.id === fx.brands[0].cols[0].id)).toBeUndefined();
     expect(g.line.find((o) => o.id === fx.brands[0].lines[0].id)).toBeUndefined();
     expect(g.store).toHaveLength(2);
-    // SP thuộc BST/dòng/chất liệu bị ẩn không được đếm vào nhãn
+    // SP thuộc BST/dòng/tuổi vàng bị ẩn không được đếm vào nhãn
     expect(g.brand[0].count).toBeLessThan(18);
   });
 });

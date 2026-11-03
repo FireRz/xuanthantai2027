@@ -162,7 +162,7 @@ describe("T08.7 — R3 ghi đè, R6 ô trống giữ nguyên, R4 về > đặt",
     ]);
   });
 
-  it("R6: ô trống giữ nguyên (AC3) — SP đã có không bị xóa BST/chất liệu/giá", () => {
+  it("R6: ô trống giữ nguyên (AC3) — SP đã có không bị xóa BST/tuổi vàng/giá", () => {
     const a = run(file([prod(2, { sku: "AK0001", name: "Nhẫn A mới" })]));
     expect(a.productItems[0].changes).toEqual([
       { column: "Tên SP", old: "Nhẫn A", new: "Nhẫn A mới" },
@@ -228,7 +228,7 @@ describe("T08.7 — R5, R7 chưa có → lỗi (AC5, AC7)", () => {
     expect(r).toEqual(['SoLuong|12|Mã cửa hàng|Mã cửa hàng "CH99" chưa có trên web']);
   });
 
-  it("nhãn, dòng, BST, chất liệu, khung giá chưa có", () => {
+  it("nhãn, dòng, BST, tuổi vàng, khung giá chưa có → tự tạo, không báo lỗi", () => {
     const f = file([
       prod(2, { sku: "N1", brand: "Không có", line: "Nhẫn" }),
       prod(3, { sku: "N2", brand: "Phúc Lộc", line: "Vòng" }),
@@ -236,19 +236,29 @@ describe("T08.7 — R5, R7 chưa có → lỗi (AC5, AC7)", () => {
       prod(5, { sku: "N4", brand: "Phúc Lộc", line: "Nhẫn", material: "Bạc" }),
       prod(6, { sku: "N5", brand: "Phúc Lộc", line: "Nhẫn", priceRange: "9tr < 10tr" }),
     ]);
-    expect(reasons(f)).toEqual([
-      'SanPham|2|Nhãn hàng|Nhãn hàng "Không có" chưa có trên web',
-      'SanPham|3|Dòng hàng|Dòng hàng "Vòng" chưa có trong nhãn Phúc Lộc',
-      'SanPham|4|Bộ sưu tập|Bộ sưu tập "Xuân 2028" chưa có trong nhãn Phúc Lộc',
-      'SanPham|5|Chất liệu|Chất liệu "Bạc" chưa có trên web',
-      'SanPham|6|Khung giá|Khung giá "9tr < 10tr" chưa có trên web',
+    expect(reasons(f)).toEqual([]);
+    const a = run(f);
+    expect(a.plan.newProducts).toHaveLength(5);
+    expect(a.newCatalogLabels).toEqual([
+      "Nhãn hàng: Không có",
+      "Dòng hàng: Nhẫn (Không có)",
+      "Dòng hàng: Vòng (Phúc Lộc)",
+      "Bộ sưu tập: Xuân 2028 (Phúc Lộc)",
+      "Tuổi vàng: Bạc",
+      "Khung giá: 9tr < 10tr",
     ]);
-    expect(run(f).plan.newProducts).toEqual([]);
   });
 
-  it("không tự tạo gì khi có lỗi: kế hoạch vẫn chỉ gồm dòng hợp lệ nhưng số lỗi > 0", () => {
-    const a = run(file([prod(2, { sku: "N1", brand: "X", line: "Y" })]));
-    expect(a.summary.errors).toBe(1);
+  it("danh mục mới trùng tên trong file chỉ tạo một lần", () => {
+    const a = run(
+      file([
+        prod(2, { sku: "N1", brand: "Mới", line: "Nhẫn", material: "Bạc" }),
+        prod(3, { sku: "N2", brand: "mới", line: "nhẫn", material: "BẠC" }),
+      ]),
+    );
+    expect(a.plan.newCatalog.brands).toHaveLength(1);
+    expect(a.plan.newCatalog.lines).toHaveLength(1);
+    expect(a.plan.newCatalog.materials).toHaveLength(1);
   });
 
   it("SP mới thiếu nhãn / dòng (P4)", () => {
@@ -260,16 +270,18 @@ describe("T08.7 — R5, R7 chưa có → lỗi (AC5, AC7)", () => {
 });
 
 describe("T08.7 — R9, R13 cùng nhãn", () => {
-  it("dòng thuộc nhãn khác → lỗi", () => {
-    const r = reasons(file([prod(2, { sku: "N1", brand: "Phúc Lộc", line: "Lắc" })]));
-    expect(r).toEqual(['SanPham|2|Dòng hàng|Dòng hàng "Lắc" chưa có trong nhãn Phúc Lộc']);
+  it("dòng thuộc nhãn khác → tạo dòng mới trong nhãn này", () => {
+    const a = run(file([prod(2, { sku: "N1", brand: "Phúc Lộc", line: "Lắc" })]));
+    expect(a.summary.errors).toBe(0);
+    expect(a.newCatalogLabels).toEqual(["Dòng hàng: Lắc (Phúc Lộc)"]);
   });
 
-  it("BST thuộc nhãn khác → lỗi", () => {
-    const r = reasons(
+  it("BST thuộc nhãn khác → tạo BST mới trong nhãn này", () => {
+    const a = run(
       file([prod(2, { sku: "N1", brand: "Phúc Lộc", line: "Nhẫn", collection: "Hè 2027" })]),
     );
-    expect(r).toEqual(['SanPham|2|Bộ sưu tập|Bộ sưu tập "Hè 2027" chưa có trong nhãn Phúc Lộc']);
+    expect(a.summary.errors).toBe(0);
+    expect(a.newCatalogLabels).toEqual(["Bộ sưu tập: Hè 2027 (Phúc Lộc)"]);
   });
 
   it("R13: SP đã có đổi nhãn mà không đổi dòng → lỗi; có BST cũ mà không đổi BST → lỗi", () => {
@@ -393,7 +405,7 @@ describe("T08.7 — R15 so khớp không phân biệt hoa/thường và khoảng
     );
     expect(a.issues).toEqual([]);
     expect(a.summary.changedQuantities).toBe(1);
-    expect(a.productItems).toEqual([]); // nhãn/dòng/chất liệu giống hệt → không đổi
+    expect(a.productItems).toEqual([]); // nhãn/dòng/tuổi vàng giống hệt → không đổi
   });
 });
 
@@ -420,10 +432,7 @@ describe("T08.7 — nhiều lỗi (mockup): đếm đủ, vẫn phân loại dò
   it("3 lỗi + 2 thay đổi", () => {
     const a = run(
       file(
-        [
-          prod(18, { sku: "AK0001", collection: "Xuân 2028" }),
-          prod(9, { sku: "AK0002", price: "39000000" }),
-        ],
+        [prod(18, { sku: "AK0001", price: "abc" }), prod(9, { sku: "AK0002", price: "39000000" })],
         [
           qty(41, { sku: "AK0001", store: "CH999", ordered: "1" }),
           qty(77, { sku: "AK0002", store: "CH01", ordered: "-2" }),

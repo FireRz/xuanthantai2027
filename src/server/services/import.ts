@@ -74,6 +74,7 @@ export function toPreview(a: ImportAnalysis, limit = PREVIEW_DETAIL_LIMIT): Impo
     issues: a.issues.slice(0, limit),
     productItems: a.productItems.slice(0, limit),
     quantityItems: a.quantityItems.slice(0, limit),
+    newCatalog: a.newCatalogLabels.slice(0, limit),
     truncated: {
       issues: a.issues.length > limit,
       productItems: a.productItems.length > limit,

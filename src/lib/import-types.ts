@@ -53,6 +53,8 @@ export interface ImportPreview {
   issues: ImportIssue[];
   productItems: ProductItem[];
   quantityItems: QuantityItem[];
+  /** Danh mục có trong file nhưng chưa có trên web — sẽ được tạo tự động khi áp dụng. */
+  newCatalog?: string[];
   /** Thời gian server đọc + kiểm tra file (ms) — để đo hiệu năng (T08.10). */
   elapsedMs?: number;
   /** Danh sách chi tiết đã bị cắt bớt (xem `summary` để biết tổng). */

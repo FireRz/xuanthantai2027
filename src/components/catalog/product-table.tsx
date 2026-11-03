@@ -5,7 +5,7 @@ import { ProductImage } from "./product-image";
 import { ClickableRow, ProductLink } from "./product-link";
 import { StatusBadge } from "./status-badge";
 
-// Điện thoại ẩn Nhãn / Dòng / BST / Chất liệu (UI-DESIGN §5.4).
+// Điện thoại ẩn Nhãn / Dòng / BST / Tuổi vàng (UI-DESIGN §5.4).
 const HIDE_ON_PHONE = "hidden md:table-cell";
 
 const th =
@@ -44,7 +44,7 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
               BST
             </th>
             <th scope="col" className={`${th} ${HIDE_ON_PHONE}`}>
-              Chất liệu
+              Tuổi vàng
             </th>
             <th scope="col" className={`${th} ${num}`}>
               Giá

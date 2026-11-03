@@ -22,7 +22,7 @@ async function assertRefsExist(input: {
     input.materialId &&
     !(await prisma.material.findUnique({ where: { id: input.materialId } }))
   ) {
-    throw new DomainError("MATERIAL_NOT_FOUND", "Chất liệu không tồn tại");
+    throw new DomainError("MATERIAL_NOT_FOUND", "Tuổi vàng không tồn tại");
   }
   if (
     input.priceRangeId &&

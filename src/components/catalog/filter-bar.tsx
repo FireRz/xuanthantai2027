@@ -20,7 +20,7 @@ const GROUPS: { key: GroupKey; label: string }[] = [
   { key: "brand", label: "Nhãn hàng" },
   { key: "line", label: "Dòng hàng" },
   { key: "col", label: "Bộ sưu tập" },
-  { key: "mat", label: "Chất liệu" },
+  { key: "mat", label: "Tuổi vàng" },
   { key: "pr", label: "Khung giá" },
 ];
 
@@ -36,7 +36,7 @@ function labelOf(o: FacetOption, options: FacetOption[]) {
 }
 
 /**
- * Bộ lọc (ADR-009 U8'): nút thả xuống Nhãn hàng / Dòng / BST / Chất liệu / Khung giá (chọn nhiều,
+ * Bộ lọc (ADR-009 U8'): nút thả xuống Nhãn hàng / Dòng / BST / Tuổi vàng / Khung giá (chọn nhiều,
  * số đếm, nút "Xem N SP"); điện thoại: bảng lọc trượt từ dưới lên với các chip.
  * Chọn tới đâu áp dụng tới đó lên URL (B9); số đếm là của máy chủ (B4).
  */

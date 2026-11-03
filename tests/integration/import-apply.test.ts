@@ -48,7 +48,7 @@ const file = (products: (string | number | null)[][], quantities: (string | numb
       "Nhãn hàng",
       "Dòng hàng",
       "Bộ sưu tập",
-      "Chất liệu",
+      "Tuổi vàng",
       "Khung giá",
       "Giá bán lẻ",
     ]);

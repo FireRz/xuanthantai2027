@@ -7,8 +7,8 @@ import { makeBrandTree, resetDb } from "./helpers";
 beforeEach(resetDb);
 afterAll(() => prisma.$disconnect());
 
-describe("T06.2 — Chất liệu", () => {
-  it("tạo chất liệu (không thuộc nhãn)", async () => {
+describe("T06.2 — Tuổi vàng", () => {
+  it("tạo tuổi vàng (không thuộc nhãn)", async () => {
     const m = await createMaterial(" Vàng  18K ");
     expect(m).toMatchObject({ name: "Vàng 18K", active: true });
   });
@@ -22,7 +22,7 @@ describe("T06.2 — Chất liệu", () => {
     await expect(createMaterial("vàng 18k")).rejects.toMatchObject({ code: "NAME_DUPLICATE" });
   });
 
-  it("đổi tên: trùng chất liệu khác → lỗi; giữ liên kết SP (AC3)", async () => {
+  it("đổi tên: trùng tuổi vàng khác → lỗi; giữ liên kết SP (AC3)", async () => {
     const a = await createMaterial("Vàng 18K");
     await createMaterial("Vàng 24K");
     await expect(renameMaterial(a.id, "Vàng 24K")).rejects.toMatchObject({

@@ -7,7 +7,7 @@ export async function resetDb() {
   );
 }
 
-/** Tạo nhanh dữ liệu khung: 1 nhãn, 1 dòng, 1 BST, 1 chất liệu. */
+/** Tạo nhanh dữ liệu khung: 1 nhãn, 1 dòng, 1 BST, 1 tuổi vàng. */
 export async function makeBrandTree(brandName = "Nhãn A") {
   const brand = await prisma.brand.create({ data: { name: brandName } });
   const line = await prisma.productLine.create({ data: { brandId: brand.id, name: "Dòng 1" } });

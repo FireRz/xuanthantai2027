@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 
 /**
  * SP "hiển thị được" trên trang xem (ARCHITECTURE §4.2, ADR-008 M2):
- * SP, nhãn, dòng đang hiện; BST và chất liệu (nếu có) đang hiện.
+ * SP, nhãn, dòng đang hiện; BST và tuổi vàng (nếu có) đang hiện.
  * Ẩn danh mục cha → SP ẩn theo mà không đổi product.active.
  */
 export const visibleProductWhere = {

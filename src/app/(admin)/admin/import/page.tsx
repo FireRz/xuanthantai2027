@@ -38,8 +38,8 @@ export default async function ImportPage() {
       <ul className="list-disc space-y-1 pl-5 text-sm text-neutral-700">
         <li>Giá trị trong file ghi đè giá trị hiện có; ô để trống thì giữ nguyên.</li>
         <li>
-          Cửa hàng, Nhãn, Dòng, Bộ sưu tập, Chất liệu, Khung giá phải có sẵn trên web (tạo ở mục
-          Danh mục trước); SP mới thì được tạo từ file.
+          Cửa hàng phải có sẵn trên web (tạo ở mục Danh mục trước). Nhãn, Dòng, Bộ sưu tập, Tuổi
+          vàng, Khung giá chưa có thì được tự tạo; SP mới thì được tạo từ file.
         </li>
         <li>Chi tiết từng cột nằm ở sheet HuongDan trong file mẫu.</li>
       </ul>

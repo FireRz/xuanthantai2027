@@ -118,7 +118,7 @@ export function ProductTable({ rows }: { rows: ProductRow[] }) {
               <th className="p-3">Nhãn</th>
               <th className="p-3">Dòng</th>
               <th className="p-3">BST</th>
-              <th className="p-3">Chất liệu</th>
+              <th className="p-3">Tuổi vàng</th>
               <th className="p-3 text-right">Giá</th>
               <th className="p-3">Trạng thái</th>
               <th className="p-3">

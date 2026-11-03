@@ -296,6 +296,22 @@ export function ImportFlow() {
         </p>
       )}
 
+      {preview.newCatalog && preview.newCatalog.length > 0 && (
+        <details
+          data-testid="import-new-catalog"
+          className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900"
+        >
+          <summary className="cursor-pointer font-medium">
+            Sẽ tự tạo {formatInt(preview.newCatalog.length)} danh mục chưa có trên web
+          </summary>
+          <ul className="mt-2 list-disc pl-5">
+            {preview.newCatalog.map((l) => (
+              <li key={l}>{l}</li>
+            ))}
+          </ul>
+        </details>
+      )}
+
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card id="sum-new" value={s.newProducts} label="SP mới" />
         <Card id="sum-changed" value={s.changedProducts} label="SP thay đổi" />

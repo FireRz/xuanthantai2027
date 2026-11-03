@@ -2,7 +2,7 @@
  * Tham số URL của trang xem (ARCHITECTURE §5.1):
  *   ?brand=a,b&line=…&col=…,none&mat=…&pr=…&store=CH01&all=1&q=NTT&sort=…&view=grid|list&sp=NTT001
  * Giá trị lạ hoặc không hợp lệ bị bỏ, không gây lỗi (ARCHITECTURE §5.1, T04.9).
- * Id nhãn/dòng/BST/chất liệu là UUID; cửa hàng theo mã.
+ * Id nhãn/dòng/BST/tuổi vàng là UUID; cửa hàng theo mã.
  */
 import { z } from "zod";
 
@@ -97,7 +97,7 @@ export function buildCatalogQuery(p: Partial<CatalogParams>): string {
   return s ? `?${s}` : "";
 }
 
-/** Số bộ lọc nhóm (nhãn, dòng, BST, chất liệu, khung giá) đang chọn — để hiện trên nút "Lọc (n)". */
+/** Số bộ lọc nhóm (nhãn, dòng, BST, tuổi vàng, khung giá) đang chọn — để hiện trên nút "Lọc (n)". */
 export function countGroupFilters(p: Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "pr">) {
   return p.brand.length + p.line.length + p.col.length + p.mat.length + p.pr.length;
 }

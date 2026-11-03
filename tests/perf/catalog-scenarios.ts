@@ -56,7 +56,7 @@ export async function perfScenarios(prisma: PrismaClient): Promise<Scenario[]> {
     run: (a) => a.listProducts({ ...none, store: s1, limit: 24 }),
   });
   out.push({
-    name: "nhãn + dòng + BST (+ không thuộc BST) + chất liệu, còn thiếu nhiều nhất",
+    name: "nhãn + dòng + BST (+ không thuộc BST) + tuổi vàng, còn thiếu nhiều nhất",
     run: (a) => a.listProducts({ ...none, ...filters, sort: "shortage", limit: 24 }),
   });
   out.push({

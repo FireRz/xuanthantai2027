@@ -11,7 +11,7 @@ const XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 /**
  * Xuất Excel cho người xem (F11, công khai): nhận đúng các tham số của trang danh mục
- * (nhãn, dòng, BST, chất liệu, khung giá, cửa hàng, all, q, sort) và xuất toàn bộ kết quả, không phân trang.
+ * (nhãn, dòng, BST, tuổi vàng, khung giá, cửa hàng, all, q, sort) và xuất toàn bộ kết quả, không phân trang.
  */
 export async function GET(req: Request) {
   const raw = Object.fromEntries(new URL(req.url).searchParams);

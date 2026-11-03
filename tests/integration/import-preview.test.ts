@@ -89,15 +89,15 @@ describe("T08.5/T08.7 — xem trước với dữ liệu thật", () => {
     await seed();
     const buf = await xlsx((wb) => {
       const sp = wb.addWorksheet("SanPham");
-      sp.addRow(["Mã SP", "Nhãn hàng", "Dòng hàng", "Bộ sưu tập"]);
-      sp.addRow(["AK0001", null, null, "Xuân 2028"]);
+      sp.addRow(["Mã SP", "Nhãn hàng", "Dòng hàng", "Giá bán lẻ"]);
+      sp.addRow(["AK0001", null, null, "abc"]);
       const sl = wb.addWorksheet("SoLuong");
       sl.addRow(["Mã SP", "Mã cửa hàng", "SL đặt"]);
       sl.addRow(["AK0001", "CH99", 1]);
     });
     const p = await previewImport(buf);
     expect(p.issues.map((i) => `${i.sheet} dòng ${i.row}: ${i.column} — ${i.reason}`)).toEqual([
-      'SanPham dòng 2: Bộ sưu tập — Bộ sưu tập "Xuân 2028" chưa có trong nhãn Phúc Lộc',
+      "SanPham dòng 2: Giá bán lẻ — Giá bán lẻ phải là số nguyên VND ≥ 0",
       'SoLuong dòng 2: Mã cửa hàng — Mã cửa hàng "CH99" chưa có trên web',
     ]);
   });
