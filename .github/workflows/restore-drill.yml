@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 30
     services:
       postgres:
-        image: postgres:17
+        image: postgres:18
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -40,8 +40,8 @@ jobs:
           sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
           echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
           sudo apt-get update
-          sudo apt-get install -y postgresql-client-17
-          /usr/lib/postgresql/17/bin/pg_restore --no-owner --no-privileges --exit-on-error --dbname=postgresql://postgres:postgres@localhost:5432/restore_drill backup.dump
+          sudo apt-get install -y postgresql-client-18
+          /usr/lib/postgresql/18/bin/pg_restore --no-owner --no-privileges --exit-on-error --dbname=postgresql://postgres:postgres@localhost:5432/restore_drill backup.dump
       - name: Đối chiếu với production
         env:
           BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
