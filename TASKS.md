@@ -148,7 +148,7 @@
 | T10.1 | Chốt hạ tầng | — | S | ✅ |
 | T10.2 | Vercel + Neon + Blob, biến môi trường (xong 2026-11-02, xuanthantai2027.vercel.app) | T01.1, *tài khoản Vercel* | S | ✅ |
 | T10.3 | Migrate khi deploy + health (/api/health 200 trên Vercel, 2026-11-02) | T10.2, T01.5 | S | ✅ |
-| T10.4 | Sao lưu + diễn tập khôi phục | T10.2 | M | 🟨 |
+| T10.4 | Sao lưu + diễn tập khôi phục (2026-11-03: Backup chạy được, Restore drill ĐẠT, số dòng mọi bảng khớp production) | T10.2 | M | ✅ |
 | T10.5 | Giám sát lỗi (2026-11-03: gây lỗi giả trên Vercel Preview, thấy request_error trong Logs) | T10.2 | S | ✅ |
 | T10.6 | Nhập dữ liệu thật (2026-11-03: đã nạp production 68 CH, 3.000 SP, 21 dòng SL, khớp file; còn ảnh) | F06, T07.8, T08.9 | M | 🟨 |
 | T10.7 | E2E + thiết bị thật | F03–F08, F11, T10.6 | M | ⬜ |
