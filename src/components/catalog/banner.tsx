@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { SiteNav } from "./site-nav";
 
 /**
  * Banner Tết (ADR-009 U4', U14', U18'): ảnh tranh Tết làm nền toàn banner, chữ căn giữa trên
@@ -7,7 +6,7 @@ import { SiteNav } from "./site-nav";
  */
 export function Banner() {
   return (
-    <header className="relative flex min-h-[560px] w-full flex-col overflow-hidden bg-[#cc1208] text-center text-white sm:min-h-[420px] lg:aspect-[2400/900] lg:max-h-[640px] lg:min-h-0">
+    <header className="relative flex min-h-[250px] w-full flex-col overflow-hidden bg-[#cc1208] text-center text-white sm:min-h-[420px] lg:aspect-[2400/900] lg:max-h-[640px] lg:min-h-0">
       {/* Tranh ngang (docs/brand/tet-banner-2400.png) phủ kín banner; điện thoại/tablet neo góc dưới-trái để thấy con dê. */}
       <Image
         src="/brand/tet-banner-2400.png"
@@ -15,20 +14,23 @@ export function Banner() {
         fill
         priority
         sizes="100vw"
-        className="object-cover object-[left_bottom] lg:object-center"
+        className="object-cover object-[45%_bottom] lg:object-center"
       />
-      <SiteNav />
-      <div className="relative z-10 mx-auto flex max-w-4xl flex-1 flex-col items-center justify-start px-6 pt-24 pb-24 sm:justify-center sm:pt-0 sm:pb-16">
+      <div
+        aria-hidden
+        className="from-brand-dark/70 absolute inset-0 bg-gradient-to-b via-transparent to-transparent sm:hidden"
+      />
+      <div className="relative z-10 mx-auto flex max-w-4xl flex-1 flex-col items-center justify-center px-6 pt-4 pb-10 sm:pb-16">
         <h1 className="font-display text-gold text-[30px] leading-[1.1] font-bold whitespace-nowrap [text-shadow:0_2px_12px_rgb(90_5_5/0.7)] md:text-[72px]">
           Xuân Đinh Mùi · 2027
         </h1>
-        <p className="font-display text-festive-text mt-3 text-lg italic [text-shadow:0_1px_8px_rgb(90_5_5/0.8)] md:text-2xl">
+        <p className="font-display text-festive-text mt-3 text-base italic [text-shadow:0_1px_8px_rgb(90_5_5/0.8)] md:text-2xl">
           Vạn sự như ý — Tài lộc đầy nhà
         </p>
         <p className="text-festive-text mx-auto mt-4 hidden max-w-2xl text-[15px] md:text-base lg:block">
           Theo dõi số lượng đặt và hàng đã về của các bộ sưu tập Xuân Thần Tài
         </p>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3 sm:mt-6">
           <a
             href="#bo-suu-tap"
             className="bg-gold text-gold-fg inline-flex min-h-11 items-center rounded-full px-6 font-semibold shadow-md hover:bg-white"
