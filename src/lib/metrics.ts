@@ -43,3 +43,9 @@ export function totalMetrics(rows: readonly StoreQty[]): QtyMetrics {
   }
   return computeMetrics(ordered, received);
 }
+
+/** Tỷ lệ bán = Bán / (Bán + Tồn); chưa có Bán lẫn Tồn → null (hiển thị "—"). */
+export function sellThrough(sold: number, stock: number): number | null {
+  const base = sold + stock;
+  return base === 0 ? null : sold / base;
+}

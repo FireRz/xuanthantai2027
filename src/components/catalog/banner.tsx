@@ -21,10 +21,13 @@ export function Banner() {
         className="from-brand-dark/70 absolute inset-0 bg-gradient-to-b via-transparent to-transparent sm:hidden"
       />
       <div className="relative z-10 mx-auto flex max-w-4xl flex-1 flex-col items-center justify-center px-6 pt-0 pb-4 sm:pb-16">
-        <h1 className="font-display text-gold text-[6.4vw] leading-[1.1] font-bold whitespace-nowrap [text-shadow:0_2px_12px_rgb(90_5_5/0.7)] sm:text-[30px] md:text-[72px]">
+        <h1 className="anim-rise font-display text-gold text-[6.4vw] leading-[1.1] font-bold whitespace-nowrap [text-shadow:0_2px_12px_rgb(90_5_5/0.7)] sm:text-[30px] md:text-[72px]">
           Xuân Đinh Mùi · 2027
         </h1>
-        <p className="font-display text-festive-text mt-[0.5vw] text-[3.4vw] italic [text-shadow:0_1px_8px_rgb(90_5_5/0.8)] sm:mt-3 sm:text-lg md:text-2xl">
+        <p
+          style={{ "--d": "150ms" } as React.CSSProperties}
+          className="anim-rise font-display text-festive-text mt-[0.5vw] text-[3.4vw] italic [text-shadow:0_1px_8px_rgb(90_5_5/0.8)] sm:mt-3 sm:text-lg md:text-2xl"
+        >
           Khởi vận hanh thông - tài lộc như ý
         </p>
         <p className="text-festive-text mx-auto mt-4 hidden max-w-2xl text-[15px] md:text-base lg:block">

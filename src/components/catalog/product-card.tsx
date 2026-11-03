@@ -1,4 +1,5 @@
 import { formatInt, formatPercent, formatVnd, orDash } from "@/lib/format";
+import { sellThrough } from "@/lib/metrics";
 import { stockStatus } from "@/lib/status";
 import type { ProductListItem } from "@/server/services/catalog";
 import { ProductImage } from "./product-image";
@@ -29,7 +30,7 @@ export function ProductCard({
       className="group border-line hover:border-gold flex flex-col overflow-hidden rounded-xl border bg-white transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <ProductLink sku={item.sku} className="flex flex-1 flex-col">
-        <div className="relative aspect-square">
+        <div className="relative aspect-square overflow-hidden [&_img]:transition-transform [&_img]:duration-500 group-hover:[&_img]:scale-105">
           <ProductImage
             thumbUrl={item.thumbUrl}
             alt={item.name ?? item.sku}
@@ -55,7 +56,7 @@ export function ProductCard({
               aria-valuenow={pct}
               className="bg-gold-soft h-1.5 overflow-hidden rounded-full"
             >
-              <div className="bg-gold h-full rounded-full" style={{ width: `${pct}%` }} />
+              <div className="bg-gold anim-grow h-full rounded-full" style={{ width: `${pct}%` }} />
             </div>
             <div className="mt-1.5 flex items-baseline justify-between gap-2 text-[13px] tabular-nums">
               <span>
@@ -82,6 +83,8 @@ export function ProductCard({
               >
                 {formatInt(item.stock)}
               </b>
+              {" · "}
+              <span>{formatPercent(sellThrough(item.sold, item.stock))}</span>
             </p>
           </div>
         </div>

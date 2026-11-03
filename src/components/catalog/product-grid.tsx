@@ -9,7 +9,11 @@ export function ProductGrid({ items }: { items: ProductListItem[] }) {
       className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4"
     >
       {items.map((item, i) => (
-        <li key={item.id} className="min-w-0">
+        <li
+          key={item.id}
+          className="anim-rise min-w-0"
+          style={{ "--d": `${(i % 12) * 45}ms` } as React.CSSProperties}
+        >
           <ProductCard item={item} priority={i < 4} />
         </li>
       ))}

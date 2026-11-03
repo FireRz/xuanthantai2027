@@ -1,5 +1,6 @@
 import { formatInt, formatPercent, formatVnd, orDash } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { sellThrough } from "@/lib/metrics";
 import { stockStatus } from "@/lib/status";
 import type { ProductListItem } from "@/server/services/catalog";
 import { ProductImage } from "./product-image";
@@ -23,7 +24,7 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
       data-testid="product-table"
       className="border-line overflow-x-auto rounded-xl border bg-white lg:overflow-visible"
     >
-      <table className="w-full min-w-[760px] border-collapse text-[14px] md:text-[15px] lg:min-w-0">
+      <table className="w-full min-w-[820px] border-collapse text-[14px] md:text-[15px] lg:min-w-0">
         <thead>
           <tr>
             <th scope="col" className={`${th} w-16 rounded-tl-xl`}>
@@ -67,6 +68,9 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
             </th>
             <th scope="col" className={`${th} ${num}`}>
               Tồn
+            </th>
+            <th scope="col" className={`${th} ${num}`}>
+              % Bán
             </th>
             <th scope="col" className={`${th} rounded-tr-xl`}>
               Trạng thái
@@ -114,6 +118,9 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
                   )}
                 >
                   {formatInt(item.stock)}
+                </td>
+                <td className={`px-3 py-2 ${num}`}>
+                  {formatPercent(sellThrough(item.sold, item.stock))}
                 </td>
                 <td className="px-3 py-2">
                   <StatusBadge status={stockStatus(m)} />

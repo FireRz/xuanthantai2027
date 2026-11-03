@@ -28,8 +28,8 @@ export interface ProductDetail {
   total: QtyMetrics;
   totalSold: number;
   totalStock: number;
-  /** Đang lọc một cửa hàng: chỉ có đúng cửa hàng đó trong `stores`. */
-  storeFiltered: boolean;
+  /** Đang lọc một cửa hàng đang hoạt động: số liệu riêng của cửa hàng đó (popup hiện ở phần tóm tắt). */
+  scope: (StoreQtyRow & { storeCode: string }) | null;
 }
 
 /**
@@ -52,13 +52,15 @@ export async function getProductDetail(
         collection: { select: { name: true } },
         material: { select: { name: true } },
         productType: { select: { name: true } },
-        quantities: { select: {
+        quantities: {
+          select: {
             storeId: true,
             qtyOrdered: true,
             qtyReceived: true,
             qtySold: true,
             qtyStock: true,
-          } },
+          },
+        },
       },
     }),
     prisma.store.findMany({
@@ -70,10 +72,7 @@ export async function getProductDetail(
   if (!product) return null;
 
   const byStore = new Map(product.quantities.map((q) => [q.storeId, q]));
-  const wanted = storeCode?.trim().toUpperCase();
-  const only = wanted ? stores.filter((s) => s.code.toUpperCase() === wanted) : [];
-  const shown = only.length > 0 ? only : stores;
-  const rows = shown.map((s) => {
+  const rows = stores.map((s) => {
     const q = byStore.get(s.id);
     return {
       code: s.code,
@@ -84,6 +83,16 @@ export async function getProductDetail(
       stock: q?.qtyStock ?? 0,
     };
   });
+
+  const storeRows: StoreQtyRow[] = rows.map((r) => ({
+    code: r.code,
+    name: r.name,
+    metrics: computeMetrics(r.ordered, r.received),
+    sold: r.sold,
+    stock: r.stock,
+  }));
+  const wanted = storeCode?.trim().toUpperCase();
+  const picked = wanted ? storeRows.find((s) => s.code.toUpperCase() === wanted) : undefined;
 
   return {
     sku: product.sku,
@@ -96,16 +105,10 @@ export async function getProductDetail(
     collectionName: product.collection?.name ?? null,
     materialName: product.material?.name ?? null,
     productTypeName: product.productType?.name ?? null,
-    stores: rows.map((r) => ({
-      code: r.code,
-      name: r.name,
-      metrics: computeMetrics(r.ordered, r.received),
-      sold: r.sold,
-      stock: r.stock,
-    })),
+    stores: storeRows,
     total: totalMetrics(rows.map((r) => ({ ...r, storeActive: true }))),
     totalSold: rows.reduce((a, r) => a + r.sold, 0),
     totalStock: rows.reduce((a, r) => a + r.stock, 0),
-    storeFiltered: only.length > 0,
+    scope: picked ? { ...picked, storeCode: picked.code } : null,
   };
 }
