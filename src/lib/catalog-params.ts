@@ -1,6 +1,6 @@
 /**
  * Tham số URL của trang xem (ARCHITECTURE §5.1):
- *   ?brand=a,b&line=…&col=…,none&mat=…&typ=…&pr=…&store=CH01&all=1&q=NTT&sort=…&view=grid|list&sp=NTT001
+ *   ?brand=a,b&line=…&col=…,none&mat=…&typ=…&pr=…&store=CH01&all=1&q=NTT&sort=…&view=grid|list&sp=NTT001&xem=hinh
  * Giá trị lạ hoặc không hợp lệ bị bỏ, không gây lỗi (ARCHITECTURE §5.1, T04.9).
  * Id nhãn/dòng/BST/tuổi vàng là UUID; cửa hàng theo mã.
  */
@@ -10,6 +10,9 @@ export const SORTS = ["sku", "updated", "price_asc", "price_desc", "shortage", "
 export type Sort = (typeof SORTS)[number];
 export const VIEWS = ["grid", "list"] as const;
 export type View = (typeof VIEWS)[number];
+
+/** Kiểu sắp xếp bị ẩn ở chế độ "Chỉ xem hình" (dựa trên số lượng) — rơi về `sku`. */
+export const PHOTO_HIDDEN_SORTS: readonly Sort[] = ["shortage", "sold"];
 
 /** Giá trị đặc biệt của bộ lọc BST: SP không thuộc BST nào. */
 export const NO_COLLECTION = "none";
@@ -36,6 +39,8 @@ export interface CatalogParams {
   sp: string | null;
   /** Số SP đang hiển thị (tải thêm tăng dần). */
   n: number;
+  /** Chế độ "Chỉ xem hình" (?xem=hinh): ẩn mọi số lượng/trạng thái (ADR-011). */
+  photo: boolean;
 }
 
 export type RawSearchParams = Record<string, string | string[] | undefined>;
@@ -70,6 +75,7 @@ const schema = z.object({
   sort: single.transform((v): Sort => (SORTS.includes(v as Sort) ? (v as Sort) : "sku")),
   view: single.transform((v): View => (v === "list" ? "list" : "grid")),
   sp: single.transform((v) => v?.trim() || null),
+  xem: single.transform((v) => v === "hinh"),
   n: single.transform((v) => {
     const n = Number.parseInt(v ?? "", 10);
     return Number.isFinite(n) && n >= PAGE_SIZE ? Math.min(n, MAX_SHOWN) : PAGE_SIZE;
@@ -78,7 +84,9 @@ const schema = z.object({
 
 /** Đọc tham số URL (Zod); giá trị không hợp lệ bị bỏ, không bao giờ ném lỗi. */
 export function parseCatalogParams(raw: RawSearchParams): CatalogParams {
-  return schema.parse(raw);
+  const { xem, ...rest } = schema.parse(raw);
+  const sort = xem && PHOTO_HIDDEN_SORTS.includes(rest.sort) ? "sku" : rest.sort;
+  return { ...rest, sort, photo: xem };
 }
 
 /** Ghép lại thành chuỗi truy vấn; bỏ giá trị mặc định cho URL gọn. */
@@ -96,6 +104,7 @@ export function buildCatalogQuery(p: Partial<CatalogParams>): string {
   if (p.sort && p.sort !== "sku") u.set("sort", p.sort);
   if (p.view === "list") u.set("view", "list");
   if (p.sp) u.set("sp", p.sp);
+  if (p.photo) u.set("xem", "hinh");
   if (p.n && p.n > PAGE_SIZE) u.set("n", String(p.n));
   const s = u.toString();
   return s ? `?${s}` : "";

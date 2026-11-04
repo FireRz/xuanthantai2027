@@ -24,6 +24,7 @@ describe("parseCatalogParams", () => {
       view: "grid",
       sp: null,
       n: PAGE_SIZE,
+      photo: false,
     });
   });
 
@@ -49,6 +50,19 @@ describe("parseCatalogParams", () => {
     expect(p).toMatchObject({ store: "CH001", q: "ttg0", sp: "TTG0001", all: true });
   });
 
+  it("xem=hinh bật chế độ hình; giá trị khác thì tắt", () => {
+    expect(parseCatalogParams({ xem: "hinh" }).photo).toBe(true);
+    expect(parseCatalogParams({ xem: "abc" }).photo).toBe(false);
+    expect(parseCatalogParams({}).photo).toBe(false);
+  });
+
+  it("chế độ hình: sort shortage/sold rơi về sku", () => {
+    expect(parseCatalogParams({ xem: "hinh", sort: "shortage" }).sort).toBe("sku");
+    expect(parseCatalogParams({ xem: "hinh", sort: "sold" }).sort).toBe("sku");
+    expect(parseCatalogParams({ xem: "hinh", sort: "price_desc" }).sort).toBe("price_desc");
+    expect(parseCatalogParams({ sort: "sold" }).sort).toBe("sold");
+  });
+
   it("n không hợp lệ hoặc nhỏ hơn một trang → một trang", () => {
     expect(parseCatalogParams({ n: "abc" }).n).toBe(PAGE_SIZE);
     expect(parseCatalogParams({ n: "5" }).n).toBe(PAGE_SIZE);
@@ -69,10 +83,15 @@ describe("buildCatalogQuery", () => {
       q: "a",
       view: "list",
       n: "48",
+      xem: "hinh",
     });
     expect(
       parseCatalogParams(Object.fromEntries(new URLSearchParams(buildCatalogQuery(p)))),
     ).toEqual(p);
+  });
+  it("buildCatalogQuery ghi xem=hinh", () => {
+    expect(buildCatalogQuery({ photo: true })).toBe("?xem=hinh");
+    expect(buildCatalogQuery({ photo: false })).toBe("");
   });
   it("all chỉ có nghĩa khi đã chọn cửa hàng", () => {
     expect(buildCatalogQuery({ all: true })).toBe("");
@@ -100,6 +119,7 @@ describe("T04.2 — bộ đọc/ghi URL cho đủ 5 bộ lọc", () => {
       view: "list",
       sp: "NTT001",
       n: 48,
+      photo: false,
     });
     expect(
       parseCatalogParams(Object.fromEntries(new URLSearchParams(buildCatalogQuery(p)))),
