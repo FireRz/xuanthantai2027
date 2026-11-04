@@ -6,7 +6,7 @@ import { prisma } from "../../src/server/db";
 const cards = (page: Page) => page.getByTestId("product-card");
 const noHorizontalScroll = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-const photoToggle = (page: Page) => page.getByRole("link", { name: "Chỉ xem hình" });
+const photoToggle = (page: Page) => page.getByRole("switch", { name: "Chỉ xem hình" });
 
 test.afterAll(() => prisma.$disconnect());
 
@@ -18,11 +18,30 @@ test.describe("chế độ Chỉ xem hình", () => {
     await expect(page.getByTestId("export-button")).toHaveCount(0);
     await expect(page.getByTestId("export-button-mobile")).toHaveCount(0);
     await expect(page.getByTestId("export-menu")).toHaveCount(0);
-    await expect(photoToggle(page)).toHaveAttribute("aria-pressed", "true");
+    await expect(photoToggle(page)).toHaveAttribute("aria-checked", "true");
 
     // Chế độ đầy đủ vẫn có progressbar (đối chứng)
     await page.goto("/");
     await expect(page.getByRole("progressbar").first()).toBeVisible();
+  });
+
+  test("lần đầu vào: bong bóng gợi ý cạnh công tắc, không che bấm; lần sau không tự hiện", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const hint = page.getByTestId("photo-hint");
+    await expect(hint).toBeVisible();
+    await expect(hint).toContainText("Ẩn số đặt, về, bán, tồn");
+    expect(await noHorizontalScroll(page)).toBe(true);
+    // Bong bóng không nhận chuột: bấm công tắc được ngay.
+    await photoToggle(page).click();
+    await expect(page).toHaveURL(/xem=hinh/);
+    await page.mouse.move(5, 600); // máy tính: rê chuột ra khỏi công tắc thì gợi ý tắt
+    await expect(hint).toBeHidden();
+
+    await page.goto("/");
+    await expect(photoToggle(page)).toBeVisible();
+    await expect(page.getByTestId("photo-hint")).toBeHidden();
   });
 
   test("bấm Chỉ xem hình → URL có xem=hinh; lọc tìm mã vẫn giữ; bấm lại → mất xem=hinh", async ({
@@ -31,7 +50,7 @@ test.describe("chế độ Chỉ xem hình", () => {
     await page.goto("/");
     await photoToggle(page).click();
     await expect(page).toHaveURL(/xem=hinh/);
-    await expect(photoToggle(page)).toHaveAttribute("aria-pressed", "true");
+    await expect(photoToggle(page)).toHaveAttribute("aria-checked", "true");
 
     await page.getByRole("searchbox", { name: "Tìm mã SP" }).pressSequentially("ak00", {
       delay: 60,
@@ -43,7 +62,7 @@ test.describe("chế độ Chỉ xem hình", () => {
     await photoToggle(page).click();
     await expect(page).not.toHaveURL(/xem=hinh/);
     await expect(page).toHaveURL(/q=ak00/);
-    await expect(photoToggle(page)).toHaveAttribute("aria-pressed", "false");
+    await expect(photoToggle(page)).toHaveAttribute("aria-checked", "false");
   });
 
   test("mở thẳng /?xem=hinh&sp=<mã đầu tiên>: popup có ảnh, không có tóm tắt và bảng cửa hàng", async ({

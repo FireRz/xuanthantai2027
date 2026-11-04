@@ -35,8 +35,8 @@ Bấm **Xuất Excel** để tải file chứa đúng danh sách đang lọc (k�
 
 Với người chỉ cần xem hình và thông tin sản phẩm (không cần số Đặt / Về / Thiếu / Bán / Tồn), gửi link có thêm `?xem=hinh`, ví dụ `https://<tên miền>/?xem=hinh`. Trang mở ra chỉ có ảnh, mã, tên, nhãn, dòng, BST, tuổi vàng, chủng loại và giá; không có thanh tiến độ, trạng thái, bảng số lượng theo cửa hàng, nút Xuất Excel hay kiểu sắp xếp theo thiếu / bán.
 
-- Bạn cũng có thể tự bật bằng nút **Chỉ xem hình** cạnh Lưới / Bảng; chế độ giữ nguyên khi lọc, tìm mã, mở chi tiết, bấm Xem thêm.
-- Đây chỉ là cách hiển thị gọn, không phải phân quyền: người nhận vẫn có thể bấm lại nút **Chỉ xem hình** để tắt và xem số lượng.
+- Bạn cũng có thể tự bật bằng công tắc **Ẩn số lượng / Chỉ xem hình** ở cuối thanh cửa hàng (cạnh nút Tìm, luôn thấy khi cuộn); chế độ giữ nguyên khi lọc, tìm mã, mở chi tiết, bấm Xem thêm.
+- Đây chỉ là cách hiển thị gọn, không phải phân quyền: người nhận vẫn có thể gạt lại công tắc để tắt và xem số lượng.
 - Trong chi tiết sản phẩm (cả hai chế độ): bấm ảnh để phóng to (Esc hoặc ✕ để thu lại), dùng nút mũi tên hai bên ảnh hoặc phím ← / → (vuốt trái / phải trên ảnh hoặc phần thông tin trên điện thoại) để sang sản phẩm trước / sau. Thứ tự đúng như danh sách đang xem (cùng bộ lọc, tìm mã, cửa hàng, sắp xếp), dòng `2 / 150` cạnh mã cho biết đang ở sản phẩm thứ mấy. Vuốt ngang trên bảng số lượng theo cửa hàng chỉ cuộn bảng. Chuyển sản phẩm không thêm lịch sử: bấm Back hoặc ✕ là đóng chi tiết luôn.
 
 ### A5. Cách tính cần biết

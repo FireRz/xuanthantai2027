@@ -4,6 +4,7 @@ import { Search, Store } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { CatalogParams } from "@/lib/catalog-params";
 import { useCatalogNav } from "./catalog-nav";
+import { PhotoSwitch } from "./photo-switch";
 
 /** Thời gian chờ sau phím cuối trước khi lọc theo mã (ms). */
 export const SEARCH_DEBOUNCE_MS = 350;
@@ -16,6 +17,7 @@ export interface StoreOption {
 /**
  * Thanh "Cửa hàng của bạn" dính dưới banner (ADR-009 U14'): ô chọn cửa hàng (chọn một) + ô tìm mã SP.
  * Đổi cửa hàng áp dụng ngay; bấm "Tìm" áp dụng cả mã tìm và cuộn xuống danh sách.
+ * Cuối hàng là công tắc "Chỉ xem hình" — thanh dính khi cuộn nên công tắc luôn trong tầm mắt.
  */
 export function StoreBar({ stores }: { stores: StoreOption[] }) {
   const { state: params, go: navigate, pending } = useCatalogNav();
@@ -117,6 +119,7 @@ export function StoreBar({ stores }: { stores: StoreOption[] }) {
         >
           Tìm
         </button>
+        <PhotoSwitch />
       </form>
     </div>
   );
