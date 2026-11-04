@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
-import { sellThrough } from "@/lib/metrics";
+import { computeMetrics, sellThrough } from "@/lib/metrics";
+import type { GroupDim } from "@/lib/analytics-params";
 import type { CatalogParams } from "@/lib/catalog-params";
 import type { StockStatus } from "@/lib/status";
 import { prisma } from "@/server/db";
@@ -72,7 +73,7 @@ export function rowToTotals(r: TotalsRow): AnalyticsTotals {
     shortage: Number(r.shortage),
     sold,
     stock,
-    receivedRate: ordered === 0 ? null : Math.min(received / ordered, 1),
+    receivedRate: computeMetrics(ordered, received).rate,
     sellRate: sellThrough(sold, stock),
   };
 }
@@ -138,4 +139,72 @@ export async function getTopProducts(
     ORDER BY value DESC, p.sku ASC
     LIMIT ${limit}`;
   return rows.map((r) => ({ sku: r.sku, name: r.name, thumbUrl: r.thumb_url, value: r.value }));
+}
+
+export interface GroupRow extends AnalyticsTotals {
+  /** Id UUID, mã cửa hàng, hoặc null cho dòng rỗng. */
+  id: string | null;
+  name: string;
+}
+
+/** Khóa ngoại trên bí danh p, bí danh bảng tên (đã JOIN trong catalogFromSql) và tên dòng rỗng. */
+const ATTR_DIMS: Record<
+  Exclude<GroupDim, "store">,
+  { fk: Prisma.Sql; label: Prisma.Sql; empty: string }
+> = {
+  brand: { fk: Prisma.sql`p.brand_id`, label: Prisma.sql`b.name`, empty: "Chưa có nhãn" },
+  line: { fk: Prisma.sql`p.product_line_id`, label: Prisma.sql`l.name`, empty: "Chưa có dòng" },
+  col: { fk: Prisma.sql`p.collection_id`, label: Prisma.sql`c.name`, empty: "Ngoài bộ sưu tập" },
+  mat: { fk: Prisma.sql`p.material_id`, label: Prisma.sql`m.name`, empty: "Chưa có tuổi vàng" },
+  typ: {
+    fk: Prisma.sql`p.product_type_id`,
+    label: Prisma.sql`pt.name`,
+    empty: "Chưa có chủng loại",
+  },
+  pr: { fk: Prisma.sql`p.price_range_id`, label: Prisma.sql`pr.name`, empty: "Ngoài khung giá" },
+};
+
+type GroupSqlRow = TotalsRow & { id: string | null; name: string };
+
+/**
+ * Bảng so sánh theo nhóm (§5.3). Chiều thuộc tính SP: GROUP BY khóa ngoại trên đúng tập SP
+ * của danh mục; giá trị rỗng gộp một dòng (id null). Chiều cửa hàng: theo cặp (SP, cửa hàng đang hiện).
+ * Sắp theo Số mã giảm dần, hòa theo tên; không có dòng cho nhóm không có SP.
+ */
+export async function getGroupBreakdown(
+  params: AnalyticsParams,
+  dim: GroupDim,
+): Promise<GroupRow[]> {
+  const store = await findActiveStore(params.store);
+  const from = catalogFromSql(params, store);
+
+  let rows: GroupSqlRow[];
+  if (dim === "store") {
+    // Mỗi cặp (SP trong tập, cửa hàng đang hiện) có dòng SL. Số mã chỉ đếm cặp có đặt > 0;
+    // cửa hàng có cặp nhưng toàn đặt = 0 vẫn có dòng (Số mã 0) để tổng Về/Bán/Tồn khớp số tổng.
+    // Cửa hàng không có cặp nào trong tập thì không có dòng.
+    const onlyStore = store ? Prisma.sql`AND st.id = ${store.id}::uuid` : Prisma.empty;
+    rows = await prisma.$queryRaw<GroupSqlRow[]>`
+      WITH s AS (SELECT p.id ${from})
+      SELECT st.code AS id, st.name,
+        (COUNT(*) FILTER (WHERE q.qty_ordered > 0))::bigint AS products,
+        COALESCE(SUM(q.qty_ordered), 0)::bigint AS ordered,
+        COALESCE(SUM(q.qty_received), 0)::bigint AS received,
+        COALESCE(SUM(GREATEST(q.qty_ordered - q.qty_received, 0)), 0)::bigint AS shortage,
+        COALESCE(SUM(q.qty_sold), 0)::bigint AS sold,
+        COALESCE(SUM(q.qty_stock), 0)::bigint AS stock
+      FROM s
+      JOIN store_product_qty q ON q.product_id = s.id
+      JOIN store st ON st.id = q.store_id AND st.active ${onlyStore}
+      GROUP BY st.id, st.code, st.name
+      ORDER BY products DESC, st.name ASC`;
+  } else {
+    const { fk, label, empty } = ATTR_DIMS[dim];
+    rows = await prisma.$queryRaw<GroupSqlRow[]>`
+      SELECT (${fk})::text AS id, COALESCE(MAX(${label}), ${empty}) AS name, ${totalsSelectSql()}
+      ${from}
+      GROUP BY ${fk}
+      ORDER BY products DESC, name ASC`;
+  }
+  return rows.map((r) => ({ id: r.id, name: r.name, ...rowToTotals(r) }));
 }
