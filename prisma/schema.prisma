@@ -173,3 +173,12 @@ model AdminUser {
 
   @@map("admin_user")
 }
+
+/// Cấu hình dạng khóa/giá trị (mật khẩu xem phân tích, bộ đếm sai...). Xem ADR-012.
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("app_setting")
+}

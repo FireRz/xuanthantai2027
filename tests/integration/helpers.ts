@@ -3,7 +3,7 @@ import { prisma } from "@/server/db";
 /** Xóa sạch dữ liệu giữa các test (giữ schema). */
 export async function resetDb() {
   await prisma.$executeRawUnsafe(
-    `TRUNCATE store_product_qty, product, product_line, collection, material, product_type, price_range, store, brand, admin_user CASCADE`,
+    `TRUNCATE store_product_qty, product, product_line, collection, material, product_type, price_range, store, brand, admin_user, app_setting CASCADE`,
   );
 }
 
