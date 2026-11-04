@@ -1,4 +1,4 @@
-import { LayoutGrid, List } from "lucide-react";
+import { Image as ImageIcon, LayoutGrid, List } from "lucide-react";
 import Link from "next/link";
 import { buildCatalogQuery, type CatalogParams } from "@/lib/catalog-params";
 import { cn } from "@/lib/utils";
@@ -34,5 +34,28 @@ export function ViewToggle({ params }: { params: CatalogParams }) {
         </Link>
       ))}
     </div>
+  );
+}
+
+/** Công tắc "Chỉ xem hình": ẩn mọi số lượng/trạng thái, giữ nguyên bộ lọc đang xem. */
+export function PhotoModeToggle({ params }: { params: CatalogParams }) {
+  const href = buildCatalogQuery({ ...params, photo: !params.photo, n: undefined }) || "?";
+  return (
+    <Link
+      href={href}
+      scroll={false}
+      replace
+      aria-pressed={params.photo}
+      className={cn(
+        "border-line inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium",
+        params.photo
+          ? "bg-brand border-brand text-white"
+          : "text-ink-muted hover:text-ink bg-white",
+      )}
+    >
+      <ImageIcon className="size-4" aria-hidden />
+      <span className="sm:hidden">Hình</span>
+      <span className="hidden sm:inline">Chỉ xem hình</span>
+    </Link>
   );
 }

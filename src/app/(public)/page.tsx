@@ -12,7 +12,7 @@ import { ResultsFade } from "@/components/catalog/results-fade";
 import { ProductGridSkeleton } from "@/components/catalog/product-grid";
 import { SiteFooter } from "@/components/catalog/site-footer";
 import { StoreBar } from "@/components/catalog/store-bar";
-import { ViewToggle } from "@/components/catalog/view-toggle";
+import { PhotoModeToggle, ViewToggle } from "@/components/catalog/view-toggle";
 import {
   buildCatalogQuery,
   parseCatalogParams,
@@ -56,11 +56,14 @@ export default async function HomePage({
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2
               id="sp-heading"
-              className="font-display text-navy text-xl font-semibold md:text-2xl"
+              className="font-display text-navy min-w-0 text-xl font-semibold md:text-2xl"
             >
               Tất cả sản phẩm
             </h2>
-            <ViewToggle params={params} />
+            <div className="flex items-center gap-2">
+              <ViewToggle params={params} />
+              <PhotoModeToggle params={params} />
+            </div>
           </div>
           {/* Chừa chỗ cho bộ lọc lúc đang tải (tránh trang nhảy): điện thoại chỉ một hàng Lọc + Sắp xếp. */}
           <div className="mb-5 min-h-11 md:min-h-24">
