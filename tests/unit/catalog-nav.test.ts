@@ -15,7 +15,8 @@ const linkHtml = (params: Record<string, string>, extra: ProviderProps = {}) =>
     createElement(CatalogNavProvider, {
       params: parseCatalogParams(params),
       ...extra,
-      children: createElement(ProductLink, { sku: "NTT001" }, "x"),
+      // eslint-disable-next-line react/no-children-prop
+      children: createElement(ProductLink, { sku: "NTT001", children: "x" }),
     }),
   );
 
