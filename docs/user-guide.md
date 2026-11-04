@@ -45,11 +45,28 @@ Với người chỉ cần xem hình và thông tin sản phẩm (không cần s
 - **Tỷ lệ về** = Về / Đặt, tối đa 100%; chưa đặt thì hiện "—".
 - Số tổng hệ thống = cộng số của mọi cửa hàng đang hiển thị.
 
+### A6. Trang phân tích
+
+Trang `/phan-tich` cho xem số tổng, số mã theo trạng thái, bảng so sánh theo nhóm và top 10 mã, theo đúng bộ lọc của danh mục. Trang có mật khẩu xem chung; chân trang danh mục có link nhỏ **Phân tích**.
+
+**Quản trị đặt mật khẩu:** **Tài khoản → Mật khẩu xem phân tích**, nhập mật khẩu mới (tối thiểu 10 ký tự) rồi **Lưu**. Đổi mật khẩu thì mọi người phải nhập lại; **Tắt trang phân tích** xóa mật khẩu và đóng trang. Nhập sai 5 lần liên tiếp trong 15 phút thì trang khóa tạm (dùng chung cho mọi người xem).
+
+**Gửi cho người cần xem:** gửi link `https://<tên miền>/phan-tich` kèm mật khẩu (nên gửi hai tin riêng). Sau khi nhập đúng, trình duyệt nhớ 30 ngày. Link có kèm bộ lọc (ví dụ `?brand=...&nhom=line`) mở đúng góc nhìn đó sau khi nhập mật khẩu.
+
+**Ý nghĩa các chỉ số:**
+- **Số mã**: số sản phẩm đang tính. **Đặt / Về / Bán / Tồn**: cộng số lượng của các mã đó. **Thiếu**: cộng phần còn thiếu của từng mã (Đặt − Về, không âm), nên mã về dư không bù cho mã thiếu.
+- **% hàng về** = tổng Về / tổng Đặt, tối đa 100%. **% bán** = tổng Bán / (tổng Bán + tổng Tồn). Cả hai tính **trên tổng**, không phải trung bình cộng các tỷ lệ của từng mã hay từng dòng; chưa đặt thì hiện "—".
+- **Thanh trạng thái**: số mã Đủ hàng, Còn thiếu, Chưa về, Không đặt (chỉ để xem, không bấm được); **Hết hàng** là số mã có Tồn bằng 0.
+- **So sánh theo**: Nhãn, Dòng, BST, Tuổi vàng, Chủng loại, Khung giá hoặc Cửa hàng. Bấm tên một dòng trong bảng để thêm giá trị đó vào bộ lọc; bấm tiêu đề cột để sắp xếp. Mã thiếu thuộc tính nằm ở dòng "Ngoài bộ sưu tập", "Chưa có tuổi vàng"... Tổng các dòng bằng số tổng.
+- **Top 10**: "Bán chạy nhất" và "Còn thiếu nhiều nhất"; bấm một mã để mở chi tiết ngay trên trang phân tích.
+
+**Khi so sánh theo Cửa hàng:** một mã có thể có mặt ở nhiều cửa hàng nên tổng **Số mã** và **Thiếu** của các dòng cửa hàng **không bằng** số tổng (số tổng đếm mỗi mã một lần). Đây là bình thường.
+
 ---
 
 ## B. Dành cho quản trị
 
-Vào `<địa chỉ web>/login`, đăng nhập bằng tên đăng nhập và mật khẩu. Menu: **Danh mục · Sản phẩm · Ảnh · Nhập Excel · Số lượng · Xuất dữ liệu · Tài khoản**.
+Vào `<địa chỉ web>/login`, đăng nhập bằng tên đăng nhập và mật khẩu. Menu: **Danh mục · Sản phẩm · Ảnh · Nhập Excel · Số lượng · Xuất dữ liệu · Phân tích · Tài khoản**.
 
 ### B1. Thứ tự nhập dữ liệu lần đầu
 
