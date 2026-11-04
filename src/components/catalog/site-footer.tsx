@@ -1,4 +1,5 @@
 import { MessageCircle } from "lucide-react";
+import Link from "next/link";
 import { formatDateTime } from "@/lib/format";
 import { BRANCH_SHORT, CONTACT, teamsChatUrl } from "@/lib/site";
 import { getLastDataUpdate } from "@/server/services/catalog";
@@ -48,6 +49,16 @@ export async function SiteFooter() {
             ) : (
               <span>(Teams)</span>
             )}
+          </p>
+          <p>
+            <Link
+              href="/phan-tich"
+              prefetch={false}
+              data-testid="footer-analytics-link"
+              className="text-festive-text/80 focus-visible:outline-gold rounded text-xs underline-offset-2 hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+              Phân tích
+            </Link>
           </p>
         </div>
       </div>

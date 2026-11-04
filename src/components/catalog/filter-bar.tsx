@@ -38,12 +38,15 @@ export function FilterBar({
   facets,
   toolbar,
   sheetExtra,
+  showSort = true,
 }: {
   facets: FacetCounts;
   /** Sắp xếp + công tắc "Xem tất cả SP" (T04.7, T04.8); điện thoại chỉ còn nút sắp xếp. */
   toolbar?: React.ReactNode;
   /** Mục thêm trong bảng lọc điện thoại (công tắc "Xem tất cả SP"). */
   sheetExtra?: React.ReactNode;
+  /** Có sắp xếp (bảng lọc điện thoại, thanh dính, cột trái); trang phân tích tắt đi. */
+  showSort?: boolean;
 }) {
   const owned = (xs: FacetOption[]) =>
     xs.filter((o) => o.brandId).map((o) => ({ id: o.id, brandId: o.brandId as string }));
@@ -130,6 +133,7 @@ export function FilterBar({
         onClear={clearAll}
         onOpenSheet={() => setSheetOpen(true)}
         extra={sheetExtra}
+        showSort={showSort}
       />
 
       <FilterSheet
@@ -139,7 +143,7 @@ export function FilterBar({
         state={state}
         pending={pending}
         onToggle={toggle}
-        onSort={(sort) => go({ sort })}
+        onSort={showSort ? (sort) => go({ sort }) : undefined}
         onClear={() => go({ brand: [], line: [], col: [], mat: [], typ: [], pr: [] })}
         extra={sheetExtra}
       />
@@ -229,7 +233,8 @@ function FilterSheet({
   state: CatalogParams;
   pending: boolean;
   onToggle: (key: SheetKey, id: string) => void;
-  onSort: (sort: CatalogParams["sort"]) => void;
+  /** Không có thì bảng lọc không có mục Sắp xếp. */
+  onSort?: (sort: CatalogParams["sort"]) => void;
   onClear: () => void;
   extra?: React.ReactNode;
 }) {
@@ -289,19 +294,21 @@ function FilterSheet({
             </fieldset>
           );
         })}
-        <fieldset className="space-y-2">
-          <legend className="text-ink-muted mb-1 text-sm font-semibold">Sắp xếp</legend>
-          <div className="flex flex-wrap gap-2">
-            {visibleSorts(state.photo).map((sort) => (
-              <SheetChip
-                key={sort}
-                label={SORT_LABELS[sort]}
-                selected={state.sort === sort}
-                onClick={() => onSort(sort)}
-              />
-            ))}
-          </div>
-        </fieldset>
+        {onSort && (
+          <fieldset className="space-y-2">
+            <legend className="text-ink-muted mb-1 text-sm font-semibold">Sắp xếp</legend>
+            <div className="flex flex-wrap gap-2">
+              {visibleSorts(state.photo).map((sort) => (
+                <SheetChip
+                  key={sort}
+                  label={SORT_LABELS[sort]}
+                  selected={state.sort === sort}
+                  onClick={() => onSort(sort)}
+                />
+              ))}
+            </div>
+          </fieldset>
+        )}
       </div>
       <div className="border-line flex gap-3 border-t px-4 py-3">
         <button

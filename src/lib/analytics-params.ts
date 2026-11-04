@@ -7,3 +7,14 @@ export function parseGroupDim(raw: string | string[] | undefined): GroupDim {
   const v = Array.isArray(raw) ? raw[0] : raw;
   return GROUP_DIMS.includes(v as GroupDim) ? (v as GroupDim) : "brand";
 }
+
+/** Tên chiều nhóm trên nút chọn và tiêu đề cột Tên của bảng so sánh. */
+export const GROUP_DIM_LABELS: Record<GroupDim, string> = {
+  brand: "Nhãn",
+  line: "Dòng",
+  col: "BST",
+  mat: "Tuổi vàng",
+  typ: "Chủng loại",
+  pr: "Khung giá",
+  store: "Cửa hàng",
+};

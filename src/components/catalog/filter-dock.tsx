@@ -89,6 +89,8 @@ interface DockProps {
   onToggle: (key: SheetKey, id: string) => void;
   onRemove: (c: SelectedChip) => void;
   onClear: () => void;
+  /** Có menu sắp xếp (trang phân tích tắt đi). */
+  showSort: boolean;
 }
 
 /**
@@ -107,7 +109,7 @@ export function FilterDock({
   /** Mục thêm trong cột trái (công tắc "Xem tất cả SP"). */
   extra?: React.ReactNode;
 }) {
-  const { docked, facets, state, pending, chips, onToggle, onRemove, onClear } = props;
+  const { docked, facets, state, pending, chips, onToggle, onRemove, onClear, showSort } = props;
   const hidden = !docked;
   const groupCount = countGroupFilters(state);
   // Gắn thẳng vào <body>: thanh lọc gốc mờ đi khi đang tải (opacity tạo lớp xếp chồng riêng)
@@ -155,7 +157,7 @@ export function FilterDock({
               <span className="text-ink-muted hidden text-sm whitespace-nowrap lg:inline">
                 {pending ? "Đang lọc…" : `${formatInt(facets.total)} SP`}
               </span>
-              <SortMenu testId="dock-sort-menu" />
+              {showSort && <SortMenu testId="dock-sort-menu" />}
             </div>
           </div>
           <ActiveFilters
@@ -185,6 +187,7 @@ function FilterSidebar({
   onToggle,
   onRemove,
   onClear,
+  showSort,
   extra,
 }: DockProps & { extra?: React.ReactNode }) {
   const groups = nonEmptyGroups(facets);
@@ -270,10 +273,12 @@ function FilterSidebar({
             );
           })}
         </div>
-        <div>
-          <p className="text-ink-muted mb-2 text-sm font-semibold">Sắp xếp</p>
-          <SortMenu testId="sidebar-sort-menu" compact />
-        </div>
+        {showSort && (
+          <div>
+            <p className="text-ink-muted mb-2 text-sm font-semibold">Sắp xếp</p>
+            <SortMenu testId="sidebar-sort-menu" compact />
+          </div>
+        )}
       </div>
     </aside>
   );

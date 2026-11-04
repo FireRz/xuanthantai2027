@@ -19,7 +19,14 @@ export interface StoreOption {
  * Đổi cửa hàng áp dụng ngay; bấm "Tìm" áp dụng cả mã tìm và cuộn xuống danh sách.
  * Cuối hàng là công tắc "Chỉ xem hình" — thanh dính khi cuộn nên công tắc luôn trong tầm mắt.
  */
-export function StoreBar({ stores }: { stores: StoreOption[] }) {
+export function StoreBar({
+  stores,
+  showPhotoSwitch = true,
+}: {
+  stores: StoreOption[];
+  /** Công tắc "Chỉ xem hình" — trang phân tích không có (chỉ có số). */
+  showPhotoSwitch?: boolean;
+}) {
   const { state: params, go: navigate, pending } = useCatalogNav();
   const [q, setQ] = useState(params.q);
   const [prevQ, setPrevQ] = useState(params.q);
@@ -119,7 +126,7 @@ export function StoreBar({ stores }: { stores: StoreOption[] }) {
         >
           Tìm
         </button>
-        <PhotoSwitch />
+        {showPhotoSwitch && <PhotoSwitch />}
       </form>
     </div>
   );
