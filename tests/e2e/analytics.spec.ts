@@ -5,6 +5,7 @@ import {
   setViewerPassword,
   verifyViewerPassword,
 } from "../../src/server/auth/viewer-pass";
+import { assertLocalDatabase } from "./helpers";
 import { SORT_LABELS } from "../../src/components/catalog/catalog-toolbar";
 
 // Trang /phan-tich (cổng mật khẩu xem chung). Chạy trên DB dev đã seed (npm run seed).
@@ -35,7 +36,10 @@ async function releasePassword() {
   }
 }
 
-test.beforeAll(acquirePassword);
+test.beforeAll(async () => {
+  assertLocalDatabase();
+  await acquirePassword();
+});
 test.afterAll(async () => {
   await releasePassword();
   await prisma.$disconnect();

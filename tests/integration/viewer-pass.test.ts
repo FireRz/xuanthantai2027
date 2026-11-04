@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { prisma } from "@/server/db";
-import { MIN_PASSWORD_LENGTH } from "@/lib/password";
+import { MIN_PASSWORD_LENGTH, verifyPassword } from "@/lib/password";
 import { LOCK_WINDOW_MS, MAX_FAILED_ATTEMPTS } from "@/server/auth/login";
 import {
   clearViewerPassword,
@@ -12,6 +12,12 @@ import {
   verifyViewerPassword,
 } from "@/server/auth/viewer-pass";
 import { resetDb } from "./helpers";
+
+// Đếm số lần verifyPassword (scrypt) thật sự chạy, giữ nguyên hành vi gốc.
+vi.mock("@/lib/password", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/password")>();
+  return { ...actual, verifyPassword: vi.fn(actual.verifyPassword) };
+});
 
 const PASSWORD = "mat-khau-xem-chung";
 
@@ -86,6 +92,22 @@ describe("mật khẩu xem chung (ADR-012)", () => {
     const r = await verifyViewerPassword(PASSWORD, now);
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.reason).toBe("locked");
+  });
+
+  it("10 lần đoán sai song song: chỉ MAX_FAILED_ATTEMPTS lần được kiểm tra mật khẩu, còn lại bị khóa ngay", async () => {
+    await setViewerPassword(PASSWORD);
+    const now = new Date();
+    vi.mocked(verifyPassword).mockClear();
+    const results = await Promise.all(
+      Array.from({ length: 10 }, () => verifyViewerPassword("sai", now)),
+    );
+    expect(vi.mocked(verifyPassword)).toHaveBeenCalledTimes(MAX_FAILED_ATTEMPTS);
+    expect(results.filter((r) => !r.ok && r.reason === "invalid")).toHaveLength(
+      MAX_FAILED_ATTEMPTS,
+    );
+    expect(results.filter((r) => !r.ok && r.reason === "locked")).toHaveLength(
+      10 - MAX_FAILED_ATTEMPTS,
+    );
   });
 
   it("đúng mật khẩu thì xóa bộ đếm sai", async () => {

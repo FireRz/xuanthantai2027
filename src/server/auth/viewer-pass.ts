@@ -83,17 +83,9 @@ export async function verifyViewerPassword(
     if (lockedUntil > now) return { ok: false, reason: "locked", lockedUntil };
   }
 
-  if (await verifyPassword(password, hashRow.value)) {
-    if (byKey.has(K_FAILED) || lockedRow) {
-      await prisma.appSetting.deleteMany({ where: { key: { in: [K_FAILED, K_LOCKED] } } });
-    }
-    const version = parseVersion(byKey.get(K_VERSION)?.value);
-    const expiresAt = new Date(now.getTime() + VIEWER_COOKIE_MAX_AGE_S * 1000);
-    return { ok: true, cookie: signViewerCookie(version, expiresAt) };
-  }
-
-  // Tăng bộ đếm nguyên tử trong một câu lệnh (nhiều lần đoán song song không lọt qua khóa).
-  // Lần sai trước cách quá 15 phút (theo đồng hồ `now` truyền vào) thì đếm lại từ 1.
+  // Giữ chỗ lần đoán TRƯỚC khi chạy scrypt: tăng bộ đếm nguyên tử trong một câu lệnh, nên một loạt
+  // đoán song song không thể lọt hết qua khóa. Lần sai trước cách quá 15 phút (theo đồng hồ `now`
+  // truyền vào) thì đếm lại từ 1.
   const nowTs = now.toISOString();
   const cutoffTs = new Date(now.getTime() - LOCK_WINDOW_MS).toISOString();
   const [{ value }] = await prisma.$queryRaw<{ value: string }[]>(Prisma.sql`
@@ -104,8 +96,24 @@ export async function verifyViewerPassword(
                    THEN '1' ELSE (app_setting.value::int + 1)::text END,
       updated_at = (${nowTs}::timestamptz AT TIME ZONE 'UTC')
     RETURNING value`);
-  const failed = Number(value);
-  if (failed >= MAX_FAILED_ATTEMPTS) {
+  const attempt = Number(value);
+  if (attempt > MAX_FAILED_ATTEMPTS) {
+    // Đã đủ số lần đoán được phép (đang chạy dở hoặc đã khóa): không kiểm tra mật khẩu nữa.
+    const row = await prisma.appSetting.findUnique({ where: { key: K_LOCKED } });
+    const written = row ? new Date(row.value) : null;
+    const lockedUntil =
+      written && written > now ? written : new Date(now.getTime() + LOCK_WINDOW_MS);
+    return { ok: false, reason: "locked", lockedUntil };
+  }
+
+  if (await verifyPassword(password, hashRow.value)) {
+    await prisma.appSetting.deleteMany({ where: { key: { in: [K_FAILED, K_LOCKED] } } });
+    const version = parseVersion(byKey.get(K_VERSION)?.value);
+    const expiresAt = new Date(now.getTime() + VIEWER_COOKIE_MAX_AGE_S * 1000);
+    return { ok: true, cookie: signViewerCookie(version, expiresAt) };
+  }
+
+  if (attempt >= MAX_FAILED_ATTEMPTS) {
     await put(K_LOCKED, new Date(now.getTime() + LOCK_WINDOW_MS).toISOString());
   }
   return { ok: false, reason: "invalid" };

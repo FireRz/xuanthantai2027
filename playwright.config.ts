@@ -2,7 +2,7 @@ import "dotenv/config";
 import { defineConfig, devices } from "@playwright/test";
 
 const ADMIN_WRITE =
-  /(admin-products|admin-product-image|master-data|admin-quantities|admin-import|admin-export)\.spec\.ts/;
+  /(admin-products|admin-product-image|master-data|admin-quantities|admin-import|admin-export|analytics-access)\.spec\.ts/;
 const port = Number(process.env.E2E_PORT ?? 3100);
 
 // Hai viewport bắt buộc theo Definition of Done: điện thoại 375px và máy tính 1280px.

@@ -59,3 +59,17 @@ export function makePng(width: number, height: number, [r, g, b]: [number, numbe
     chunk("IEND", Buffer.alloc(0)),
   ]);
 }
+
+/** Chặn test ghi mật khẩu xem chung vào DB không phải máy local (DATABASE_URL phải trỏ localhost). */
+export function assertLocalDatabase() {
+  const url = process.env.DATABASE_URL ?? "";
+  let host = "";
+  try {
+    host = new URL(url).hostname;
+  } catch {
+    // URL sai dạng → coi như không an toàn
+  }
+  if (host !== "localhost" && host !== "127.0.0.1") {
+    throw new Error(`Từ chối chạy: DATABASE_URL không trỏ về localhost (host: "${host}")`);
+  }
+}
