@@ -13,10 +13,12 @@ import { cn } from "@/lib/utils";
 export function ImageZoom({
   src,
   alt,
+  className,
   children,
 }: {
   src: string | null;
   alt: string;
+  className?: string;
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -55,7 +57,7 @@ export function ImageZoom({
         type="button"
         aria-label={`Phóng to ảnh ${alt}`}
         onClick={() => setOpen(true)}
-        className="relative block w-full cursor-zoom-in"
+        className={cn("relative mx-auto block w-full cursor-zoom-in", className)}
       >
         {children}
         <span

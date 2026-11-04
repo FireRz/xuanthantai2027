@@ -91,15 +91,16 @@ function DetailBody({
     >
       <div className="grid shrink-0 gap-4 p-4 md:grid-cols-[300px_1fr] md:gap-6 md:px-6 md:py-5">
         {/* Điện thoại: ảnh tối đa 30% chiều cao màn hình để số liệu hiện ngay màn đầu; chế độ hình thì ảnh là nội dung chính nên không giới hạn. */}
-        <ImageZoom src={d.imageUrl ?? d.thumbUrl} alt={d.name ?? d.sku}>
+        <ImageZoom
+          src={d.imageUrl ?? d.thumbUrl}
+          alt={d.name ?? d.sku}
+          className={cn("md:max-w-none", !photo && "max-w-[30vh]")}
+        >
           <ProductImage
             thumbUrl={d.imageUrl ?? d.thumbUrl}
             alt={d.name ?? d.sku}
             priority
-            className={cn(
-              "border-line mx-auto aspect-square w-full rounded-xl border md:max-w-none",
-              !photo && "max-w-[30vh]",
-            )}
+            className="border-line aspect-square w-full rounded-xl border"
           />
         </ImageZoom>
         <div className="min-w-0">
