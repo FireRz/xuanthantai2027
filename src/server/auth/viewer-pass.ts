@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/server/db";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { assertPasswordPolicy } from "./admin-account";
@@ -21,10 +22,14 @@ export type ViewerVerifyResult =
   | { ok: false; reason: "invalid" | "unset" }
   | { ok: false; reason: "locked"; lockedUntil: Date };
 
+function parseVersion(value: string | undefined): number {
+  const n = value === undefined ? 0 : Number(value);
+  return Number.isInteger(n) && n >= 0 ? n : 0;
+}
+
 async function getVersion(): Promise<number> {
   const row = await prisma.appSetting.findUnique({ where: { key: K_VERSION } });
-  const n = row ? Number(row.value) : 0;
-  return Number.isInteger(n) && n >= 0 ? n : 0;
+  return parseVersion(row?.value);
 }
 
 function put(key: string, value: string) {
@@ -82,16 +87,24 @@ export async function verifyViewerPassword(
     if (byKey.has(K_FAILED) || lockedRow) {
       await prisma.appSetting.deleteMany({ where: { key: { in: [K_FAILED, K_LOCKED] } } });
     }
-    const version = Number(byKey.get(K_VERSION)?.value ?? 0);
+    const version = parseVersion(byKey.get(K_VERSION)?.value);
     const expiresAt = new Date(now.getTime() + VIEWER_COOKIE_MAX_AGE_S * 1000);
     return { ok: true, cookie: signViewerCookie(version, expiresAt) };
   }
 
-  const failedRow = byKey.get(K_FAILED);
-  const stale = !!failedRow && now.getTime() - failedRow.updatedAt.getTime() > LOCK_WINDOW_MS;
-  const previous = failedRow && !stale ? Number(failedRow.value) || 0 : 0;
-  const failed = previous + 1;
-  await put(K_FAILED, String(failed));
+  // Tăng bộ đếm nguyên tử trong một câu lệnh (nhiều lần đoán song song không lọt qua khóa).
+  // Lần sai trước cách quá 15 phút (theo đồng hồ `now` truyền vào) thì đếm lại từ 1.
+  const nowTs = now.toISOString();
+  const cutoffTs = new Date(now.getTime() - LOCK_WINDOW_MS).toISOString();
+  const [{ value }] = await prisma.$queryRaw<{ value: string }[]>(Prisma.sql`
+    INSERT INTO app_setting (key, value, updated_at)
+    VALUES (${K_FAILED}, '1', (${nowTs}::timestamptz AT TIME ZONE 'UTC'))
+    ON CONFLICT (key) DO UPDATE SET
+      value = CASE WHEN app_setting.updated_at < (${cutoffTs}::timestamptz AT TIME ZONE 'UTC')
+                   THEN '1' ELSE (app_setting.value::int + 1)::text END,
+      updated_at = (${nowTs}::timestamptz AT TIME ZONE 'UTC')
+    RETURNING value`);
+  const failed = Number(value);
   if (failed >= MAX_FAILED_ATTEMPTS) {
     await put(K_LOCKED, new Date(now.getTime() + LOCK_WINDOW_MS).toISOString());
   }

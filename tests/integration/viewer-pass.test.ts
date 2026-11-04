@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/server/db";
 import { MIN_PASSWORD_LENGTH } from "@/lib/password";
-import { LOCK_WINDOW_MS } from "@/server/auth/login";
+import { LOCK_WINDOW_MS, MAX_FAILED_ATTEMPTS } from "@/server/auth/login";
 import {
   clearViewerPassword,
   isCurrentViewerCookie,
@@ -50,7 +50,7 @@ describe("mật khẩu xem chung (ADR-012)", () => {
 
   it("sai 5 lần → locked; lần 6 đúng mật khẩu vẫn locked; sau 15 phút + 1ms thì đúng là ok", async () => {
     await setViewerPassword(PASSWORD);
-    const t0 = new Date(); // updatedAt của bộ đếm do DB đặt theo giờ thật nên mốc phải gần giờ thật
+    const t0 = new Date();
     for (let i = 0; i < 5; i++) {
       expect(await verifyViewerPassword("sai", t0)).toEqual({ ok: false, reason: "invalid" });
     }
@@ -70,12 +70,22 @@ describe("mật khẩu xem chung (ADR-012)", () => {
     for (let i = 0; i < 4; i++) await verifyViewerPassword("sai", t0);
     // Lần sai thứ 5 nhưng muộn hơn cửa sổ → chỉ tính là lần sai đầu tiên, chưa khóa.
     const late = new Date(t0.getTime() + LOCK_WINDOW_MS + 60_000);
-    await prisma.appSetting.update({
-      where: { key: "viewer_failed_count" },
-      data: { updatedAt: t0 },
-    });
     expect(await verifyViewerPassword("sai", late)).toEqual({ ok: false, reason: "invalid" });
     expect((await verifyViewerPassword(PASSWORD, late)).ok).toBe(true);
+  });
+
+  it("10 lần đoán sai song song vẫn bị khóa (bộ đếm tăng nguyên tử)", async () => {
+    await setViewerPassword(PASSWORD);
+    const now = new Date();
+    await Promise.all(Array.from({ length: 10 }, () => verifyViewerPassword("sai", now)));
+    // Lần đến sau khi đã khóa thì không tăng nữa, nên chỉ cần ít nhất 5 lần được đếm (không mất lần nào).
+    const count = Number(
+      (await prisma.appSetting.findUniqueOrThrow({ where: { key: "viewer_failed_count" } })).value,
+    );
+    expect(count).toBeGreaterThanOrEqual(MAX_FAILED_ATTEMPTS);
+    const r = await verifyViewerPassword(PASSWORD, now);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.reason).toBe("locked");
   });
 
   it("đúng mật khẩu thì xóa bộ đếm sai", async () => {
