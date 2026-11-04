@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowUpDown, ChevronDown } from "lucide-react";
-import { PHOTO_HIDDEN_SORTS, SORTS, type Sort } from "@/lib/catalog-params";
+import { visibleSorts, type Sort } from "@/lib/catalog-params";
 import { cn } from "@/lib/utils";
 import { useCatalogNav } from "./catalog-nav";
 
@@ -42,7 +42,7 @@ export function SortMenu({
         onChange={(e) => go({ sort: e.target.value as Sort })}
         className="absolute inset-0 size-full cursor-pointer opacity-0"
       >
-        {SORTS.filter((s) => !(state.photo && PHOTO_HIDDEN_SORTS.includes(s))).map((s) => (
+        {visibleSorts(state.photo).map((s) => (
           <option key={s} value={s}>
             {SORT_LABELS[s]}
           </option>

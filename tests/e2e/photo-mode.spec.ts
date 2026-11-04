@@ -65,6 +65,27 @@ test.describe("chế độ Chỉ xem hình", () => {
     await expect(page.getByTestId("sort-menu")).toHaveValue("sku");
   });
 
+  test("điện thoại: bảng lọc ở chế độ hình không có kiểu sắp xếp dựa trên số lượng", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "Chỉ điện thoại");
+    await page.goto("/?xem=hinh");
+    await page.getByTestId("open-filter-sheet").click();
+    const sheet = page.getByTestId("filter-sheet");
+    await expect(sheet.getByRole("button", { name: "Mã SP A→Z" })).toBeVisible();
+    await expect(sheet.getByRole("button", { name: "Còn thiếu nhiều nhất" })).toHaveCount(0);
+    await expect(sheet.getByRole("button", { name: "Bán chạy nhất" })).toHaveCount(0);
+  });
+
+  test("0 kết quả: Xóa lọc giữ chế độ Chỉ xem hình", async ({ page }) => {
+    await page.goto("/?xem=hinh&q=KHONG-CO-MA-NAY");
+    await page.getByRole("link", { name: "Xóa lọc" }).click();
+    await expect(cards(page).first()).toBeVisible();
+    await expect(page).toHaveURL(/xem=hinh/);
+    await expect(page).not.toHaveURL(/q=/);
+  });
+
   test("/?xem=hinh&view=list ở 375px: không cuộn ngang cả trang", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/?xem=hinh&view=list");

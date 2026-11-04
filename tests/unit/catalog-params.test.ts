@@ -4,6 +4,7 @@ import {
   PAGE_SIZE,
   parseCatalogParams,
   pruneInvalidSelections,
+  visibleSorts,
 } from "@/lib/catalog-params";
 
 const ID = "0f8fad5b-d9cb-469f-a165-70867728950e";
@@ -164,5 +165,18 @@ describe("T04.9 — pruneInvalidSelections", () => {
       cols,
     );
     expect(r).toEqual({ brand: [], line: [LA], col: [ID] });
+  });
+});
+
+describe("visibleSorts", () => {
+  it("chế độ đầy đủ → đủ mọi kiểu sắp xếp", () => {
+    expect(visibleSorts(false)).toContain("shortage");
+    expect(visibleSorts(false)).toContain("sold");
+  });
+  it("chế độ Chỉ xem hình → ẩn Còn thiếu và Bán chạy", () => {
+    const r = visibleSorts(true);
+    expect(r).not.toContain("shortage");
+    expect(r).not.toContain("sold");
+    expect(r).toContain("sku");
   });
 });

@@ -83,15 +83,12 @@ export function ProductSwipe({
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  // Tải trước SP kế bên để chuyển nhanh và ảnh hiện ngay.
+  // Chỉ tải trước ảnh SP kế bên (không router.prefetch: trang force-dynamic, prefetch đầy đủ rất tốn).
   const prevImage = neighbors?.prevImage ?? null;
   const nextImage = neighbors?.nextImage ?? null;
-  const prevUrl = prev ? urlFor(prev) : null;
-  const nextUrl = next ? urlFor(next) : null;
   useEffect(() => {
-    for (const url of [prevUrl, nextUrl]) if (url) router.prefetch(url);
     for (const src of [prevImage, nextImage]) if (src) new Image().src = src;
-  }, [router, prevUrl, nextUrl, prevImage, nextImage]);
+  }, [prevImage, nextImage]);
 
   function setOffset(dx: number, animate: boolean) {
     const el = contentRef.current;

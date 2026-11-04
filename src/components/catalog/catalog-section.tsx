@@ -59,7 +59,7 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
       {total === 0 ? (
         <EmptyState
           canClear={hasActiveFilter(params)}
-          clearHref={`${buildCatalogQuery({ sort: params.sort, view: params.view })}#san-pham`}
+          clearHref={`${buildCatalogQuery({ sort: params.sort, view: params.view, photo: params.photo })}#san-pham`}
           storeOnly={Boolean(params.store && !params.all && scope.kind === "store")}
           q={params.q}
         />

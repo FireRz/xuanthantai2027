@@ -14,6 +14,11 @@ export type View = (typeof VIEWS)[number];
 /** Kiểu sắp xếp bị ẩn ở chế độ "Chỉ xem hình" (dựa trên số lượng) — rơi về `sku`. */
 export const PHOTO_HIDDEN_SORTS: readonly Sort[] = ["shortage", "sold"];
 
+/** Các kiểu sắp xếp được phép chọn: chế độ "Chỉ xem hình" bỏ những kiểu dựa trên số lượng. */
+export function visibleSorts(photo: boolean): Sort[] {
+  return SORTS.filter((s) => !(photo && PHOTO_HIDDEN_SORTS.includes(s)));
+}
+
 /** Giá trị đặc biệt của bộ lọc BST: SP không thuộc BST nào. */
 export const NO_COLLECTION = "none";
 /** Số SP mỗi lần tải (T03.5). */

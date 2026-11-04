@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   countGroupFilters,
   hasActiveFilter,
-  SORTS,
+  visibleSorts,
   type CatalogParams,
 } from "@/lib/catalog-params";
 import { formatInt } from "@/lib/format";
@@ -292,7 +292,7 @@ function FilterSheet({
         <fieldset className="space-y-2">
           <legend className="text-ink-muted mb-1 text-sm font-semibold">Sắp xếp</legend>
           <div className="flex flex-wrap gap-2">
-            {SORTS.map((sort) => (
+            {visibleSorts(state.photo).map((sort) => (
               <SheetChip
                 key={sort}
                 label={SORT_LABELS[sort]}
