@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { beVietnam, playfair } from "@/lib/fonts";
+import { BRANCH_SHORT, SITE_NAME } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Xuân Thần Tài 2027",
+  title: `${SITE_NAME} · ${BRANCH_SHORT}`,
   description: "Bộ sưu tập trang sức mùa Xuân Thần Tài",
   // Không cho công cụ tìm kiếm lập chỉ mục bất kỳ trang nào (ADR-005 I6).
   robots: { index: false, follow: false },

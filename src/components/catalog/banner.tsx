@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { BRANCH_FULL } from "@/lib/site";
 import { BannerFx } from "./banner-fx";
 
 /**
@@ -34,6 +35,13 @@ export function Banner() {
         </p>
         <p className="text-festive-text mx-auto mt-4 hidden max-w-2xl text-[15px] md:text-base lg:block">
           Theo dõi số lượng đặt và hàng đã về của các bộ sưu tập Xuân Thần Tài
+        </p>
+        {/* Cùng chữ với dòng trên; điện thoại (dòng trên ẩn) vẫn hiện, co theo chiều rộng. */}
+        <p
+          data-testid="branch-name"
+          className="text-festive-text mx-auto mt-[0.5vw] max-w-2xl text-[3vw] sm:mt-1 sm:text-[15px] md:text-base"
+        >
+          {BRANCH_FULL}
         </p>
       </div>
       <svg
