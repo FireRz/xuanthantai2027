@@ -145,6 +145,8 @@ export interface GroupRow extends AnalyticsTotals {
   /** Id UUID, mã cửa hàng, hoặc null cho dòng rỗng. */
   id: string | null;
   name: string;
+  /** Nhãn sở hữu: chỉ có ở chiều dòng và BST (tên có thể lặp giữa các nhãn); còn lại null. */
+  brandName: string | null;
 }
 
 /** Khóa ngoại trên bí danh p, bí danh bảng tên (đã JOIN trong catalogFromSql) và tên dòng rỗng. */
@@ -164,7 +166,7 @@ const ATTR_DIMS: Record<
   pr: { fk: Prisma.sql`p.price_range_id`, label: Prisma.sql`pr.name`, empty: "Ngoài khung giá" },
 };
 
-type GroupSqlRow = TotalsRow & { id: string | null; name: string };
+type GroupSqlRow = TotalsRow & { id: string | null; name: string; brand_name: string | null };
 
 /**
  * Bảng so sánh theo nhóm (§5.3). Chiều thuộc tính SP: GROUP BY khóa ngoại trên đúng tập SP
@@ -186,7 +188,7 @@ export async function getGroupBreakdown(
     const onlyStore = store ? Prisma.sql`AND st.id = ${store.id}::uuid` : Prisma.empty;
     rows = await prisma.$queryRaw<GroupSqlRow[]>`
       WITH s AS (SELECT p.id ${from})
-      SELECT st.code AS id, st.name,
+      SELECT st.code AS id, st.name, NULL::text AS brand_name,
         (COUNT(*) FILTER (WHERE q.qty_ordered > 0))::bigint AS products,
         COALESCE(SUM(q.qty_ordered), 0)::bigint AS ordered,
         COALESCE(SUM(q.qty_received), 0)::bigint AS received,
@@ -197,14 +199,20 @@ export async function getGroupBreakdown(
       JOIN store_product_qty q ON q.product_id = s.id
       JOIN store st ON st.id = q.store_id AND st.active ${onlyStore}
       GROUP BY st.id, st.code, st.name
-      ORDER BY products DESC, st.name ASC`;
+      ORDER BY products DESC, st.name ASC, st.code ASC`;
   } else {
     const { fk, label, empty } = ATTR_DIMS[dim];
+    // Khóa ngoại kép đảm bảo dòng/BST cùng nhãn với SP nên MAX(b.name) chính xác; dòng rỗng không có nhãn.
+    const brandName =
+      dim === "line" || dim === "col"
+        ? Prisma.sql`CASE WHEN ${fk} IS NULL THEN NULL ELSE MAX(b.name) END`
+        : Prisma.sql`NULL::text`;
     rows = await prisma.$queryRaw<GroupSqlRow[]>`
-      SELECT (${fk})::text AS id, COALESCE(MAX(${label}), ${empty}) AS name, ${totalsSelectSql()}
+      SELECT (${fk})::text AS id, COALESCE(MAX(${label}), ${empty}) AS name,
+        ${brandName} AS brand_name, ${totalsSelectSql()}
       ${from}
       GROUP BY ${fk}
-      ORDER BY products DESC, name ASC`;
+      ORDER BY products DESC, name ASC, brand_name ASC NULLS LAST, id ASC`;
   }
-  return rows.map((r) => ({ id: r.id, name: r.name, ...rowToTotals(r) }));
+  return rows.map((r) => ({ id: r.id, name: r.name, brandName: r.brand_name, ...rowToTotals(r) }));
 }

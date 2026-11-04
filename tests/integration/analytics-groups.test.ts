@@ -120,9 +120,33 @@ describe("Phân tích — getGroupBreakdown, chiều thuộc tính SP", () => {
       const params = { ...base, store: "S2" };
       const rows = await getGroupBreakdown(params, dim);
       const s = await getAnalyticsSummary(params);
-      for (const k of ["products", "ordered", "shortage", "stock"] as Key[]) {
+      for (const k of ["products", "ordered", "received", "shortage", "sold", "stock"] as Key[]) {
         expect(sum(rows, k)).toBe(s[k]);
       }
+    }
+  });
+
+  it("line/col có brandName của nhãn sở hữu, dòng rỗng và chiều khác là null; thứ tự xác định", async () => {
+    const fx = await setup();
+    for (const dim of ["line", "col"] as GroupDim[]) {
+      const rows = await getGroupBreakdown(base, dim);
+      const named = rows.filter((r) => r.id !== null);
+      // tên "Nhẫn"/"BST 1" lặp ở hai nhãn nên có nhiều dòng cùng tên, khác brandName
+      expect(new Set(named.map((r) => r.name)).size).toBeLessThan(named.length);
+      expect(named.every((r) => ["Nhãn A", "Nhãn B"].includes(r.brandName!))).toBe(true);
+      expect(rows.filter((r) => r.id === null).every((r) => r.brandName === null)).toBe(true);
+      for (let i = 1; i < rows.length; i++) {
+        const [a, b] = [rows[i - 1], rows[i]];
+        if (a.products === b.products && a.name === b.name && a.brandName && b.brandName) {
+          expect(a.brandName <= b.brandName).toBe(true);
+        }
+      }
+    }
+    const lineRow = (await getGroupBreakdown(base, "line"))[0];
+    const line = await prisma.productLine.findUniqueOrThrow({ where: { id: lineRow.id! } });
+    expect(lineRow.brandName).toBe(fx.brands.find((b) => b.brand.id === line.brandId)!.brand.name);
+    for (const dim of ["brand", "mat", "typ", "pr", "store"] as GroupDim[]) {
+      expect((await getGroupBreakdown(base, dim)).every((r) => r.brandName === null)).toBe(true);
     }
   });
 
@@ -224,6 +248,20 @@ describe("Phân tích — getGroupBreakdown, chiều store", () => {
     // chọn cửa hàng ẩn → rơi về tổng hệ thống (hai cửa hàng đang hiện)
     const hidden = await getGroupBreakdown({ ...base, store: "S3" }, "store");
     expect(hidden.map((r) => r.id).sort()).toEqual(["S1", "S2"]);
+  });
+
+  it("chọn cửa hàng + all=1: products = số SP đặt>0 ở cửa hàng đó, khác summary.products", async () => {
+    const fx = await setup();
+    const params = { ...base, store: "S1", all: true };
+    const rows = await getGroupBreakdown(params, "store");
+    const s = await getAnalyticsSummary(params);
+    const expected = await prisma.storeProductQty.count({
+      where: { storeId: fx.stores[0].id, qtyOrdered: { gt: 0 } },
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].id).toBe("S1");
+    expect(rows[0].products).toBe(expected);
+    expect(s.products).toBeGreaterThan(expected);
   });
 
   it("cửa hàng không có cặp nào trong tập → không có dòng", async () => {
