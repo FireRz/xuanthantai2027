@@ -2,8 +2,15 @@ import { Prisma } from "@prisma/client";
 import { computeMetrics, type QtyMetrics } from "@/lib/metrics";
 import type { CatalogParams } from "@/lib/catalog-params";
 import { prisma } from "@/server/db";
-import { visibleProductJoinsSql, visibleProductSql } from "@/server/repositories/visibility";
-import { buildWhere, findActiveStore, orderBySql, qtyJoinSql } from "./catalog-filter";
+import { visibleProductJoinsSql } from "@/server/repositories/visibility";
+import {
+  buildWhere,
+  findActiveStore,
+  orderBySql,
+  qtyJoinSql,
+  type FilterInput,
+  type ScopeStore,
+} from "./catalog-filter";
 
 export { findActiveStore } from "./catalog-filter";
 export { getFacetCounts } from "./catalog-facets";
@@ -61,6 +68,18 @@ type ListParams = Pick<CatalogParams, "store" | "all" | "q"> &
   };
 
 /**
+ * Phần `FROM … WHERE` dùng chung cho danh sách, đếm và SP trước/sau trong popup:
+ * cùng bộ lọc, tìm mã, phạm vi cửa hàng ("Xem tất cả SP"). Bí danh: p, b, l, c, m, pt, pr, q.
+ */
+export function catalogFromSql(
+  params: FilterInput & Pick<CatalogParams, "all">,
+  store: ScopeStore | null,
+) {
+  const where = buildWhere(params, { store, all: params.all });
+  return Prisma.sql`FROM product p ${visibleProductJoinsSql} ${qtyJoinSql(store)} WHERE ${Prisma.join(where, " AND ")}`;
+}
+
+/**
  * Danh sách SP hiển thị được kèm số liệu theo phạm vi:
  * - không chọn cửa hàng → tổng hệ thống (view product_totals, CH ẩn không cộng);
  * - chọn cửa hàng → số của cửa hàng đó, mặc định chỉ SP có đặt > 0 (ADR-002 D6), `all` hiện mọi SP.
@@ -71,8 +90,7 @@ export async function listProducts(params: ListParams): Promise<ProductListResul
   const limit = params.limit === null ? Prisma.sql`ALL` : (params.limit ?? 24);
   const offset = params.offset ?? 0;
 
-  const where = buildWhere(params, { store, all: params.all });
-  const from = Prisma.sql`FROM product p ${visibleProductJoinsSql} ${qtyJoinSql(store)} WHERE ${Prisma.join(where, " AND ")}`;
+  const from = catalogFromSql(params, store);
 
   const [rows, count] = await Promise.all([
     prisma.$queryRaw<Row[]>`

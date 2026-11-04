@@ -78,8 +78,10 @@ export default async function HomePage({
           </ResultsFade>
         </section>
       </main>
+      {/* Khóa cố định: chuyển SP trước/sau trong popup (transition) giữ popup cũ trên màn hình,
+          không nháy khung chờ, ProductDialog không gắn lại. Mở popup lần đầu vẫn hiện khung chờ. */}
       {params.sp && (
-        <Suspense key={params.sp} fallback={<ProductDetailFallback />}>
+        <Suspense key="sp" fallback={<ProductDetailFallback />}>
           <ProductDetailSection sku={params.sp} params={params} />
         </Suspense>
       )}

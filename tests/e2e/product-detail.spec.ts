@@ -108,6 +108,8 @@ test.describe("T05.5 ?sp= và đóng popup", () => {
       orderBy: { sku: "asc" },
     });
     await page.goto(`/?q=${p.sku.slice(0, 3)}&sort=price_asc&sp=${p.sku}`);
+    // Chờ nội dung hiện hẳn: lúc đang truyền dần (streaming), khung chờ và nội dung ẩn cùng có trong trang.
+    await expect(page.getByTestId("product-detail")).toBeVisible();
     await expect(page.getByTestId("product-detail")).toHaveAttribute("data-sku", p.sku);
     await expect(dialog(page)).toBeVisible(); // đã hydrate và mở dạng modal
     await page.keyboard.press("Escape");

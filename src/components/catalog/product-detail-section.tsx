@@ -3,13 +3,18 @@ import { sellThrough } from "@/lib/metrics";
 import { stockStatus } from "@/lib/status";
 import { cn } from "@/lib/utils";
 import { getProductDetail, type ProductDetail } from "@/server/services/product-detail";
+import { getProductNeighbors } from "@/server/services/product-neighbors";
 import type { CatalogParams } from "@/lib/catalog-params";
 import { ImageZoom } from "./image-zoom";
 import { ProductDialog } from "./product-dialog";
 import { ProductImage } from "./product-image";
+import { NeighborButtons, NeighborPosition, ProductSwipe } from "./product-swipe";
 import { StatusBadge } from "./status-badge";
 
-/** Popup chi tiết SP theo `?sp=` (F05). Mã không có / SP bị ẩn → thông báo "Không tìm thấy sản phẩm" (T05.6). */
+/**
+ * Popup chi tiết SP theo `?sp=` (F05). Mã không có / SP bị ẩn → thông báo "Không tìm thấy sản phẩm" (T05.6).
+ * Kèm SP trước/sau theo danh sách đang xem để vuốt / bấm mũi tên / phím ←→ chuyển SP.
+ */
 export async function ProductDetailSection({
   sku,
   params,
@@ -17,7 +22,10 @@ export async function ProductDetailSection({
   sku: string;
   params: CatalogParams;
 }) {
-  const detail = await getProductDetail(sku, params.store);
+  const [detail, neighbors] = await Promise.all([
+    getProductDetail(sku, params.store),
+    getProductNeighbors(params, sku),
+  ]);
   if (!detail) {
     return (
       <ProductDialog title="Không tìm thấy sản phẩm">
@@ -29,7 +37,9 @@ export async function ProductDetailSection({
   }
   return (
     <ProductDialog title={detail.name ?? detail.sku}>
-      <DetailBody detail={detail} filterStore={params.store} photo={params.photo} />
+      <ProductSwipe neighbors={neighbors}>
+        <DetailBody detail={detail} filterStore={params.store} photo={params.photo} />
+      </ProductSwipe>
     </ProductDialog>
   );
 }
@@ -89,22 +99,31 @@ function DetailBody({
       data-photo={photo ? "" : undefined}
       className="md:flex md:min-h-0 md:flex-1 md:flex-col"
     >
-      <div className="grid shrink-0 gap-4 p-4 md:grid-cols-[300px_1fr] md:gap-6 md:px-6 md:py-5">
+      {/* Vùng vuốt sang SP trước/sau: ảnh + khối thông tin (không gồm bảng cửa hàng — bảng đó cuộn ngang). */}
+      <div
+        data-swipe-area
+        className="grid shrink-0 touch-pan-y touch-pinch-zoom gap-4 p-4 md:grid-cols-[300px_1fr] md:gap-6 md:px-6 md:py-5"
+      >
         {/* Điện thoại: ảnh tối đa 30% chiều cao màn hình để số liệu hiện ngay màn đầu; chế độ hình thì ảnh là nội dung chính nên không giới hạn. */}
-        <ImageZoom
-          src={d.imageUrl ?? d.thumbUrl}
-          alt={d.name ?? d.sku}
-          className={cn("md:max-w-none", !photo && "max-w-[30vh]")}
-        >
-          <ProductImage
-            thumbUrl={d.imageUrl ?? d.thumbUrl}
+        <NeighborButtons>
+          <ImageZoom
+            src={d.imageUrl ?? d.thumbUrl}
             alt={d.name ?? d.sku}
-            priority
-            className="border-line aspect-square w-full rounded-xl border"
-          />
-        </ImageZoom>
+            className={cn("md:max-w-none", !photo && "max-w-[30vh]")}
+          >
+            <ProductImage
+              thumbUrl={d.imageUrl ?? d.thumbUrl}
+              alt={d.name ?? d.sku}
+              priority
+              className="border-line aspect-square w-full rounded-xl border"
+            />
+          </ImageZoom>
+        </NeighborButtons>
         <div className="min-w-0">
-          <p className="text-ink-muted font-medium tracking-wide uppercase">{d.sku}</p>
+          <p className="flex items-baseline justify-between gap-3">
+            <span className="text-ink-muted font-medium tracking-wide uppercase">{d.sku}</span>
+            <NeighborPosition />
+          </p>
           <p className="my-1.5">{classification}</p>
           <p>Tuổi vàng: {orDash(d.materialName)}</p>
           <p>Chủng loại: {orDash(d.productTypeName)}</p>
