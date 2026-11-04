@@ -31,6 +31,14 @@ Không cần đăng nhập. Mở đường link được gửi; dùng được t
 
 Bấm **Xuất Excel** để tải file chứa đúng danh sách đang lọc (kèm số lượng của cửa hàng bạn chọn, nếu có).
 
+### A4b. Chỉ xem hình — gửi link cho người chỉ cần xem mẫu
+
+Với người chỉ cần xem hình và thông tin sản phẩm (không cần số Đặt / Về / Thiếu / Bán / Tồn), gửi link có thêm `?xem=hinh`, ví dụ `https://<tên miền>/?xem=hinh`. Trang mở ra chỉ có ảnh, mã, tên, nhãn, dòng, BST, tuổi vàng, chủng loại và giá; không có thanh tiến độ, trạng thái, bảng số lượng theo cửa hàng, nút Xuất Excel hay kiểu sắp xếp theo thiếu / bán.
+
+- Bạn cũng có thể tự bật bằng nút **Chỉ xem hình** cạnh Lưới / Bảng; chế độ giữ nguyên khi lọc, tìm mã, mở chi tiết, bấm Xem thêm.
+- Đây chỉ là cách hiển thị gọn, không phải phân quyền: người nhận vẫn có thể bấm lại nút **Chỉ xem hình** để tắt và xem số lượng.
+- Trong chi tiết sản phẩm (cả hai chế độ): bấm ảnh để phóng to, dùng mũi tên hoặc phím ← / → (vuốt trái / phải trên điện thoại) để sang sản phẩm trước / sau.
+
 ### A5. Cách tính cần biết
 
 - **Còn thiếu** = Đặt − Về, không âm (Về nhiều hơn Đặt thì Còn thiếu = 0).

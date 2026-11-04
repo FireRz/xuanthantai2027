@@ -53,7 +53,7 @@ export function ProductDialog({ title, children }: { title: string; children: Re
         // Bấm vùng nền mờ phía ngoài cửa sổ (sự kiện rơi vào chính thẻ dialog).
         if (e.target === e.currentTarget) close();
       }}
-      className="animate-in fade-in zoom-in-95 max-md:slide-in-from-bottom-10 text-ink m-auto h-auto max-h-[92vh] w-[860px] max-w-[94vw] overflow-y-auto overscroll-contain rounded-2xl bg-white p-0 shadow-2xl duration-200 backdrop:bg-[rgba(43,26,18,.55)] motion-reduce:animate-none max-md:m-0 max-md:h-dvh max-md:max-h-none max-md:w-dvw max-md:max-w-none max-md:rounded-none md:overflow-hidden md:open:flex md:open:flex-col"
+      className="animate-in fade-in zoom-in-95 max-md:slide-in-from-bottom-10 text-ink m-auto h-auto max-h-[92vh] w-[860px] max-w-[94vw] overflow-y-auto overscroll-contain rounded-2xl bg-white p-0 shadow-2xl duration-200 backdrop:bg-[rgba(43,26,18,.55)] motion-reduce:animate-none max-md:m-0 max-md:h-dvh max-md:max-h-none max-md:w-dvw max-md:max-w-none max-md:rounded-none md:overflow-hidden md:open:flex md:open:flex-col md:has-[[data-photo]]:h-fit"
     >
       <div className="border-line sticky top-0 z-10 flex shrink-0 items-center justify-between gap-3 border-b bg-white px-4 py-3 md:px-6 md:py-4">
         <h2

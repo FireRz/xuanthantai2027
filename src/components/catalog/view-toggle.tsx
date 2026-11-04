@@ -46,6 +46,7 @@ export function PhotoModeToggle({ params }: { params: CatalogParams }) {
       scroll={false}
       replace
       aria-pressed={params.photo}
+      aria-label="Chỉ xem hình"
       className={cn(
         "border-line inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium",
         params.photo

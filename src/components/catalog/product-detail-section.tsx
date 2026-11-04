@@ -85,6 +85,7 @@ function DetailBody({
     <div
       data-testid="product-detail"
       data-sku={d.sku}
+      data-photo={photo ? "" : undefined}
       className="md:flex md:min-h-0 md:flex-1 md:flex-col"
     >
       <div className="grid shrink-0 gap-4 p-4 md:grid-cols-[300px_1fr] md:gap-6 md:px-6 md:py-5">
