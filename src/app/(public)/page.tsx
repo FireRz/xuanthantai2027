@@ -77,7 +77,7 @@ export default async function HomePage({
       </main>
       {params.sp && (
         <Suspense key={params.sp} fallback={<ProductDetailFallback />}>
-          <ProductDetailSection sku={params.sp} store={params.store} />
+          <ProductDetailSection sku={params.sp} params={params} />
         </Suspense>
       )}
       <BackToTop />

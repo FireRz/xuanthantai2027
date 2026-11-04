@@ -3,7 +3,13 @@ import { ProductCard } from "./product-card";
 import { RevealItem } from "./reveal";
 
 /** Lưới thẻ SP: 2 cột điện thoại, 3 cột tablet, 4 cột máy tính (UI-DESIGN §5). */
-export function ProductGrid({ items }: { items: ProductListItem[] }) {
+export function ProductGrid({
+  items,
+  photo = false,
+}: {
+  items: ProductListItem[];
+  photo?: boolean;
+}) {
   return (
     <ul
       data-testid="product-grid"
@@ -11,7 +17,7 @@ export function ProductGrid({ items }: { items: ProductListItem[] }) {
     >
       {items.map((item, i) => (
         <RevealItem key={item.id} className="min-w-0" delay={(i % 4) * 70}>
-          <ProductCard item={item} priority={i < 4} />
+          <ProductCard item={item} priority={i < 4} photo={photo} />
         </RevealItem>
       ))}
     </ul>

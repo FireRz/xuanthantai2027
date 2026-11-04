@@ -52,7 +52,7 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
           <b className="text-ink font-semibold">{scopeLabel}</b> · {formatInt(total)} SP
         </p>
         <div className="flex items-center gap-2">
-          <ExportButton params={params} />
+          {!params.photo && <ExportButton params={params} />}
         </div>
       </div>
 
@@ -65,7 +65,11 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
         />
       ) : (
         <>
-          {params.view === "list" ? <ProductTable items={items} /> : <ProductGrid items={items} />}
+          {params.view === "list" ? (
+            <ProductTable items={items} photo={params.photo} />
+          ) : (
+            <ProductGrid items={items} photo={params.photo} />
+          )}
           <div className="mt-8 flex flex-col items-center gap-2">
             <p className="text-ink-muted text-sm" data-testid="shown-count">
               Đang hiển thị {formatInt(items.length)} / {formatInt(total)} SP

@@ -13,9 +13,12 @@ import { StatusBadge } from "./status-badge";
 export function ProductCard({
   item,
   priority = false,
+  photo = false,
 }: {
   item: ProductListItem;
   priority?: boolean;
+  /** Chế độ "Chỉ xem hình": ẩn tiến độ, Bán/Tồn và nhãn trạng thái. */
+  photo?: boolean;
 }) {
   const { metrics: m } = item;
   const status = stockStatus(m);
@@ -37,7 +40,7 @@ export function ProductCard({
             priority={priority}
             className="size-full"
           />
-          <StatusBadge status={status} className="absolute top-2 right-2 shadow-sm" />
+          {!photo && <StatusBadge status={status} className="absolute top-2 right-2 shadow-sm" />}
         </div>
         <div className="flex flex-1 flex-col gap-1 p-3">
           <p className="text-ink-muted text-[13px] font-medium tracking-wide uppercase md:text-[14px]">
@@ -47,47 +50,52 @@ export function ProductCard({
             {orDash(item.name)}
           </h3>
           <p className="font-semibold whitespace-nowrap tabular-nums">{formatVnd(item.priceVnd)}</p>
-          <div className="mt-1.5">
-            <div
-              role="progressbar"
-              aria-label="Tỷ lệ hàng đã về"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={pct}
-              className="bg-gold-soft h-1.5 overflow-hidden rounded-full"
-            >
-              <div className="bg-gold anim-grow h-full rounded-full" style={{ width: `${pct}%` }} />
-            </div>
-            {/* Thẻ hẹp (2 cột điện thoại): "Còn thiếu" xuống dòng riêng thay vì tràn khỏi thẻ. */}
-            <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-2 text-[13px] tabular-nums">
-              <span className="whitespace-nowrap">
-                Về{" "}
-                <b className="text-navy font-semibold">
-                  {formatInt(m.received)}/{formatInt(m.ordered)}
-                </b>{" "}
-                <span className="text-ink-muted">({formatPercent(m.rate)})</span>
-              </span>
-              {m.shortage > 0 && (
-                <span className="text-status-short-fg font-semibold whitespace-nowrap">
-                  Còn thiếu {formatInt(m.shortage)}
-                </span>
-              )}
-            </div>
-            <p className="text-ink-muted mt-1 text-[13px] tabular-nums">
-              Bán <b className="text-navy font-semibold">{formatInt(item.sold)}</b>
-              {" · "}
-              Tồn{" "}
-              <b
-                className={
-                  outOfStock ? "text-status-short-fg font-bold" : "text-navy font-semibold"
-                }
+          {!photo && (
+            <div className="mt-1.5">
+              <div
+                role="progressbar"
+                aria-label="Tỷ lệ hàng đã về"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={pct}
+                className="bg-gold-soft h-1.5 overflow-hidden rounded-full"
               >
-                {formatInt(item.stock)}
-              </b>
-              {" · "}
-              <span>{formatPercent(sellThrough(item.sold, item.stock))}</span>
-            </p>
-          </div>
+                <div
+                  className="bg-gold anim-grow h-full rounded-full"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+              {/* Thẻ hẹp (2 cột điện thoại): "Còn thiếu" xuống dòng riêng thay vì tràn khỏi thẻ. */}
+              <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-2 text-[13px] tabular-nums">
+                <span className="whitespace-nowrap">
+                  Về{" "}
+                  <b className="text-navy font-semibold">
+                    {formatInt(m.received)}/{formatInt(m.ordered)}
+                  </b>{" "}
+                  <span className="text-ink-muted">({formatPercent(m.rate)})</span>
+                </span>
+                {m.shortage > 0 && (
+                  <span className="text-status-short-fg font-semibold whitespace-nowrap">
+                    Còn thiếu {formatInt(m.shortage)}
+                  </span>
+                )}
+              </div>
+              <p className="text-ink-muted mt-1 text-[13px] tabular-nums">
+                Bán <b className="text-navy font-semibold">{formatInt(item.sold)}</b>
+                {" · "}
+                Tồn{" "}
+                <b
+                  className={
+                    outOfStock ? "text-status-short-fg font-bold" : "text-navy font-semibold"
+                  }
+                >
+                  {formatInt(item.stock)}
+                </b>
+                {" · "}
+                <span>{formatPercent(sellThrough(item.sold, item.stock))}</span>
+              </p>
+            </div>
+          )}
         </div>
       </ProductLink>
     </article>

@@ -26,12 +26,12 @@ const item = (over: Partial<ProductListItem> = {}): ProductListItem => ({
 });
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }));
 
-const html = (i: ProductListItem) =>
+const html = (i: ProductListItem, photo = false) =>
   renderToStaticMarkup(
     // eslint-disable-next-line react/no-children-prop
     createElement(CatalogNavProvider, {
       params: parseCatalogParams({ sort: "price_asc" }),
-      children: createElement(ProductCard, { item: i }),
+      children: createElement(ProductCard, { item: i, photo }),
     }),
   );
 
@@ -109,5 +109,20 @@ describe("T03.2 — ProductCard", () => {
     expect(out).toContain('data-status="full"');
     expect(out).toContain("7/5");
     expect(out).not.toContain("Còn thiếu ");
+  });
+});
+
+describe("chế độ Chỉ xem hình — ProductCard", () => {
+  it("chế độ hình: có ảnh, mã, tên, giá; không có Về/Còn thiếu/Bán/Tồn/trạng thái", () => {
+    const out = html(item({ metrics: computeMetrics(120, 90), sold: 5, stock: 3 }), true);
+    expect(out).toContain("NTT001");
+    expect(out).toContain("Nhẫn Kim Tiền");
+    expect(out).toContain(formatVnd(12_500_000));
+    expect(out).toContain('src="https://blob.example/NTT001-thumb.webp"');
+    expect(out).not.toContain('role="progressbar"');
+    expect(out).not.toContain("Còn thiếu");
+    expect(out).not.toContain("Tồn");
+    expect(out).not.toContain("Bán");
+    expect(out).not.toContain("data-status=");
   });
 });

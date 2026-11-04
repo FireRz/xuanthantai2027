@@ -18,13 +18,24 @@ const num = "text-right tabular-nums";
  * Dạng Bảng: đủ cột trên máy tính (chữ 14px, đệm ô hẹp để vừa khung 1230px với mã SP dài); màn hẹp cuộn ngang trong khung bảng,
  * không cuộn ngang cả trang.
  */
-export function ProductTable({ items }: { items: ProductListItem[] }) {
+export function ProductTable({
+  items,
+  photo = false,
+}: {
+  items: ProductListItem[];
+  photo?: boolean;
+}) {
   return (
     <div
       data-testid="product-table"
       className="border-line overflow-x-auto rounded-xl border bg-white"
     >
-      <table className="w-full min-w-[820px] border-collapse text-[14px] md:text-[15px] lg:min-w-0 lg:text-[14px]">
+      <table
+        className={cn(
+          "w-full border-collapse text-[14px] md:text-[15px] lg:min-w-0 lg:text-[14px]",
+          photo ? "min-w-[560px]" : "min-w-[820px]",
+        )}
+      >
         <thead>
           <tr>
             <th scope="col" className={`${th} w-16 rounded-tl-xl`}>
@@ -48,33 +59,37 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
             <th scope="col" className={`${th} ${HIDE_ON_PHONE}`}>
               Tuổi vàng
             </th>
-            <th scope="col" className={`${th} ${num}`}>
+            <th scope="col" className={cn(th, num, photo && "rounded-tr-xl")}>
               Giá
             </th>
-            <th scope="col" className={`${th} ${num}`}>
-              Đặt
-            </th>
-            <th scope="col" className={`${th} ${num}`}>
-              Về
-            </th>
-            <th scope="col" className={`${th} ${num}`}>
-              Thiếu
-            </th>
-            <th scope="col" className={`${th} ${num}`}>
-              %
-            </th>
-            <th scope="col" className={`${th} ${num}`}>
-              Bán
-            </th>
-            <th scope="col" className={`${th} ${num}`}>
-              Tồn
-            </th>
-            <th scope="col" className={`${th} ${num}`}>
-              % Bán
-            </th>
-            <th scope="col" className={`${th} rounded-tr-xl`}>
-              Trạng thái
-            </th>
+            {!photo && (
+              <>
+                <th scope="col" className={`${th} ${num}`}>
+                  Đặt
+                </th>
+                <th scope="col" className={`${th} ${num}`}>
+                  Về
+                </th>
+                <th scope="col" className={`${th} ${num}`}>
+                  Thiếu
+                </th>
+                <th scope="col" className={`${th} ${num}`}>
+                  %
+                </th>
+                <th scope="col" className={`${th} ${num}`}>
+                  Bán
+                </th>
+                <th scope="col" className={`${th} ${num}`}>
+                  Tồn
+                </th>
+                <th scope="col" className={`${th} ${num}`}>
+                  % Bán
+                </th>
+                <th scope="col" className={`${th} rounded-tr-xl`}>
+                  Trạng thái
+                </th>
+              </>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -114,25 +129,29 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
                 <td className={`px-3 py-2 whitespace-nowrap lg:px-2 ${num}`}>
                   {formatVnd(item.priceVnd)}
                 </td>
-                <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatInt(m.ordered)}</td>
-                <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatInt(m.received)}</td>
-                <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatInt(m.shortage)}</td>
-                <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatPercent(m.rate)}</td>
-                <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatInt(item.sold)}</td>
-                <td
-                  className={cn(
-                    `px-3 py-2 lg:px-2 ${num}`,
-                    item.stock === 0 && m.received > 0 && "text-status-short-fg font-bold",
-                  )}
-                >
-                  {formatInt(item.stock)}
-                </td>
-                <td className={`px-3 py-2 lg:px-2 ${num}`}>
-                  {formatPercent(sellThrough(item.sold, item.stock))}
-                </td>
-                <td className="px-3 py-2 lg:px-2">
-                  <StatusBadge status={stockStatus(m)} />
-                </td>
+                {!photo && (
+                  <>
+                    <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatInt(m.ordered)}</td>
+                    <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatInt(m.received)}</td>
+                    <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatInt(m.shortage)}</td>
+                    <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatPercent(m.rate)}</td>
+                    <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatInt(item.sold)}</td>
+                    <td
+                      className={cn(
+                        `px-3 py-2 lg:px-2 ${num}`,
+                        item.stock === 0 && m.received > 0 && "text-status-short-fg font-bold",
+                      )}
+                    >
+                      {formatInt(item.stock)}
+                    </td>
+                    <td className={`px-3 py-2 lg:px-2 ${num}`}>
+                      {formatPercent(sellThrough(item.sold, item.stock))}
+                    </td>
+                    <td className="px-3 py-2 lg:px-2">
+                      <StatusBadge status={stockStatus(m)} />
+                    </td>
+                  </>
+                )}
               </ClickableRow>
             );
           })}
