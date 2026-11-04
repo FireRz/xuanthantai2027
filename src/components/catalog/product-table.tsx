@@ -11,18 +11,18 @@ import { StatusBadge } from "./status-badge";
 const HIDE_ON_PHONE = "hidden md:table-cell";
 
 const th =
-  "whitespace-nowrap px-3 py-2 text-left text-xs font-semibold text-ink-muted bg-gold-soft";
+  "whitespace-nowrap px-3 py-2 lg:px-2 text-left text-xs font-semibold text-ink-muted bg-gold-soft";
 const num = "text-right tabular-nums";
 
 /**
- * Dạng Bảng: đủ cột trên máy tính (tiêu đề dính khi cuộn); điện thoại cuộn ngang trong khung bảng,
+ * Dạng Bảng: đủ cột trên máy tính (đệm ô hẹp lại để vừa khung); màn hẹp cuộn ngang trong khung bảng,
  * không cuộn ngang cả trang.
  */
 export function ProductTable({ items }: { items: ProductListItem[] }) {
   return (
     <div
       data-testid="product-table"
-      className="border-line overflow-x-auto rounded-xl border bg-white lg:overflow-visible"
+      className="border-line overflow-x-auto rounded-xl border bg-white"
     >
       <table className="w-full min-w-[820px] border-collapse text-[14px] md:text-[15px] lg:min-w-0">
         <thead>
@@ -86,43 +86,51 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
                 sku={item.sku}
                 className="border-line hover:bg-gold-soft/60 cursor-pointer border-t"
               >
-                <td className="px-3 py-2">
+                <td className="px-3 py-2 lg:px-2">
                   <ProductImage
                     thumbUrl={item.thumbUrl}
                     alt={item.name ?? item.sku}
                     className="border-line size-12 rounded-md border text-xs"
                   />
                 </td>
-                <td className="sticky left-0 bg-white px-3 py-2 font-medium tracking-wide whitespace-nowrap uppercase lg:static">
+                <td className="sticky left-0 bg-white px-3 py-2 font-medium tracking-wide whitespace-nowrap uppercase lg:static lg:px-2">
                   <ProductLink sku={item.sku} className="hover:underline">
                     {item.sku}
                   </ProductLink>
                 </td>
-                <td className="min-w-40 px-3 py-2 font-semibold">{orDash(item.name)}</td>
-                <td className={`px-3 py-2 ${HIDE_ON_PHONE}`}>{item.brandName}</td>
-                <td className={`px-3 py-2 ${HIDE_ON_PHONE}`}>{item.lineName}</td>
-                <td className={`px-3 py-2 ${HIDE_ON_PHONE}`}>{orDash(item.collectionName)}</td>
-                <td className={`px-3 py-2 whitespace-nowrap ${HIDE_ON_PHONE}`}>
+                <td className="min-w-40 px-3 py-2 font-semibold lg:min-w-36 lg:px-2">
+                  {orDash(item.name)}
+                </td>
+                <td className={`px-3 py-2 lg:px-2 ${HIDE_ON_PHONE}`}>{item.brandName}</td>
+                <td className={`px-3 py-2 lg:px-2 ${HIDE_ON_PHONE}`}>{item.lineName}</td>
+                <td className={`px-3 py-2 lg:px-2 ${HIDE_ON_PHONE}`}>
+                  {orDash(item.collectionName)}
+                </td>
+                <td
+                  className={`px-3 py-2 whitespace-nowrap lg:px-2 lg:whitespace-normal ${HIDE_ON_PHONE}`}
+                >
                   {orDash(item.materialName)}
                 </td>
-                <td className={`px-3 py-2 whitespace-nowrap ${num}`}>{formatVnd(item.priceVnd)}</td>
-                <td className={`px-3 py-2 ${num}`}>{formatInt(m.ordered)}</td>
-                <td className={`px-3 py-2 ${num}`}>{formatInt(m.received)}</td>
-                <td className={`px-3 py-2 ${num}`}>{formatInt(m.shortage)}</td>
-                <td className={`px-3 py-2 ${num}`}>{formatPercent(m.rate)}</td>
-                <td className={`px-3 py-2 ${num}`}>{formatInt(item.sold)}</td>
+                <td className={`px-3 py-2 whitespace-nowrap lg:px-2 ${num}`}>
+                  {formatVnd(item.priceVnd)}
+                </td>
+                <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatInt(m.ordered)}</td>
+                <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatInt(m.received)}</td>
+                <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatInt(m.shortage)}</td>
+                <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatPercent(m.rate)}</td>
+                <td className={`px-3 py-2 lg:px-2 ${num}`}>{formatInt(item.sold)}</td>
                 <td
                   className={cn(
-                    `px-3 py-2 ${num}`,
+                    `px-3 py-2 lg:px-2 ${num}`,
                     item.stock === 0 && m.received > 0 && "text-status-short-fg font-bold",
                   )}
                 >
                   {formatInt(item.stock)}
                 </td>
-                <td className={`px-3 py-2 ${num}`}>
+                <td className={`px-3 py-2 lg:px-2 ${num}`}>
                   {formatPercent(sellThrough(item.sold, item.stock))}
                 </td>
-                <td className="px-3 py-2">
+                <td className="px-3 py-2 lg:px-2">
                   <StatusBadge status={stockStatus(m)} />
                 </td>
               </ClickableRow>
