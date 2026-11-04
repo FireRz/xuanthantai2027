@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-const SRC = "/brand/tet-banner-2400.png";
+const SRC = "/brand/tet-banner-2400.webp";
 const IMG_W = 2400;
 const IMG_H = 900;
 

@@ -51,7 +51,9 @@ test.describe("T03.5 xem thêm", () => {
 test.describe("T03.6 trạng thái rỗng", () => {
   test("không có SP khớp → thông báo và nút Xóa lọc", async ({ page }) => {
     await page.goto("/?q=KHONG-CO-MA-NAY");
-    await expect(page.getByTestId("empty-state")).toContainText("Không có sản phẩm phù hợp");
+    await expect(page.getByTestId("empty-state")).toContainText(
+      "Không tìm thấy mã “KHONG-CO-MA-NAY”",
+    );
     await page.getByRole("link", { name: "Xóa lọc" }).click();
     await expect(cards(page).first()).toBeVisible();
   });
@@ -68,12 +70,23 @@ test.describe("T03.8, T03.12 cửa hàng và phạm vi", () => {
     await expect(cards(page).first()).not.toHaveText(total);
   });
 
-  test("thanh cửa hàng luôn thấy khi cuộn", async ({ page }) => {
+  test("thanh cửa hàng luôn thấy khi cuộn (điện thoại: chỉ còn hàng tìm mã, ADR-009 U14'')", async ({
+    page,
+    isMobile,
+  }) => {
     await page.goto("/");
     await page.evaluate(() => window.scrollTo(0, 1500));
     const top = await page.getByTestId("store-bar").evaluate((e) => e.getBoundingClientRect().top);
-    expect(Math.round(top)).toBe(0);
-    await expect(page.getByLabel("Cửa hàng của bạn")).toBeInViewport();
+    await expect(page.getByLabel("Tìm mã SP")).toBeInViewport();
+    if (isMobile) {
+      expect(Math.round(top)).toBeLessThan(0);
+      await expect(page.getByLabel("Cửa hàng của bạn")).not.toBeInViewport();
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await expect(page.getByLabel("Cửa hàng của bạn")).toBeInViewport();
+    } else {
+      expect(Math.round(top)).toBe(0);
+      await expect(page.getByLabel("Cửa hàng của bạn")).toBeInViewport();
+    }
   });
 
   test("tìm theo mã (nút Tìm)", async ({ page }) => {

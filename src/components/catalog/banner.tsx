@@ -9,13 +9,14 @@ import { BannerFx } from "./banner-fx";
 export function Banner() {
   return (
     <header className="relative flex aspect-[2400/900] w-full flex-col overflow-hidden bg-[#cc1208] text-center text-white sm:aspect-auto sm:min-h-[420px] lg:aspect-[2400/900] lg:max-h-[640px] lg:min-h-0">
-      {/* Tranh ngang (docs/brand/tet-banner-2400.png) phủ kín banner; điện thoại thu nhỏ đúng tỉ lệ 2400:900 (chữ co theo chiều rộng). */}
+      {/* Tranh ngang (WebP nén sẵn từ docs/brand/banner_tet_2400x900.png) phủ kín banner; `unoptimized` để dùng chung đúng file với BannerFx — chỉ tải một lần; điện thoại thu nhỏ đúng tỉ lệ 2400:900 (chữ co theo chiều rộng). */}
       <Image
-        src="/brand/tet-banner-2400.png"
+        src="/brand/tet-banner-2400.webp"
         alt=""
         fill
         priority
         sizes="100vw"
+        unoptimized
         className="object-cover object-center"
       />
       <BannerFx />

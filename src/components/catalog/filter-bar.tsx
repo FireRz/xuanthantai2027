@@ -20,9 +20,11 @@ import {
   FilterDropdown,
   GROUPS,
   labelOf,
+  removeChip,
   selectedChips,
   SHEET_GROUPS,
   shown,
+  type SelectedChip,
   type SheetKey,
 } from "./filter-parts";
 
@@ -59,6 +61,7 @@ export function FilterBar({
   const groupCount = countGroupFilters(state);
   const chips = selectedChips(facets, state);
   const clearAll = () => go(CLEAR_ALL);
+  const removeOne = (c: SelectedChip) => go(removeChip(c, state));
 
   return (
     <div
@@ -109,7 +112,7 @@ export function FilterBar({
       <ActiveFilters
         chips={chips.map((c) => (c.key === "typ" ? { ...c, className: "md:hidden" } : c))}
         showClear={hasActiveFilter(state)}
-        onRemove={(c) => toggle(c.key, c.id)}
+        onRemove={removeOne}
         onClear={clearAll}
         testId="active-filters"
         clearTestId="clear-filters"
@@ -123,6 +126,7 @@ export function FilterBar({
         pending={pending}
         chips={chips}
         onToggle={toggle}
+        onRemove={removeOne}
         onClear={clearAll}
         onOpenSheet={() => setSheetOpen(true)}
         extra={sheetExtra}

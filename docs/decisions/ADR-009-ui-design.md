@@ -40,3 +40,8 @@ Góp ý của chủ dự án: mockup v1 "giống báo cáo hơn là một trang 
 | U17 | Hình trang trí Tết (cành mai, đồng xu Thần Tài) phải là **ảnh có quyền sử dụng** do chủ dự án cung cấp (mua/tải từ nguồn có giấy phép, hoặc đội thiết kế làm). **Không tự vẽ** (chủ dự án chê hình tự vẽ) và **không lấy ảnh Google** khi không rõ giấy phép. Bỏ luôn họa tiết đồng xu tự vẽ ở nền banner. Trong lúc chờ, mockup để ô "Ảnh trang trí Tết (chờ file)" | Hình SVG tự vẽ ở U4' |
 | U18 | **Phong cách banner** (chủ dự án gửi ảnh mẫu tìm trên Google): tranh Tết kiểu cổ — **nền đỏ trơn ở giữa**, cành hoa trắng kem góc trên trái, **mây lành** viền vàng kem, **con dê (năm Đinh Mùi 2027)** góc dưới trái, núi và ấn triện đỏ. Ảnh dùng làm **nền toàn banner**, chữ đặt giữa phần nền đỏ trơn. Mockup đang dùng **tạm** ảnh mẫu này, có ghi chú "Ảnh tham khảo — cần mua bản quyền". **Trước khi go-live** phải mua/được cấp bản quyền ảnh này (hoặc ảnh tương tự), bản rộng ≥ 2400px | Ô chờ ảnh ở U17 |
 | U18' | Chủ dự án gửi **ảnh banner chính thức** (1518×1036, cùng phong cách U18) → lưu `docs/brand/tet-banner.png`, đã thay vào mockup, bỏ ghi chú "ảnh tham khảo". Cần ghi nguồn/quyền sử dụng ảnh vào `docs/brand/LICENSE.txt`. Bản 1518px hơi nhỏ cho màn hình rộng — nếu có, nên dùng bản ≥ 2400px | Ảnh tham khảo ở U18 |
+
+## Sửa đổi khi dùng thử (2026-11-04)
+| # | Thay đổi | Thay cho |
+|---|----------|----------|
+| U14'' | **Điện thoại:** khi đã cuộn qua banner, thanh "Cửa hàng của bạn" chỉ còn **hàng tìm mã SP** (hàng chọn cửa hàng lùi khuất phía trên, kéo lên đầu trang thì hiện lại) để phần dính không chiếm quá nhiều màn hình; cửa hàng đang xem vẫn ghi ở nhãn phạm vi trên danh sách. Máy tính giữ nguyên cả thanh | Thanh dính đủ hai hàng trên điện thoại ở U14' |

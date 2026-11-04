@@ -371,7 +371,7 @@ test.describe("T04.10 số kết quả và trạng thái không có SP phù hợ
     await page.goto("/?q=zzz-khong-co&sort=price_asc");
     await expect(scope(page)).toContainText("0 SP");
     const empty = page.getByTestId("empty-state");
-    await expect(empty).toContainText("Không có sản phẩm phù hợp");
+    await expect(empty).toContainText("Không tìm thấy mã “zzz-khong-co”");
     await expect(cards(page)).toHaveCount(0);
     await empty.getByRole("link", { name: "Xóa lọc" }).click();
     await expect(scope(page)).toContainText("3.000 SP");

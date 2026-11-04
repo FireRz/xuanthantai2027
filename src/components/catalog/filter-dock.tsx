@@ -87,6 +87,7 @@ interface DockProps {
   pending: boolean;
   chips: SelectedChip[];
   onToggle: (key: SheetKey, id: string) => void;
+  onRemove: (c: SelectedChip) => void;
   onClear: () => void;
 }
 
@@ -106,7 +107,7 @@ export function FilterDock({
   /** Mục thêm trong cột trái (công tắc "Xem tất cả SP"). */
   extra?: React.ReactNode;
 }) {
-  const { docked, facets, state, pending, chips, onToggle, onClear } = props;
+  const { docked, facets, state, pending, chips, onToggle, onRemove, onClear } = props;
   const hidden = !docked;
   const groupCount = countGroupFilters(state);
   // Gắn thẳng vào <body>: thanh lọc gốc mờ đi khi đang tải (opacity tạo lớp xếp chồng riêng)
@@ -160,7 +161,7 @@ export function FilterDock({
           <ActiveFilters
             chips={chips}
             showClear={hasActiveFilter(state)}
-            onRemove={(c) => onToggle(c.key, c.id)}
+            onRemove={onRemove}
             onClear={onClear}
             label="Đang lọc:"
             className="flex-nowrap overflow-x-auto md:flex-wrap"
@@ -182,6 +183,7 @@ function FilterSidebar({
   pending,
   chips,
   onToggle,
+  onRemove,
   onClear,
   extra,
 }: DockProps & { extra?: React.ReactNode }) {
@@ -223,12 +225,7 @@ function FilterSidebar({
         <section aria-label="Đang lọc">
           <p className="text-ink-muted mb-2 text-sm font-semibold">Đang lọc</p>
           {chips.length > 0 ? (
-            <ActiveFilters
-              chips={chips}
-              showClear={false}
-              onRemove={(c) => onToggle(c.key, c.id)}
-              onClear={onClear}
-            />
+            <ActiveFilters chips={chips} showClear={false} onRemove={onRemove} onClear={onClear} />
           ) : (
             <p className="text-ink-muted text-sm">Chưa chọn bộ lọc nào, đang xem tất cả.</p>
           )}

@@ -36,15 +36,26 @@ export function StoreBar({ stores }: { stores: StoreOption[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, params.q]);
 
-  // Chiều cao thật của thanh (điện thoại xuống 2 dòng) → `--store-bar-h`, để bộ lọc dính ngay bên dưới.
+  // Điện thoại (thanh xuống 2 dòng): khi đã dính thì lùi lên đúng bằng hàng chọn cửa hàng, chỉ còn
+  // hàng tìm mã — dùng `top` âm của sticky nên không đổi chiều cao trong trang (danh sách không giật).
+  // Phần còn thấy được ghi ra `--store-bar-h`, để bộ lọc dính ngay bên dưới.
   const bar = useRef<HTMLDivElement>(null);
+  const searchRow = useRef<HTMLLabelElement>(null);
   useEffect(() => {
     const el = bar.current;
-    if (!el) return;
+    const row = searchRow.current;
+    if (!el || !row) return;
     const root = document.documentElement;
-    const ro = new ResizeObserver(() =>
-      root.style.setProperty("--store-bar-h", `${el.offsetHeight}px`),
-    );
+    const update = () => {
+      const form = getComputedStyle(row.parentElement as Element);
+      const padTop = parseFloat(form.paddingTop) || 0;
+      // Giấu tới hết mép dưới ô chọn cửa hàng: chừa lại đúng khoảng cách giữa hai hàng.
+      const gap = parseFloat(form.rowGap) || 0;
+      const hide = row.offsetTop > padTop + 4 ? row.offsetTop - gap : 0;
+      el.style.top = `-${hide}px`;
+      root.style.setProperty("--store-bar-h", `${el.offsetHeight - hide}px`);
+    };
+    const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
@@ -85,7 +96,7 @@ export function StoreBar({ stores }: { stores: StoreOption[] }) {
             ))}
           </select>
         </label>
-        <label className="relative flex min-w-0 flex-1 basis-40 items-center">
+        <label ref={searchRow} className="relative flex min-w-0 flex-1 basis-40 items-center">
           <Search
             className="text-ink-muted pointer-events-none absolute left-3 size-4"
             aria-hidden

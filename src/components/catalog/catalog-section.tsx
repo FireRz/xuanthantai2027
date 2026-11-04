@@ -61,6 +61,7 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
           canClear={hasActiveFilter(params)}
           clearHref={`${buildCatalogQuery({ sort: params.sort, view: params.view })}#san-pham`}
           storeOnly={Boolean(params.store && !params.all && scope.kind === "store")}
+          q={params.q}
         />
       ) : (
         <>
@@ -89,20 +90,35 @@ function EmptyState({
   canClear,
   clearHref,
   storeOnly,
+  q,
 }: {
   canClear: boolean;
   clearHref: string;
   /** Đang xem một cửa hàng ở chế độ mặc định (chỉ SP cửa hàng đó đặt). */
   storeOnly: boolean;
+  /** Mã đang tìm — nêu rõ để người dùng biết vì sao không có kết quả. */
+  q: string;
 }) {
   return (
     <div
       data-testid="empty-state"
       className="border-line rounded-xl border border-dashed bg-white px-4 py-14 text-center"
     >
-      <p className="font-display text-xl font-semibold">Không có sản phẩm phù hợp</p>
+      <p className="font-display text-xl font-semibold">
+        {q ? (
+          <>
+            Không tìm thấy mã <span className="text-brand">“{q}”</span>
+          </>
+        ) : (
+          "Không có sản phẩm phù hợp"
+        )}
+      </p>
       <p className="text-ink-muted mt-1">
-        {canClear ? "Hãy thử bỏ bớt điều kiện lọc." : "Danh mục hiện chưa có sản phẩm nào."}
+        {q
+          ? "Kiểm tra lại mã, hoặc bỏ bớt điều kiện lọc."
+          : canClear
+            ? "Hãy thử bỏ bớt điều kiện lọc."
+            : "Danh mục hiện chưa có sản phẩm nào."}
         {storeOnly && ' Bật "Xem tất cả SP" để xem cả sản phẩm cửa hàng này chưa đặt.'}
       </p>
       {canClear && (

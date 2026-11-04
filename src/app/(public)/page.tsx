@@ -62,7 +62,8 @@ export default async function HomePage({
             </h2>
             <ViewToggle params={params} />
           </div>
-          <div className="mb-5 min-h-24">
+          {/* Chừa chỗ cho bộ lọc lúc đang tải (tránh trang nhảy): điện thoại chỉ một hàng Lọc + Sắp xếp. */}
+          <div className="mb-5 min-h-11 md:min-h-24">
             <Suspense fallback={null}>
               <FilterSection params={params} />
             </Suspense>

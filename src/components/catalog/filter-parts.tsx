@@ -50,20 +50,31 @@ export function labelOf(o: FacetOption, options: FacetOption[]) {
 }
 
 export interface SelectedChip {
-  key: SheetKey;
+  /** `q`: mã đang tìm (ô "Tìm mã SP" trên thanh cửa hàng). */
+  key: SheetKey | "q";
   id: string;
   group: string;
   name: string;
+  /** Chữ hiện trên chip nếu khác `name`. */
+  text?: string;
 }
 
-/** Các lựa chọn đang bật, Chủng loại đứng đầu, theo thứ tự nhóm. */
+/** Các lựa chọn đang bật, Chủng loại đứng đầu, theo thứ tự nhóm; mã đang tìm đứng cuối. */
 export function selectedChips(facets: FacetCounts, state: CatalogParams): SelectedChip[] {
-  return SHEET_GROUPS.flatMap(({ key, label }) =>
+  const chips: SelectedChip[] = SHEET_GROUPS.flatMap(({ key, label }) =>
     state[key].map((id) => {
       const o = facets[key].find((x) => x.id === id);
       return { key, id, group: label, name: o ? labelOf(o, facets[key]) : id };
     }),
   );
+  if (state.q)
+    chips.push({ key: "q", id: state.q, group: "Mã SP", name: state.q, text: `Mã: ${state.q}` });
+  return chips;
+}
+
+/** Bỏ một chip: mã tìm thì xóa ô tìm, còn lại bỏ lựa chọn khỏi nhóm. */
+export function removeChip(c: SelectedChip, state: CatalogParams): Partial<CatalogParams> {
+  return c.key === "q" ? { q: "" } : { [c.key]: state[c.key].filter((x) => x !== c.id) };
 }
 
 /** Chip lựa chọn đang bật (bấm để bỏ) + nút "Xóa lọc". */
@@ -102,7 +113,7 @@ export function ActiveFilters({
             c.className,
           )}
         >
-          {c.name}
+          {c.text ?? c.name}
           <X className="size-3.5" aria-hidden />
         </button>
       ))}
