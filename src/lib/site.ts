@@ -1,6 +1,5 @@
 /** Thông tin chi nhánh và người liên hệ hiện trên trang danh mục — đổi người/chi nhánh chỉ sửa ở đây. */
 
-export const SITE_NAME = "Xuân Thần Tài 2027";
 /** Tên chi nhánh đầy đủ (dòng dưới banner). */
 export const BRANCH_FULL = "CN PNJ Miền Tây";
 /** Tên chi nhánh ngắn (chân trang, tiêu đề tab). */

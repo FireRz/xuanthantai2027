@@ -163,7 +163,7 @@ function TypeChips({
   if (options.length === 0) return null;
   const chip = (active: boolean, dim: boolean) =>
     cn(
-      "focus-visible:outline-brand inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-5 whitespace-nowrap focus-visible:outline-2",
+      "focus-visible:outline-brand inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-4 whitespace-nowrap focus-visible:outline-2",
       active ? "bg-brand border-brand text-white" : "border-line bg-white",
       dim && !active && "opacity-55",
     );

@@ -15,7 +15,7 @@ const th =
 const num = "text-right tabular-nums";
 
 /**
- * Dạng Bảng: đủ cột trên máy tính (đệm ô hẹp lại để vừa khung); màn hẹp cuộn ngang trong khung bảng,
+ * Dạng Bảng: đủ cột trên máy tính (chữ 14px, đệm ô hẹp để vừa khung 1230px với mã SP dài); màn hẹp cuộn ngang trong khung bảng,
  * không cuộn ngang cả trang.
  */
 export function ProductTable({ items }: { items: ProductListItem[] }) {
@@ -24,7 +24,7 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
       data-testid="product-table"
       className="border-line overflow-x-auto rounded-xl border bg-white"
     >
-      <table className="w-full min-w-[820px] border-collapse text-[14px] md:text-[15px] lg:min-w-0">
+      <table className="w-full min-w-[820px] border-collapse text-[14px] md:text-[15px] lg:min-w-0 lg:text-[14px]">
         <thead>
           <tr>
             <th scope="col" className={`${th} w-16 rounded-tl-xl`}>
@@ -93,12 +93,12 @@ export function ProductTable({ items }: { items: ProductListItem[] }) {
                     className="border-line size-12 rounded-md border text-xs"
                   />
                 </td>
-                <td className="sticky left-0 bg-white px-3 py-2 font-medium tracking-wide whitespace-nowrap uppercase lg:static lg:px-2">
+                <td className="sticky left-0 bg-white px-3 py-2 font-medium tracking-wide whitespace-nowrap uppercase lg:static lg:px-2 lg:tracking-normal">
                   <ProductLink sku={item.sku} className="hover:underline">
                     {item.sku}
                   </ProductLink>
                 </td>
-                <td className="min-w-40 px-3 py-2 font-semibold lg:min-w-36 lg:px-2">
+                <td className="min-w-40 px-3 py-2 font-semibold lg:min-w-32 lg:px-2">
                   {orDash(item.name)}
                 </td>
                 <td className={`px-3 py-2 lg:px-2 ${HIDE_ON_PHONE}`}>{item.brandName}</td>

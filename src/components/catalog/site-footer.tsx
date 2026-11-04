@@ -1,6 +1,6 @@
 import { MessageCircle } from "lucide-react";
 import { formatDateTime } from "@/lib/format";
-import { BRANCH_SHORT, CONTACT, SITE_NAME, teamsChatUrl } from "@/lib/site";
+import { BRANCH_SHORT, CONTACT, teamsChatUrl } from "@/lib/site";
 import { getLastDataUpdate } from "@/server/services/catalog";
 import { Logo } from "./logo";
 
@@ -16,9 +16,7 @@ export async function SiteFooter() {
       <div className="flex flex-col items-center gap-4 px-4 pt-8 pb-20 text-center sm:px-6 md:flex-row md:justify-between md:pr-28 md:pb-8 md:text-left">
         <div className="flex flex-col items-center gap-3 sm:flex-row">
           <Logo />
-          <p className="font-display text-xl font-bold text-white uppercase">
-            {SITE_NAME} · {BRANCH_SHORT}
-          </p>
+          <p className="font-display text-xl font-bold text-white uppercase">{BRANCH_SHORT}</p>
         </div>
         <div className="space-y-1.5 text-sm">
           <p data-testid="data-updated">
