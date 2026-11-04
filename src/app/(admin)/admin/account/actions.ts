@@ -1,9 +1,11 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { signOut } from "@/server/auth";
 import { changeAdminPassword } from "@/server/auth/admin-account";
 import { UnauthorizedError, requireAdmin } from "@/server/auth/require-admin";
+import { clearViewerPassword, setViewerPassword } from "@/server/auth/viewer-pass";
 import { DomainError } from "@/server/errors";
 import { MIN_PASSWORD_LENGTH } from "@/lib/password";
 
@@ -53,4 +55,35 @@ export async function changePasswordAction(
   // Mật khẩu đổi → phiên hiện tại cũng hết hiệu lực; đăng nhập lại bằng mật khẩu mới.
   await signOut({ redirectTo: "/login?changed=1" });
   return {};
+}
+
+export interface ViewerPasswordState {
+  ok: boolean;
+  message: string;
+}
+
+/** Đặt hoặc đổi mật khẩu xem /phan-tich. Không phải admin → UnauthorizedError (không đổi gì). */
+export async function setViewerPasswordAction(
+  _prev: ViewerPasswordState,
+  formData: FormData,
+): Promise<ViewerPasswordState> {
+  await requireAdmin();
+  const password = formData.get("password");
+  if (typeof password !== "string") return { ok: false, message: "Vui lòng nhập mật khẩu xem" };
+  try {
+    await setViewerPassword(password);
+  } catch (e) {
+    if (e instanceof DomainError) return { ok: false, message: e.message };
+    throw e;
+  }
+  revalidatePath("/admin/account");
+  return { ok: true, message: "Đã lưu mật khẩu xem" };
+}
+
+/** Tắt trang phân tích: xóa mật khẩu xem, mọi cookie đang có hết hiệu lực. */
+export async function clearViewerPasswordAction(): Promise<ViewerPasswordState> {
+  await requireAdmin();
+  await clearViewerPassword();
+  revalidatePath("/admin/account");
+  return { ok: true, message: "Đã tắt trang phân tích" };
 }
