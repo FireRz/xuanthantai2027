@@ -28,6 +28,8 @@ interface CatalogNav {
   /** Trạng thái lọc hiện hành, đã tính cả lựa chọn vừa bấm mà máy chủ chưa trả về (lạc quan). */
   state: CatalogParams;
   go: (patch: Partial<CatalogParams>, opts?: GoOptions) => void;
+  /** URL đầy đủ của trang hiện hành cho một trạng thái lọc: `path` + truy vấn + tham số giữ lại + neo. */
+  hrefFor: (state: CatalogParams, hash?: string) => string;
   pending: boolean;
 }
 
@@ -40,9 +42,15 @@ const Ctx = createContext<CatalogNav | null>(null);
  */
 export function CatalogNavProvider({
   params,
+  path = "/",
+  keep = "",
   children,
 }: {
   params: CatalogParams;
+  /** Đường dẫn trang đang dựng URL: `"/"` (danh mục) hoặc `"/phan-tich"`. */
+  path?: string;
+  /** Truy vấn thêm luôn nối vào URL (không có `?`/`&` đầu), ví dụ `"nhom=line"`. */
+  keep?: string;
   children: React.ReactNode;
 }) {
   const router = useRouter();
@@ -55,6 +63,12 @@ export function CatalogNavProvider({
     setState(params);
   }
 
+  const hrefFor: CatalogNav["hrefFor"] = (s, hash = "") => {
+    const q = buildCatalogQuery(s);
+    const query = keep ? (q ? `${q}&${keep}` : `?${keep}`) : q;
+    return `${path}${query}${hash}`;
+  };
+
   const go: CatalogNav["go"] = (patch, opts = {}) => {
     let next: CatalogParams = { ...state, ...patch, n: PAGE_SIZE };
     // Đổi cửa hàng thì bỏ công tắc "xem tất cả" của cửa hàng cũ.
@@ -63,7 +77,7 @@ export function CatalogNavProvider({
       next = pruneInvalidSelections(next, opts.owned.lines, opts.owned.cols);
     }
     setState(next);
-    const url = `/${buildCatalogQuery(next)}${opts.hash ?? ""}`;
+    const url = hrefFor(next, opts.hash);
     const scroll = Boolean(opts.hash);
     startTransition(() => {
       if (opts.mode === "push") router.push(url, { scroll });
@@ -71,7 +85,7 @@ export function CatalogNavProvider({
     });
   };
 
-  return <Ctx.Provider value={{ state, go, pending }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ state, go, hrefFor, pending }}>{children}</Ctx.Provider>;
 }
 
 export function useCatalogNav(): CatalogNav {

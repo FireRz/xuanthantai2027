@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { buildCatalogQuery, type CatalogParams } from "@/lib/catalog-params";
 import { useCatalogNav } from "./catalog-nav";
 
 /**
@@ -14,10 +13,6 @@ export const popupTrail = {
   trigger: null as HTMLElement | null,
 };
 
-function href(state: CatalogParams, sku: string) {
-  return `/${buildCatalogQuery({ ...state, sp: sku })}`;
-}
-
 /** Liên kết mở popup chi tiết SP: giữ nguyên bộ lọc/sắp xếp/số SP đang tải, chỉ thêm `sp` (F05). */
 export function ProductLink({
   sku,
@@ -28,10 +23,10 @@ export function ProductLink({
   className?: string;
   children: React.ReactNode;
 }) {
-  const { state } = useCatalogNav();
+  const { state, hrefFor } = useCatalogNav();
   return (
     <Link
-      href={href(state, sku)}
+      href={hrefFor({ ...state, sp: sku })}
       scroll={false}
       prefetch={false}
       data-testid="product-link"
@@ -56,7 +51,7 @@ export function ClickableRow({
   className?: string;
   children: React.ReactNode;
 }) {
-  const { state } = useCatalogNav();
+  const { state, hrefFor } = useCatalogNav();
   const router = useRouter();
   return (
     <tr
@@ -68,7 +63,7 @@ export function ClickableRow({
         if ((e.target as HTMLElement).closest("a")) return;
         popupTrail.openedInApp = true;
         popupTrail.trigger = e.currentTarget.querySelector("a");
-        router.push(href(state, sku), { scroll: false });
+        router.push(hrefFor({ ...state, sp: sku }), { scroll: false });
       }}
     >
       {children}

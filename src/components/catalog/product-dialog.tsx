@@ -3,7 +3,6 @@
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { buildCatalogQuery } from "@/lib/catalog-params";
 import { useCatalogNav } from "./catalog-nav";
 import { popupTrail } from "./product-link";
 
@@ -16,7 +15,7 @@ import { popupTrail } from "./product-link";
 export function ProductDialog({ title, children }: { title: string; children: React.ReactNode }) {
   const ref = useRef<HTMLDialogElement>(null);
   const router = useRouter();
-  const { state } = useCatalogNav();
+  const { state, hrefFor } = useCatalogNav();
 
   useEffect(() => {
     const dialog = ref.current;
@@ -36,7 +35,7 @@ export function ProductDialog({ title, children }: { title: string; children: Re
       popupTrail.openedInApp = false;
       router.back();
     } else {
-      router.replace(`/${buildCatalogQuery({ ...state, sp: null })}`, { scroll: false });
+      router.replace(hrefFor({ ...state, sp: null }), { scroll: false });
     }
   }
 

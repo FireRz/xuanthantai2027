@@ -3,7 +3,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useRef, useState, useTransition } from "react";
-import { buildCatalogQuery } from "@/lib/catalog-params";
 import { formatInt } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { ProductNeighbors } from "@/server/services/product-neighbors";
@@ -38,7 +37,7 @@ export function ProductSwipe({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { state } = useCatalogNav();
+  const { state, hrefFor } = useCatalogNav();
   const [pending, startTransition] = useTransition();
   const [dir, setDir] = useState<Dir | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -53,7 +52,7 @@ export function ProductSwipe({
 
   const prev = neighbors?.prev ?? null;
   const next = neighbors?.next ?? null;
-  const urlFor = (sku: string) => `/${buildCatalogQuery({ ...state, sp: sku })}`;
+  const urlFor = (sku: string) => hrefFor({ ...state, sp: sku });
 
   function go(d: Dir) {
     const target = d === "next" ? next : prev;
