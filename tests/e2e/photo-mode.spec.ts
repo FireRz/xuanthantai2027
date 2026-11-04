@@ -72,3 +72,75 @@ test.describe("chế độ Chỉ xem hình", () => {
     expect(await noHorizontalScroll(page)).toBe(true);
   });
 });
+
+// Phóng to ảnh trong popup (cả chế độ đầy đủ lẫn chế độ hình).
+// Seed không có ảnh thật → gắn tạm ảnh cho 1 SP riêng của từng project (tránh đụng nhau khi chạy song song), trả lại sau.
+const PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+  "base64",
+);
+
+test.describe("phóng to ảnh trong popup", () => {
+  test.describe.configure({ mode: "serial" });
+  let sku = "";
+  let imageUrl = "";
+  let before: { thumbUrl: string | null; imageUrl: string | null };
+
+  test.beforeAll(async ({}, workerInfo) => {
+    sku = workerInfo.project.name === "mobile" ? "AK0002" : "AK0003";
+    imageUrl = `https://img.test.invalid/large-${sku}.png`;
+    const p = await prisma.product.findUniqueOrThrow({ where: { sku } });
+    before = { thumbUrl: p.thumbUrl, imageUrl: p.imageUrl };
+    await prisma.product.update({
+      where: { sku },
+      data: { thumbUrl: `https://img.test.invalid/thumb-${sku}.png`, imageUrl },
+    });
+  });
+  test.afterAll(async () => {
+    await prisma.product.update({ where: { sku }, data: before });
+  });
+
+  test.beforeEach(async ({ page }) => {
+    await page.route("https://img.test.invalid/**", (route) =>
+      route.fulfill({ contentType: "image/png", body: PNG }),
+    );
+  });
+
+  const zoomButton = (page: Page) => page.getByRole("button", { name: /Phóng to ảnh/ });
+  const zoom = (page: Page) => page.getByTestId("image-zoom");
+
+  for (const [mode, qs] of [
+    ["chế độ đầy đủ", ""],
+    ["chế độ hình", "xem=hinh&"],
+  ] as const) {
+    test(`bấm ảnh trong popup → lớp phóng to hiện ảnh gốc (${mode})`, async ({ page }) => {
+      await page.goto(`/?${qs}sp=${sku}`);
+      await expect(zoom(page)).toHaveCount(0);
+      await zoomButton(page).click();
+      await expect(zoom(page)).toBeVisible();
+      await expect(zoom(page)).toHaveAttribute("open", "");
+      await expect(zoom(page).locator("img")).toHaveAttribute("src", imageUrl);
+    });
+  }
+
+  test("Esc đóng lớp phóng to, popup vẫn mở; Esc lần nữa đóng popup", async ({ page }) => {
+    await page.goto(`/?sp=${sku}`);
+    await zoomButton(page).click();
+    await expect(zoom(page)).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(zoom(page)).toBeHidden();
+    await expect(page.getByTestId("product-dialog")).toBeVisible();
+    await expect(page).toHaveURL(/sp=/);
+    await page.keyboard.press("Escape");
+    await expect(page).not.toHaveURL(/sp=/);
+  });
+
+  test("nút ✕ của lớp phóng to có nhãn Đóng ảnh; bấm → đóng, popup còn", async ({ page }) => {
+    await page.goto(`/?sp=${sku}`);
+    await zoomButton(page).click();
+    await zoom(page).getByRole("button", { name: "Đóng ảnh" }).click();
+    await expect(zoom(page)).toHaveCount(0);
+    await expect(page.getByTestId("product-dialog")).toBeVisible();
+    await expect(page).toHaveURL(/sp=/);
+  });
+});

@@ -4,6 +4,7 @@ import { stockStatus } from "@/lib/status";
 import { cn } from "@/lib/utils";
 import { getProductDetail, type ProductDetail } from "@/server/services/product-detail";
 import type { CatalogParams } from "@/lib/catalog-params";
+import { ImageZoom } from "./image-zoom";
 import { ProductDialog } from "./product-dialog";
 import { ProductImage } from "./product-image";
 import { StatusBadge } from "./status-badge";
@@ -90,15 +91,17 @@ function DetailBody({
     >
       <div className="grid shrink-0 gap-4 p-4 md:grid-cols-[300px_1fr] md:gap-6 md:px-6 md:py-5">
         {/* Điện thoại: ảnh tối đa 30% chiều cao màn hình để số liệu hiện ngay màn đầu; chế độ hình thì ảnh là nội dung chính nên không giới hạn. */}
-        <ProductImage
-          thumbUrl={d.imageUrl ?? d.thumbUrl}
-          alt={d.name ?? d.sku}
-          priority
-          className={cn(
-            "border-line mx-auto aspect-square w-full rounded-xl border md:max-w-none",
-            !photo && "max-w-[30vh]",
-          )}
-        />
+        <ImageZoom src={d.imageUrl ?? d.thumbUrl} alt={d.name ?? d.sku}>
+          <ProductImage
+            thumbUrl={d.imageUrl ?? d.thumbUrl}
+            alt={d.name ?? d.sku}
+            priority
+            className={cn(
+              "border-line mx-auto aspect-square w-full rounded-xl border md:max-w-none",
+              !photo && "max-w-[30vh]",
+            )}
+          />
+        </ImageZoom>
         <div className="min-w-0">
           <p className="text-ink-muted font-medium tracking-wide uppercase">{d.sku}</p>
           <p className="my-1.5">{classification}</p>
