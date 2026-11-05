@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { prisma } from "../../src/server/db";
+import { SORT_LABELS } from "../../src/components/catalog/catalog-toolbar";
 
 // Chạy trên DB dev đã seed quy mô lớn (npm run seed:large): 3 nhãn × 1.000 SP, 100 cửa hàng.
 
@@ -183,16 +184,13 @@ test.describe("T04.7 menu sắp xếp", () => {
   const attrs = (page: Page, name: string) =>
     cards(page).evaluateAll((els, n) => els.map((e) => e.getAttribute(n)), name);
 
-  test("mặc định Mã A→Z; có đủ 5 kiểu", async ({ page }) => {
+  test("mặc định Mã A→Z; có đủ 6 kiểu", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByTestId("sort-menu")).toHaveValue("sku");
-    await expect(page.getByTestId("sort-menu").locator("option")).toHaveText([
-      "Mã SP A→Z",
-      "Mới cập nhật",
-      "Giá thấp → cao",
-      "Giá cao → thấp",
-      "Còn thiếu nhiều nhất",
-    ]);
+    // Đủ 6 kiểu (thêm "Bán chạy nhất" ở 82b019d), đúng thứ tự trên menu.
+    await expect(page.getByTestId("sort-menu").locator("option")).toHaveText(
+      Object.values(SORT_LABELS),
+    );
     const skus = (await attrs(page, "data-sku")) as string[];
     expect([...skus].sort()).toEqual(skus);
   });
@@ -258,18 +256,35 @@ test.describe("T04.7 menu sắp xếp", () => {
 });
 
 test.describe("T04.8 công tắc 'Xem tất cả SP'", () => {
-  const sw = (page: Page) => page.getByRole("switch", { name: "Xem tất cả SP" });
+  /**
+   * Công tắc "Xem tất cả SP": máy tính nằm trên thanh công cụ; điện thoại nằm trong bảng Lọc
+   * (gọn bố cục điện thoại, 96c6296) nên mở bảng trước rồi mới tìm.
+   */
+  async function sw(page: Page, isMobile: boolean) {
+    if (isMobile) {
+      await page.getByTestId("open-filter-sheet").click();
+      await expect(page.getByTestId("filter-sheet")).toBeVisible();
+    }
+    return page.getByRole("switch", { name: "Xem tất cả SP" });
+  }
+  /** Điện thoại: đóng bảng Lọc để thao tác thanh cửa hàng phía sau. */
+  async function closeSheet(page: Page, isMobile: boolean) {
+    if (isMobile) await page.getByTestId("sheet-apply").click();
+  }
 
-  test("chỉ hiện khi đã chọn cửa hàng", async ({ page }) => {
+  test("chỉ hiện khi đã chọn cửa hàng", async ({ page, isMobile }) => {
     await page.goto("/");
-    await expect(sw(page)).toHaveCount(0);
+    await expect(await sw(page, isMobile)).toHaveCount(0);
     await page.goto("/?store=CH001");
-    await expect(sw(page)).toHaveCount(1);
+    await expect(await sw(page, isMobile)).toHaveCount(1);
     await page.goto("/?store=KHONG-CO");
-    await expect(sw(page)).toHaveCount(0);
+    await expect(await sw(page, isMobile)).toHaveCount(0);
   });
 
-  test("CH đặt n/3.000 SP → n; bật → 3.000, SP không đặt hiển thị 0; tắt → n", async ({ page }) => {
+  test("CH đặt n/3.000 SP → n; bật → 3.000, SP không đặt hiển thị 0; tắt → n", async ({
+    page,
+    isMobile,
+  }) => {
     const store = await prisma.store.findUniqueOrThrow({ where: { code: "CH001" } });
     const ordered = await prisma.storeProductQty.count({
       where: { storeId: store.id, qtyOrdered: { gt: 0 }, product: { active: true } },
@@ -278,21 +293,23 @@ test.describe("T04.8 công tắc 'Xem tất cả SP'", () => {
 
     await page.goto("/?store=CH001");
     await expect(scope(page)).toContainText(`${fmt(ordered)} SP`);
-    await sw(page).check();
+    const toggle = await sw(page, isMobile);
+    await toggle.check();
     await expect(page).toHaveURL(/all=1/);
     await expect(scope(page)).toContainText("3.000 SP");
-    await sw(page).uncheck();
+    await toggle.uncheck();
     await expect(page).not.toHaveURL(/all=1/);
     await expect(scope(page)).toContainText(`${fmt(ordered)} SP`);
   });
 
-  test("đổi cửa hàng thì công tắc tự tắt", async ({ page }) => {
+  test("đổi cửa hàng thì công tắc tự tắt", async ({ page, isMobile }) => {
     await page.goto("/?store=CH001&all=1");
-    await expect(sw(page)).toBeChecked();
+    await expect(await sw(page, isMobile)).toBeChecked();
+    await closeSheet(page, isMobile);
     await page.getByRole("combobox", { name: "Cửa hàng của bạn" }).selectOption("CH002");
     await expect(page).toHaveURL(/store=CH002/);
     await expect(page).not.toHaveURL(/all=1/);
-    await expect(sw(page)).not.toBeChecked();
+    await expect(await sw(page, isMobile)).not.toBeChecked();
   });
 });
 

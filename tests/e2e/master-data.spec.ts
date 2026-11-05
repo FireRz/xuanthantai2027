@@ -22,7 +22,7 @@ test.describe("quản trị danh mục (T06.5)", () => {
     await admin.cleanup();
   });
 
-  test("thêm BST dưới nhãn A → trang xem hiện BST đó; ẩn BST có xác nhận → biến mất", async ({
+  test("thêm BST dưới nhãn A → bộ lọc trang xem có BST đó; ẩn BST có xác nhận → biến mất", async ({
     page,
     isMobile,
   }) => {
@@ -45,7 +45,7 @@ test.describe("quản trị danh mục (T06.5)", () => {
     const collection = await prisma.collection.findFirstOrThrow({ where: { name: colName } });
     expect(collection.brandId).toBe(brand.id);
 
-    // Có SP trong BST → trang xem hiện thẻ BST (bộ lọc trang xem do F04 làm sau)
+    // Có SP trong BST → bộ lọc BST trên trang xem có BST đó
     await prisma.product.create({
       data: {
         sku: `E2E${t}`,
@@ -54,8 +54,7 @@ test.describe("quản trị danh mục (T06.5)", () => {
         collectionId: collection.id,
       },
     });
-    await page.goto("/");
-    await expect(page.getByText(colName).first()).toBeVisible();
+    // Trang chủ không còn khu BST riêng (96c6296): BST chỉ hiện trong bộ lọc — kiểm ở bước dưới.
 
     // Bộ lọc trang xem: chọn nhãn A → danh sách BST có (hoặc không còn) BST vừa thêm
     const collectionInFilter = async () => {
@@ -94,12 +93,11 @@ test.describe("quản trị danh mục (T06.5)", () => {
     await expect(page.getByText(colName)).toHaveCount(0);
     await expect(await collectionInFilter()).toHaveCount(0);
 
-    // Hiện lại → thẻ quay lại
+    // Hiện lại → BST quay lại bộ lọc trang xem
     await page.goto("/admin/master-data");
     await row.getByRole("button", { name: "Hiện" }).click();
     await expect(row.getByText("Đã ẩn", { exact: true })).toHaveCount(0);
-    await page.goto("/");
-    await expect(page.getByText(colName).first()).toBeVisible();
+    await expect(await collectionInFilter()).toHaveCount(1);
   });
 
   test("tạo dòng trùng tên trong nhãn → báo lỗi; xóa mục đang được dùng → báo phải ẩn", async ({
