@@ -47,7 +47,7 @@ Với người chỉ cần xem hình và thông tin sản phẩm (không cần s
 
 - Bạn cũng có thể tự bật bằng công tắc **Ẩn số lượng / Chỉ xem hình** ở cuối thanh cửa hàng (cạnh nút Tìm, luôn thấy khi cuộn); chế độ giữ nguyên khi lọc, tìm mã, mở chi tiết, bấm Xem thêm.
 - Đây chỉ là cách hiển thị gọn, không phải phân quyền: người nhận vẫn có thể gạt lại công tắc để tắt và xem số lượng.
-- Trong chi tiết sản phẩm (cả hai chế độ): bấm ảnh để phóng to (Esc hoặc ✕ để thu lại), dùng nút mũi tên (máy tính: hai bên ngoài khung chi tiết; điện thoại: cạnh dòng `2 / 150`) hoặc phím ← / → (vuốt trái / phải trên ảnh hoặc phần thông tin trên điện thoại) để sang sản phẩm trước / sau. Thứ tự đúng như danh sách đang xem (cùng bộ lọc, tìm mã, cửa hàng, sắp xếp), dòng `2 / 150` cạnh mã cho biết đang ở sản phẩm thứ mấy. Vuốt ngang trên bảng số lượng theo cửa hàng chỉ cuộn bảng. Chuyển sản phẩm không thêm lịch sử: bấm Back hoặc ✕ là đóng chi tiết luôn.
+- Trong chi tiết sản phẩm (cả hai chế độ): bấm ảnh để phóng to (Esc hoặc ✕ để thu lại), dùng nút mũi tên (máy tính: hai bên ngoài khung chi tiết; điện thoại: cạnh dòng `2 / 150`) hoặc phím ← / → (vuốt trái / phải trên ảnh hoặc phần thông tin trên điện thoại) để sang sản phẩm trước / sau. Thứ tự đúng như danh sách đang xem (cùng bộ lọc, tìm mã, cửa hàng, sắp xếp), dòng `2 / 150` cạnh mã cho biết đang ở sản phẩm thứ mấy. Vuốt ngang trên bảng số lượng theo cửa hàng chỉ cuộn bảng. Chuyển sản phẩm không thêm lịch sử: bấm Back hoặc ✕ là đóng chi tiết luôn. Các hiệu ứng chuyển động (lướt sản phẩm, ảnh bay vào chi tiết) tự tắt khi thiết bị bật "Giảm chuyển động" (reduce motion).
 
 ### A5. Cách tính cần biết
 
