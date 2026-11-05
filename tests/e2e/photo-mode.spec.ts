@@ -228,8 +228,11 @@ test.describe("chuyển SP trước/sau trong popup", () => {
   }) => {
     await page.goto("/");
     const [start, after] = [await skuAt(page, 2), await skuAt(page, 3)];
+    // Popup đã gắn xong (đã gửi lần tải sẵn SP kế bên) rồi mới bấm phím — máy chậm dễ bấm hụt.
+    const warm = page.waitForResponse((r) => new URL(r.url()).pathname === "/api/product-view");
     await cards(page).nth(2).click();
     await expect(detail(page)).toHaveAttribute("data-sku", start);
+    await warm;
 
     await page.keyboard.press("ArrowRight");
     await expect(page).toHaveURL(new RegExp(`sp=${after}`));
@@ -377,8 +380,11 @@ test.describe("chuyển SP trước/sau trong popup", () => {
   }) => {
     await page.goto("/");
     const [first, sixth] = [await skuAt(page, 0), await skuAt(page, 5)];
+    // Chờ lần tải sẵn đầu tiên xong (máy chủ dev biên dịch API lần đầu có thể mất vài giây).
+    const warm = page.waitForResponse((r) => new URL(r.url()).pathname === "/api/product-view");
     await cards(page).first().click();
     await expect(detail(page)).toHaveAttribute("data-sku", first);
+    await warm;
     for (let i = 0; i < 5; i++) await page.keyboard.press("ArrowRight");
     await expect(detail(page)).toHaveAttribute("data-sku", sixth);
     await expect(page).toHaveURL(new RegExp(`sp=${sixth}`));
@@ -421,8 +427,63 @@ test.describe("chuyển SP trước/sau trong popup", () => {
     expect(await transformOf(page)).toBe("none");
   });
 
+  /**
+   * Gần cuối danh sách (tìm theo mã → ít kết quả): mở SP áp chót, API của SP cuối bị giữ lại,
+   * bấm → 3 lần nhanh (2 lần sau xếp hàng chờ SP cuối, mà SP cuối không có SP sau)
+   * → vẫn hiện SP cuối, không kẹt ở trạng thái chờ/trượt ra.
+   */
+  async function pressPastEnd(page: Page) {
+    await page.goto("/");
+    const prefix = (await skuAt(page, 0)).slice(0, -1);
+    await page.goto(`/?q=${prefix}`);
+    await expect(cards(page).first()).toBeVisible();
+    const n = await cards(page).count();
+    expect(n).toBeGreaterThanOrEqual(3);
+    const [beforeLast, last] = [await skuAt(page, n - 2), await skuAt(page, n - 1)];
+    let release!: () => void;
+    const gate = new Promise<void>((res) => (release = res));
+    await page.route(
+      (u) => u.pathname === "/api/product-view" && u.searchParams.get("sp") === last,
+      async (r) => {
+        await gate;
+        await r.continue();
+      },
+    );
+    await cards(page)
+      .nth(n - 2)
+      .click();
+    await expect(detail(page)).toHaveAttribute("data-sku", beforeLast);
+    await expect(page.getByTestId("product-position")).toHaveText(`${n - 1} / ${n}`);
+    for (let i = 0; i < 3; i++) await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(500); // giữ API SP cuối lâu hơn thời gian trượt ra
+    release();
+    await expect(detail(page)).toHaveAttribute("data-sku", last);
+    await expect(page).toHaveURL(new RegExp(`sp=${last}`));
+    await expect(page.getByTestId("product-position")).toHaveText(`${n} / ${n}`);
+    await expect(content(page)).not.toHaveAttribute("data-motion");
+    await expect(peek(page)).toHaveCount(0);
+    expect(await transformOf(page)).toBe("none");
+    // Hết kẹt: bấm → nữa ở SP cuối thì nảy báo hết (giảm chuyển động: không làm gì), mã không đổi.
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(400);
+    await expect(detail(page)).toHaveAttribute("data-sku", last);
+    await expect(content(page)).not.toHaveAttribute("data-motion");
+  }
+
+  test("gần cuối, mạng chậm: bấm → 3 lần nhanh vượt quá SP cuối → dừng ở SP cuối, không kẹt", async ({
+    page,
+  }) => {
+    await pressPastEnd(page);
+  });
+
   test.describe("giảm chuyển động", () => {
     test.use({ reducedMotion: "reduce" });
+
+    test("giảm chuyển động, gần cuối, mạng chậm: bấm → 3 lần nhanh → dừng ở SP cuối", async ({
+      page,
+    }) => {
+      await pressPastEnd(page);
+    });
 
     test("giảm chuyển động: chuyển SP vẫn đúng, không bao giờ có data-motion", async ({ page }) => {
       await page.goto("/");

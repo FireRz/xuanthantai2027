@@ -86,13 +86,10 @@ export function ProductViewer({ initial }: { initial: ProductView }) {
 
   const { detail, neighbors } = view;
 
-  // Máy chủ dựng lại popup → bỏ mọi lần chuyển đang dở, bấm tiếp tính từ SP mới.
+  // Máy chủ dựng lại popup → bấm tiếp tính từ SP mới. Đang chuyển dở thì để lần chuyển đó chạy nốt
+  // (máy chủ có thể gửi lại dữ liệu của chính SP vừa mở ngay sau khi bấm).
   useEffect(() => {
-    seq.current++;
-    aim.current = { promise: Promise.resolve(initial), data: initial };
-    queued.current = [];
-    busy.current = false;
-    setMotion(IDLE);
+    if (!busy.current) aim.current = { promise: Promise.resolve(initial), data: initial };
   }, [initial]);
 
   // Ghi dữ liệu đang xem vào bộ nhớ (quay lại SP vừa xem thì hiện ngay) và tải sẵn hai SP kế bên.
@@ -122,12 +119,13 @@ export function ProductViewer({ initial }: { initial: ProductView }) {
    * Dữ liệu chưa về khi trượt ra xong → `wait` (lớp ló ra của SP đích chiếm chỗ).
    * Bấm tiếp khi đang chuyển: bỏ hiệu ứng cũ (`seq`), SP đích tính từ SP đích đang tới
    * nên bấm nhanh liên tiếp không lùi. Giảm chuyển động → đổi ngay, không hiệu ứng.
+   * Trả về false khi phía đó không có SP (không bắt đầu lần chuyển nào).
    */
-  function go(d: Dir) {
+  function go(d: Dir): boolean {
     const base = aim.current;
     if (base.data === undefined) {
       queued.current.push(d);
-      return;
+      return true;
     }
     const target = d === "next" ? base.data?.neighbors?.next : base.data?.neighbors?.prev;
     const reduced = prefersReducedMotion();
@@ -137,7 +135,7 @@ export function ProductViewer({ initial }: { initial: ProductView }) {
         setMotion({ phase: "edge", dir: d });
         setTimeout(() => setMotion((m) => (m.phase === "edge" ? IDLE : m)), EDGE_MS + SAFETY_MS);
       }
-      return;
+      return false;
     }
     const token = ++seq.current;
     busy.current = true;
@@ -171,13 +169,15 @@ export function ProductViewer({ initial }: { initial: ProductView }) {
     entry.promise.then(
       () => {
         // Có lần bấm đang chờ SP này → chạy tiếp luôn (không hiện SP trung gian).
-        const q = aim.current === entry ? queued.current.shift() : undefined;
-        if (q) go(q);
-        else finish();
+        // Lần bấm chờ nào không đi được (hết SP / SP không còn) thì bỏ; không còn lần nào → hiện SP này.
+        while (aim.current === entry && queued.current.length)
+          if (go(queued.current.shift()!)) return;
+        finish();
       },
       () => token === seq.current && fallback(target),
     );
     finish();
+    return true;
   }
 
   return (
