@@ -298,6 +298,10 @@ test.describe("chuyển SP trước/sau trong popup", () => {
     await page.goto("/");
     await cards(page).nth(1).click();
     await expect(detail(page)).toBeVisible();
+    // Đo sau khi popup trượt lên xong (các lần đo cách nhau vài khung hình khi máy chậm).
+    await page
+      .getByTestId("product-dialog")
+      .evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
     const pos = (await page.getByTestId("product-position").boundingBox())!;
     const next = (await nextButton(page).boundingBox())!;
     const img = (await detail(page).getByRole("img").first().boundingBox())!;
@@ -332,8 +336,155 @@ test.describe("chuyển SP trước/sau trong popup", () => {
     await expect(page.getByTestId("store-qty-table")).toHaveCount(0);
   });
 
+  // Lướt kiểu album: phần nội dung lướt mang data-motion trong lúc chạy hiệu ứng.
+  const content = (page: Page) => page.getByTestId("swipe-content");
+  const peek = (page: Page) => page.getByTestId("swipe-peek");
+  const transformOf = (page: Page) =>
+    content(page).evaluate((el) => getComputedStyle(el).transform);
+
+  test("bấm Sản phẩm sau: SP cũ trượt ra rồi SP mới trượt vào; xong thì đứng yên", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const [first, second] = [await skuAt(page, 0), await skuAt(page, 1)];
+    await cards(page).first().click();
+    await expect(detail(page)).toHaveAttribute("data-sku", first);
+    await expect(content(page)).not.toHaveAttribute("data-motion");
+
+    await nextButton(page).click();
+    await expect(content(page)).toHaveAttribute("data-motion", /exit-next|enter-next/);
+    await expect(detail(page)).toHaveAttribute("data-sku", second);
+    await expect(content(page)).not.toHaveAttribute("data-motion");
+    expect(await transformOf(page)).toBe("none");
+    await expect(peek(page)).toHaveCount(0);
+  });
+
+  test("SP đầu: phím ← → khung lắc (edge-prev), mã không đổi", async ({ page }) => {
+    await page.goto("/");
+    const first = await skuAt(page, 0);
+    await cards(page).first().click();
+    await expect(detail(page)).toHaveAttribute("data-sku", first);
+    await page.keyboard.press("ArrowLeft");
+    await expect(content(page)).toHaveAttribute("data-motion", "edge-prev");
+    await expect(content(page)).not.toHaveAttribute("data-motion");
+    await expect(detail(page)).toHaveAttribute("data-sku", first);
+    await expect(page).toHaveURL(new RegExp(`sp=${first}`));
+    expect(await transformOf(page)).toBe("none");
+  });
+
+  test("bấm → 5 lần liên tiếp nhanh → dừng ở mã thứ 6 của lưới, không kẹt transform", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const [first, sixth] = [await skuAt(page, 0), await skuAt(page, 5)];
+    await cards(page).first().click();
+    await expect(detail(page)).toHaveAttribute("data-sku", first);
+    for (let i = 0; i < 5; i++) await page.keyboard.press("ArrowRight");
+    await expect(detail(page)).toHaveAttribute("data-sku", sixth);
+    await expect(page).toHaveURL(new RegExp(`sp=${sixth}`));
+    await expect(page.getByTestId("product-position")).toHaveText(/^6 \/ \d/);
+    await expect(content(page)).not.toHaveAttribute("data-motion");
+    expect(await transformOf(page)).toBe("none");
+    // Đứng yên hẳn: không lùi/nhảy thêm sau đó.
+    await page.waitForTimeout(800);
+    await expect(detail(page)).toHaveAttribute("data-sku", sixth);
+  });
+
+  test("mạng chậm: API trễ 800 ms → sau khi trượt ra vẫn có swipe-peek, rồi hiện đúng SP", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const [first, second] = [await skuAt(page, 0), await skuAt(page, 1)];
+    // API của SP sau trả về 800 ms sau lúc bấm (kể cả lần tải sẵn đã gửi từ lúc mở popup).
+    let release!: () => void;
+    const gate = new Promise<void>((res) => (release = res));
+    await page.route(
+      (u) => u.pathname === "/api/product-view" && u.searchParams.get("sp") === second,
+      async (r) => {
+        await gate;
+        await r.continue();
+      },
+    );
+    await cards(page).first().click();
+    await expect(detail(page)).toHaveAttribute("data-sku", first);
+    await nextButton(page).click();
+    setTimeout(release, 800);
+    // Đã trượt ra hết nhưng dữ liệu chưa về: lớp ló ra của SP đích chiếm chỗ.
+    await page.waitForTimeout(300);
+    await expect(detail(page)).toHaveAttribute("data-sku", first);
+    await expect(peek(page)).toBeVisible();
+    await expect(peek(page)).toHaveAttribute("data-dir", "next");
+    await expect(detail(page)).toHaveAttribute("data-sku", second);
+    await expect(page).toHaveURL(new RegExp(`sp=${second}`));
+    await expect(content(page)).not.toHaveAttribute("data-motion");
+    await expect(peek(page)).toHaveCount(0);
+    expect(await transformOf(page)).toBe("none");
+  });
+
+  test.describe("giảm chuyển động", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("giảm chuyển động: chuyển SP vẫn đúng, không bao giờ có data-motion", async ({ page }) => {
+      await page.goto("/");
+      const [first, second] = [await skuAt(page, 0), await skuAt(page, 1)];
+      await cards(page).first().click();
+      await expect(detail(page)).toHaveAttribute("data-sku", first);
+      // Ghi lại nếu có khung hình nào mang data-motion.
+      await page.evaluate(() => {
+        const w = window as unknown as { sawMotion: boolean };
+        w.sawMotion = false;
+        const tick = () => {
+          if (document.querySelector("[data-motion]")) w.sawMotion = true;
+          requestAnimationFrame(tick);
+        };
+        tick();
+      });
+      await page.keyboard.press("ArrowLeft"); // SP đầu: không nảy
+      await nextButton(page).click();
+      await expect(detail(page)).toHaveAttribute("data-sku", second);
+      await expect(page).toHaveURL(new RegExp(`sp=${second}`));
+      await page.keyboard.press("ArrowLeft");
+      await expect(detail(page)).toHaveAttribute("data-sku", first);
+      await page.waitForTimeout(300);
+      expect(
+        await page.evaluate(() => (window as unknown as { sawMotion: boolean }).sawMotion),
+      ).toBe(false);
+    });
+  });
+
   test.describe("điện thoại", () => {
     test.skip(({ isMobile }) => !isMobile, "vuốt cảm ứng chỉ kiểm trên điện thoại");
+
+    test("kéo dở tay: thấy swipe-peek data-dir=next; thả dưới ngưỡng → về chỗ cũ, mã không đổi", async ({
+      page,
+    }) => {
+      await page.goto("/");
+      const first = await skuAt(page, 0);
+      await page.goto(`/?sp=${first}`);
+      await expect(detail(page)).toHaveAttribute("data-sku", first);
+      const image = detail(page).getByRole("img").first();
+      await expect(image).toBeVisible();
+      const box = (await image.boundingBox())!;
+      const [x, y] = [box.x + box.width / 2, box.y + box.height / 2];
+      const cdp = await page.context().newCDPSession(page);
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
+      for (let i = 1; i <= 9; i++)
+        await cdp.send("Input.dispatchTouchEvent", {
+          type: "touchMove",
+          touchPoints: [{ x: x - i * 5, y }],
+        });
+      await expect(peek(page)).toBeVisible();
+      await expect(peek(page)).toHaveAttribute("data-dir", "next");
+      // Thả chậm (không phải vuốt nhanh) dưới ngưỡng 60px.
+      await page.waitForTimeout(300);
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+      await cdp.detach();
+      await expect(peek(page)).toHaveCount(0);
+      await expect.poll(() => transformOf(page)).toBe("none");
+      await page.waitForTimeout(400);
+      await expect(detail(page)).toHaveAttribute("data-sku", first);
+      await expect(page).toHaveURL(new RegExp(`sp=${first}`));
+    });
 
     test("vuốt trái trên ảnh → SP sau", async ({ page }) => {
       await page.goto("/");

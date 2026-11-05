@@ -1,25 +1,29 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { createContext, useContext, useEffect, useRef } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { formatInt } from "@/lib/format";
-import { cn } from "@/lib/utils";
 import type { ProductNeighbors } from "@/server/services/product-neighbors";
+import { ProductImage } from "./product-image";
+import { EDGE_MS, prefersReducedMotion, SLOP, SPRING, swipeDecision } from "./swipe-motion";
 
 export type Dir = "prev" | "next";
+
+/** Giai đoạn hiệu ứng lướt: trượt ra → (chờ dữ liệu) → trượt vào; `edge` = nảy báo hết SP. */
+export type SwipeMotion = { phase: "idle" | "exit" | "wait" | "enter" | "edge"; dir: Dir };
 
 const Ctx = createContext<{ neighbors: ProductNeighbors | null; go: (dir: Dir) => void } | null>(
   null,
 );
 
-/** Vuốt ngang quá ngưỡng này (px) khi thả tay thì chuyển SP. */
-const SWIPE_PX = 60;
-/** Vuốt nhanh (px/ms) thì chuyển dù chưa tới ngưỡng. */
-const FLICK_SPEED = 0.5;
-/** Di chuyển tối thiểu (px) trước khi quyết định vuốt ngang hay cuộn dọc. */
-const SLOP = 10;
-
 const zoomOpen = () => document.querySelector("[data-testid=image-zoom][open]") !== null;
+
+/** Giá trị `data-motion` (CSS ở globals.css chạy hiệu ứng theo nó); đứng yên → không có. */
+function motionAttr({ phase, dir }: SwipeMotion) {
+  if (phase === "idle") return undefined;
+  // Chờ dữ liệu: giữ khung cuối của trượt ra (lớp ló ra của SP đích chiếm chỗ).
+  return `${phase === "wait" ? "exit" : phase}-${dir}`;
+}
 
 /** Cung cấp SP trước/sau + hàm chuyển cho nút hai bên popup và mũi tên cạnh số thứ tự. */
 export function NeighborProvider({
@@ -37,24 +41,26 @@ export function NeighborProvider({
 /**
  * Vùng vuốt sang SP trước/sau trong popup (cả chế độ đầy đủ lẫn chế độ hình): phím ←/→,
  * vuốt ngang trên ảnh/khối thông tin (`data-swipe-area`). Việc tải và đổi SP do ProductViewer lo.
+ * Kiểu album: kéo tay thì nội dung đi theo ngón tay, ảnh SP kế bên ló ra sát mép (`swipe-peek`);
+ * hiệu ứng trượt ra/vào/nảy chạy theo `motion` (ProductViewer sở hữu), xong thì báo `onMotionEnd`.
  * Bỏ qua khi lớp phóng to ảnh đang mở; vuốt bắt đầu trên bảng SL theo cửa hàng là cuộn bảng.
  */
 export function ProductSwipe({
   contentKey,
-  dir,
-  pending,
+  motion,
+  onMotionEnd,
   children,
 }: {
   /** Đổi khi sang SP khác → gắn lại nội dung để chạy hiệu ứng trượt vào. */
   contentKey: string;
-  dir: Dir | null;
-  pending: boolean;
+  motion: SwipeMotion;
+  onMotionEnd: () => void;
   children: React.ReactNode;
 }) {
   const ctx = useContext(Ctx);
   const neighbors = ctx?.neighbors ?? null;
   const go = (d: Dir) => ctx?.go(d);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const drag = useRef<{
     id: number;
     x: number;
@@ -63,6 +69,8 @@ export function ProductSwipe({
     axis: "x" | "y" | null;
   } | null>(null);
   const suppressClick = useRef(false);
+  /** Đang kéo tay về phía nào (để hiện lớp ló ra đúng phía). */
+  const [dragDir, setDragDir] = useState<Dir | null>(null);
 
   const prev = neighbors?.prev ?? null;
   const next = neighbors?.next ?? null;
@@ -95,10 +103,11 @@ export function ProductSwipe({
     for (const src of [prevImage, nextImage]) if (src) new Image().src = src;
   }, [prevImage, nextImage]);
 
-  function setOffset(dx: number, animate: boolean) {
-    const el = contentRef.current;
+  /** Dịch nội dung theo ngón tay; `spring` = trả về bằng đường cong nảy (hủy vuốt). */
+  function setOffset(dx: number, spring: boolean) {
+    const el = trackRef.current;
     if (!el) return;
-    el.style.transition = animate ? "transform 200ms ease-out" : "";
+    el.style.transition = spring ? `transform ${EDGE_MS}ms ${SPRING}` : "";
     el.style.transform = dx ? `translateX(${dx}px)` : "";
   }
 
@@ -126,8 +135,9 @@ export function ProductSwipe({
       }
       e.currentTarget.setPointerCapture(e.pointerId);
     }
-    // Phía không có SP: kéo nặng tay (chỉ một phần ba quãng đường).
+    // Phía không có SP: kéo nặng tay (chỉ một phần ba quãng đường), không có gì ló ra.
     const blocked = (dx < 0 && !next) || (dx > 0 && !prev);
+    setDragDir(blocked || !dx ? null : dx < 0 ? "next" : "prev");
     setOffset(blocked ? dx / 3 : dx, false);
   }
 
@@ -138,17 +148,35 @@ export function ProductSwipe({
     if (d.axis !== "x") return;
     suppressClick.current = true;
     setTimeout(() => (suppressClick.current = false), 300);
-    const dx = e.clientX - d.x;
-    const fast = Math.abs(dx) / Math.max(e.timeStamp - d.t, 1) > FLICK_SPEED;
-    const switching =
-      e.type === "pointerup" && (Math.abs(dx) > SWIPE_PX || (fast && Math.abs(dx) > SLOP * 2));
-    const target = dx < 0 ? next : prev;
-    // Chuyển được: nội dung mới trượt vào từ đúng phía nên không cần kéo ngược về giữa trước.
-    if (switching && target) {
-      setOffset(0, false);
-      go(dx < 0 ? "next" : "prev");
-    } else setOffset(0, true);
+    const decision = swipeDecision({
+      dx: e.clientX - d.x,
+      dtMs: e.timeStamp - d.t,
+      released: e.type === "pointerup",
+      hasPrev: !!prev,
+      hasNext: !!next,
+    });
+    if (decision === "next" || decision === "prev") {
+      // Trượt ra tiếp từ chỗ ngón tay (không kéo về giữa trước); giảm chuyển động thì về chỗ ngay.
+      if (prefersReducedMotion()) {
+        setDragDir(null);
+        setOffset(0, false);
+      }
+      go(decision);
+    } else {
+      // Hủy / hết SP phía đó: nảy về chỗ cũ.
+      setDragDir(null);
+      setOffset(0, !prefersReducedMotion());
+    }
   }
+
+  // Lớp ló ra: lúc kéo tay, và lúc trượt ra/chờ dữ liệu (chiếm chỗ SP cũ).
+  const peekDir =
+    motion.phase === "exit" || motion.phase === "wait"
+      ? motion.dir
+      : motion.phase === "idle"
+        ? dragDir
+        : null;
+  const peekImage = peekDir === "next" ? nextImage : prevImage;
 
   return (
     <div
@@ -167,16 +195,35 @@ export function ProductSwipe({
     >
       <div
         key={contentKey}
-        ref={contentRef}
-        className={cn(
-          "transition-opacity md:flex md:min-h-0 md:flex-1 md:flex-col",
-          pending && "opacity-60",
-          dir === "next" && "animate-in slide-in-from-right-8 fade-in-60 duration-200",
-          dir === "prev" && "animate-in slide-in-from-left-8 fade-in-60 duration-200",
-          "motion-reduce:animate-none",
-        )}
+        ref={trackRef}
+        data-testid="swipe-content"
+        data-motion={motionAttr(motion)}
+        onAnimationEnd={(e) => {
+          // Chỉ hiệu ứng của chính khung lướt (bỏ qua hiệu ứng của ảnh/khối con).
+          if (e.target === e.currentTarget) onMotionEnd();
+        }}
+        className="relative md:flex md:min-h-0 md:flex-1 md:flex-col"
       >
         {children}
+        {peekDir && (
+          <div
+            aria-hidden
+            data-testid="swipe-peek"
+            data-dir={peekDir}
+            className={
+              peekDir === "next"
+                ? "absolute inset-y-0 left-full w-full p-4 md:px-6 md:py-5"
+                : "absolute inset-y-0 right-full w-full p-4 md:px-6 md:py-5"
+            }
+          >
+            <ProductImage
+              thumbUrl={peekImage}
+              alt=""
+              priority
+              className="border-line aspect-square w-full max-w-[30vh] rounded-xl border md:w-[300px] md:max-w-none"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

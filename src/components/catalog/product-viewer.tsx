@@ -8,7 +8,14 @@ import type { ProductNeighbors } from "@/server/services/product-neighbors";
 import { useCatalogNav } from "./catalog-nav";
 import { DetailBody } from "./product-detail-body";
 import { ProductDialog } from "./product-dialog";
-import { NeighborProvider, ProductSwipe, SideNavButton, type Dir } from "./product-swipe";
+import {
+  NeighborProvider,
+  ProductSwipe,
+  SideNavButton,
+  type Dir,
+  type SwipeMotion,
+} from "./product-swipe";
+import { EDGE_MS, ENTER_MS, EXIT_MS, prefersReducedMotion } from "./swipe-motion";
 
 export interface ProductView {
   detail: ProductDetail;
@@ -19,8 +26,12 @@ export interface ProductView {
 const FRESH_MS = 60_000;
 /** Giữ tối đa bấy nhiêu SP đã tải trong bộ nhớ. */
 const MAX_CACHED = 40;
+/** Chờ thêm (ms) sau hiệu ứng rồi tự về đứng yên nếu trình duyệt không báo animationend. */
+const SAFETY_MS = 150;
+const IDLE: SwipeMotion = { phase: "idle", dir: "next" };
 
 type Entry = { at: number; promise: Promise<ProductView | null>; data?: ProductView | null };
+type Aim = Pick<Entry, "promise" | "data">;
 const cache = new Map<string, Entry>();
 
 function apiUrl(state: CatalogParams, sku: string) {
@@ -64,11 +75,25 @@ export function ProductViewer({ initial }: { initial: ProductView }) {
     setPrevInitial(initial);
     setView(initial);
   }
-  const [dir, setDir] = useState<Dir | null>(null);
-  const [pending, setPending] = useState(false);
+  const [motion, setMotion] = useState<SwipeMotion>(IDLE);
   const seq = useRef(0);
+  /** SP đích của lần chuyển gần nhất (đang chạy hoặc đã xong): bấm tiếp tính từ SP này. */
+  const aim = useRef<Aim>({ promise: Promise.resolve(initial), data: initial });
+  /** Bấm khi dữ liệu SP đích chưa về (chưa biết SP kế tiếp của nó): xếp hàng, chạy lần lượt. */
+  const queued = useRef<Dir[]>([]);
+  /** Đang có lần chuyển chưa xong. */
+  const busy = useRef(false);
 
   const { detail, neighbors } = view;
+
+  // Máy chủ dựng lại popup → bỏ mọi lần chuyển đang dở, bấm tiếp tính từ SP mới.
+  useEffect(() => {
+    seq.current++;
+    aim.current = { promise: Promise.resolve(initial), data: initial };
+    queued.current = [];
+    busy.current = false;
+    setMotion(IDLE);
+  }, [initial]);
 
   // Ghi dữ liệu đang xem vào bộ nhớ (quay lại SP vừa xem thì hiện ngay) và tải sẵn hai SP kế bên.
   useEffect(() => {
@@ -79,33 +104,80 @@ export function ProductViewer({ initial }: { initial: ProductView }) {
       if (sku) load(apiUrl(state, sku));
   }, [view, state]);
 
-  function show(v: ProductView, d: Dir) {
-    setDir(d);
-    setPending(false);
+  function show(v: ProductView) {
     setView(v);
     window.history.replaceState(null, "", hrefFor({ ...state, sp: v.detail.sku }));
   }
 
+  function fallback(sku: string) {
+    // Không tải được qua API → điều hướng thường (máy chủ dựng lại trang).
+    busy.current = false;
+    queued.current = [];
+    setMotion(IDLE);
+    router.replace(hrefFor({ ...state, sp: sku }), { scroll: false });
+  }
+
+  /**
+   * Chuyển SP: trượt ra (EXIT_MS) song song với tải dữ liệu; xong cả hai → hiện SP mới + trượt vào.
+   * Dữ liệu chưa về khi trượt ra xong → `wait` (lớp ló ra của SP đích chiếm chỗ).
+   * Bấm tiếp khi đang chuyển: bỏ hiệu ứng cũ (`seq`), SP đích tính từ SP đích đang tới
+   * nên bấm nhanh liên tiếp không lùi. Giảm chuyển động → đổi ngay, không hiệu ứng.
+   */
   function go(d: Dir) {
-    const target = d === "next" ? neighbors?.next : neighbors?.prev;
-    if (!target) return;
+    const base = aim.current;
+    if (base.data === undefined) {
+      queued.current.push(d);
+      return;
+    }
+    const target = d === "next" ? base.data?.neighbors?.next : base.data?.neighbors?.prev;
+    const reduced = prefersReducedMotion();
+    if (!target) {
+      // Hết SP phía đó: khung nảy nhẹ báo hết (không làm gián đoạn lần chuyển đang chạy).
+      if (!busy.current && !reduced) {
+        setMotion({ phase: "edge", dir: d });
+        setTimeout(() => setMotion((m) => (m.phase === "edge" ? IDLE : m)), EDGE_MS + SAFETY_MS);
+      }
+      return;
+    }
     const token = ++seq.current;
+    busy.current = true;
     const entry = load(apiUrl(state, target));
-    const fallback = () => {
-      // Không tải được qua API → điều hướng thường (máy chủ dựng lại trang).
-      setPending(false);
-      router.replace(hrefFor({ ...state, sp: target }), { scroll: false });
+    aim.current = entry;
+    let exited = reduced;
+    let done = false;
+    const finish = () => {
+      if (done || token !== seq.current || !exited || entry.data === undefined) return;
+      done = true;
+      busy.current = false;
+      if (!entry.data) return fallback(target);
+      show(entry.data);
+      if (reduced) return setMotion(IDLE);
+      setMotion({ phase: "enter", dir: d });
+      // Phòng khi không nhận được animationend: không để kẹt ở trạng thái đang trượt.
+      setTimeout(
+        () => setMotion((m) => (token === seq.current && m.phase === "enter" ? IDLE : m)),
+        ENTER_MS + SAFETY_MS,
+      );
     };
-    if (entry.data) return show(entry.data, d);
-    setPending(true);
-    entry.promise.then(
-      (v) => {
+    if (!reduced) {
+      setMotion({ phase: "exit", dir: d });
+      setTimeout(() => {
         if (token !== seq.current) return;
-        if (v) show(v, d);
-        else fallback();
+        exited = true;
+        if (entry.data === undefined) setMotion({ phase: "wait", dir: d });
+        finish();
+      }, EXIT_MS);
+    }
+    entry.promise.then(
+      () => {
+        // Có lần bấm đang chờ SP này → chạy tiếp luôn (không hiện SP trung gian).
+        const q = aim.current === entry ? queued.current.shift() : undefined;
+        if (q) go(q);
+        else finish();
       },
-      () => token === seq.current && fallback(),
+      () => token === seq.current && fallback(target),
     );
+    finish();
   }
 
   return (
@@ -115,7 +187,13 @@ export function ProductViewer({ initial }: { initial: ProductView }) {
         prev={<SideNavButton dir="prev" />}
         next={<SideNavButton dir="next" />}
       >
-        <ProductSwipe contentKey={detail.sku} dir={dir} pending={pending}>
+        <ProductSwipe
+          contentKey={detail.sku}
+          motion={motion}
+          onMotionEnd={() =>
+            setMotion((m) => (m.phase === "enter" || m.phase === "edge" ? IDLE : m))
+          }
+        >
           <DetailBody detail={detail} filterStore={state.store} photo={state.photo} />
         </ProductSwipe>
       </ProductDialog>

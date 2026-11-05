@@ -189,6 +189,79 @@
   }
 }
 
+/* Lướt SP trong popup kiểu album (data-motion do ProductSwipe gắn; hằng số ở swipe-motion.ts).
+   Trượt ra không khai báo "from": bắt đầu từ chỗ ngón tay đang kéo tới (transform đang có). */
+@keyframes swipe-exit-next {
+  to {
+    opacity: 0.4;
+    transform: translateX(-100%);
+  }
+}
+@keyframes swipe-exit-prev {
+  to {
+    opacity: 0.4;
+    transform: translateX(100%);
+  }
+}
+@keyframes swipe-enter-next {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes swipe-enter-prev {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes swipe-edge-next {
+  0%,
+  100% {
+    transform: none;
+  }
+  40% {
+    transform: translateX(-14px);
+  }
+}
+@keyframes swipe-edge-prev {
+  0%,
+  100% {
+    transform: none;
+  }
+  40% {
+    transform: translateX(14px);
+  }
+}
+/* Trượt ra giữ nguyên vị trí cuối (forwards) để lúc chờ dữ liệu lớp ló ra vẫn chiếm chỗ. */
+[data-motion="exit-next"] {
+  animation: swipe-exit-next 180ms ease-in forwards;
+}
+[data-motion="exit-prev"] {
+  animation: swipe-exit-prev 180ms ease-in forwards;
+}
+[data-motion="enter-next"] {
+  animation: swipe-enter-next 340ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+[data-motion="enter-prev"] {
+  animation: swipe-enter-prev 340ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+[data-motion="edge-next"] {
+  animation: swipe-edge-next 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+[data-motion="edge-prev"] {
+  animation: swipe-edge-prev 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-motion] {
+    animation: none;
+  }
+}
+
 /* Khung chờ lấp lánh: vệt sáng quét ngang qua khối xám. */
 @keyframes shimmer {
   to {
