@@ -27,7 +27,7 @@ export function SortMenu({
   return (
     <label
       className={cn(
-        "border-line focus-within:outline-brand relative inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border bg-white px-4 text-[15px] font-medium whitespace-nowrap focus-within:outline-2 focus-within:outline-offset-2 md:min-h-10",
+        "border-line focus-within:outline-brand relative inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border bg-white px-4 text-[15px] font-medium whitespace-nowrap focus-within:outline-2 focus-within:outline-offset-2 md:min-h-9",
         compact && "w-full",
       )}
     >

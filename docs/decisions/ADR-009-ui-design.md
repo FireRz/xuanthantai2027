@@ -49,4 +49,6 @@ Góp ý của chủ dự án: mockup v1 "giống báo cáo hơn là một trang 
 ## Sửa đổi khi dùng thử (2026-11-05)
 | # | Thay đổi | Thay cho |
 |---|----------|----------|
-| U16' | **Chân trang khớp banner và gọn hơn:** nền đỏ `--color-festive` `#CC1208` dùng chung với banner, viền lượn vàng ở mép trên; chiều cao giảm từ 334px xuống khoảng 186px trên điện thoại 375px, từ 148px xuống khoảng 104px trên máy tính (logo và tên cùng một hàng, link Phân tích chung hàng với nút Teams). Tên chi nhánh giữ màu trắng vì chữ vàng trên nền đỏ này chưa đạt tương phản 3:1 | Nền đỏ đậm `#8E1B16` ở U16 |
+| U16' | **Chân trang khớp banner và gọn hơn:** nền đỏ `--color-festive` `#CC1208` dùng chung với banner, viền lượn vàng ở mép trên; chiều cao giảm từ 334px xuống khoảng 186px trên điện thoại 375px, từ 148px xuống khoảng 104px trên máy tính (logo và tên cùng một hàng). Tên chi nhánh giữ màu trắng vì chữ vàng trên nền đỏ này chưa đạt tương phản 3:1 | Nền đỏ đậm `#8E1B16` ở U16 |
+| U16'' | **Giấu lối vào trang Phân tích ở chân trang:** bỏ chữ "Phân tích", chữ **Phòng Cung Ứng** trở thành link trông như chữ thường (không gạch chân, con trỏ không đổi) để người xem không nhận ra; bàn phím vẫn thấy viền focus. Trang vẫn cần mật khẩu xem, việc giấu chỉ để chân trang gọn và cân đối, không phải biện pháp bảo mật | Link nhỏ "Phân tích" ở ADR-012 P9 |
+| U8'' | **Pill bộ lọc thấp hơn (từ khổ `md`):** nút thả xuống và Sắp xếp từ 40px còn 36px, chip Chủng loại từ 36px còn 32px, giữ cỡ chữ 15px. Nút "Lọc" và Sắp xếp trên điện thoại vẫn 44px theo vùng chạm tối thiểu | Pill 40px ở U8' |

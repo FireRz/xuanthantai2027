@@ -240,7 +240,7 @@ export function FilterDropdown({
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "press focus-visible:outline-brand inline-flex min-h-10 items-center gap-2 rounded-full border bg-white px-4 text-[15px] font-medium whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2",
+          "press focus-visible:outline-brand inline-flex min-h-9 items-center gap-2 rounded-full border bg-white px-4 text-[15px] font-medium whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2",
           selected.length > 0 ? "border-brand text-brand border-2" : "border-line text-ink",
         )}
       >

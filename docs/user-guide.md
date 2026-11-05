@@ -57,7 +57,7 @@ Với người chỉ cần xem hình và thông tin sản phẩm (không cần s
 
 ### A6. Trang phân tích
 
-Trang `/phan-tich` cho xem số tổng, số mã theo trạng thái, bảng so sánh theo nhóm và top 10 mã, theo đúng bộ lọc của danh mục. Trang có mật khẩu xem chung; chân trang danh mục có link nhỏ **Phân tích**.
+Trang `/phan-tich` cho xem số tổng, số mã theo trạng thái, bảng so sánh theo nhóm và top 10 mã, theo đúng bộ lọc của danh mục. Trang có mật khẩu xem chung; để vào trang, bấm vào chữ **Phòng Cung Ứng** ở chân trang danh mục (lối vào được giấu, trông như chữ thường) hoặc chọn **Phân tích** trong menu quản trị.
 
 **Quản trị đặt mật khẩu:** **Tài khoản → Mật khẩu xem phân tích**, nhập mật khẩu mới (tối thiểu 10 ký tự) rồi **Lưu**. Đổi mật khẩu thì mọi người phải nhập lại; **Tắt trang phân tích** xóa mật khẩu và đóng trang. Nhập sai 5 lần liên tiếp trong 15 phút thì trang khóa tạm (dùng chung cho mọi người xem).
 

@@ -27,7 +27,15 @@ export async function SiteFooter() {
               data-testid="footer-department"
               className="font-display text-festive-text mt-0.5 text-sm font-semibold tracking-[0.02em] whitespace-nowrap"
             >
-              {DEPARTMENT}
+              {/* Lối vào trang Phân tích được giấu có chủ đích (ADR-009 U16''): trông như chữ thường, trang vẫn có mật khẩu riêng. */}
+              <Link
+                href="/phan-tich"
+                prefetch={false}
+                data-testid="footer-analytics-link"
+                className="focus-visible:outline-gold cursor-default rounded focus-visible:outline-2 focus-visible:outline-offset-2"
+              >
+                {DEPARTMENT}
+              </Link>
             </p>
           </div>
         </div>
@@ -45,7 +53,7 @@ export async function SiteFooter() {
             data-testid="contact"
             className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 md:justify-start"
           >
-            {/* Điện thoại: tên riêng một dòng để hàng cuối (Teams, Phân tích) căn giữa, không chạm nút lên đầu trang. */}
+            {/* Điện thoại: tên riêng một dòng để nút Teams căn giữa, không chạm nút lên đầu trang. */}
             <span className="w-full md:w-auto">
               Thắc mắc, góp ý: <b className="font-semibold text-white">{CONTACT.name}</b>
             </span>
@@ -62,14 +70,6 @@ export async function SiteFooter() {
             ) : (
               <span>(Teams)</span>
             )}
-            <Link
-              href="/phan-tich"
-              prefetch={false}
-              data-testid="footer-analytics-link"
-              className="text-festive-text focus-visible:outline-gold inline-flex min-h-8 items-center rounded text-xs underline-offset-2 hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
-            >
-              Phân tích
-            </Link>
           </div>
         </div>
       </div>

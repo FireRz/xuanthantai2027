@@ -188,11 +188,25 @@ test.describe("trang /phan-tich", () => {
     expect(await noHorizontalScroll(page)).toBe(true);
   });
 
-  test("chân trang danh mục có link Phân tích tới /phan-tich", async ({ page }) => {
+  test("chân trang danh mục giấu lối vào /phan-tich trong chữ Phòng Cung Ứng", async ({ page }) => {
     await page.goto("/");
     const link = page.getByTestId("footer-analytics-link");
     await link.scrollIntoViewIfNeeded();
     await expect(link).toHaveAttribute("href", "/phan-tich");
+    await expect(link).toHaveText("Phòng Cung Ứng");
+    await expect(page.locator("footer")).not.toContainText("Phân tích");
+    // Trông như chữ thường: không gạch chân, con trỏ không đổi, cùng màu với dòng chứa nó.
+    await link.hover();
+    const look = await link.evaluate((e) => {
+      const s = getComputedStyle(e);
+      const parent = getComputedStyle(e.parentElement!);
+      return {
+        underline: s.textDecorationLine,
+        cursor: s.cursor,
+        sameColor: s.color === parent.color,
+      };
+    });
+    expect(look).toEqual({ underline: "none", cursor: "default", sameColor: true });
     await link.click();
     await expect(page).toHaveURL(/\/phan-tich/);
   });

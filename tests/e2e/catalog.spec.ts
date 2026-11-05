@@ -155,6 +155,21 @@ test.describe("T03.7 ảnh", () => {
   });
 });
 
+test.describe("ADR-009 U8'' pill bộ lọc", () => {
+  test("máy tính 36px và đều hàng; điện thoại giữ vùng chạm 44px", async ({ page }, testInfo) => {
+    await page.goto("/");
+    const height = async (l: ReturnType<typeof page.locator>) =>
+      Math.round((await l.boundingBox())!.height);
+    if (testInfo.project.name.startsWith("mobile")) {
+      expect(await height(page.getByTestId("open-filter-sheet"))).toBeGreaterThanOrEqual(44);
+      return;
+    }
+    const bar = page.getByTestId("filter-bar");
+    expect(await height(bar.getByRole("button", { name: "Nhãn hàng" }))).toBe(36);
+    expect(await height(bar.locator("label", { hasText: "Sắp xếp" }))).toBe(36);
+  });
+});
+
 test.describe("T03.14 chân trang", () => {
   test("hiện đúng thời điểm dữ liệu thay đổi gần nhất (giờ Việt Nam)", async ({ page }) => {
     const [{ at }] = await prisma.$queryRaw<{ at: Date }[]>`

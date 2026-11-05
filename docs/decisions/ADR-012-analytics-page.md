@@ -14,7 +14,7 @@
 | P6 | Đổi hoặc tắt mật khẩu thì tăng **phiên bản**; mọi cookie cũ hết hiệu lực. |
 | P7 | Chưa đặt mật khẩu: trang hiện "Trang phân tích chưa mở", không có form. Admin vẫn vào được. |
 | P8 | Admin đặt, đổi hoặc tắt mật khẩu ở `/admin/account`. |
-| P9 | `noindex` như mọi trang (ADR-005 I6). Lối vào: menu admin và link nhỏ ở chân trang danh mục. |
+| P9 | `noindex` như mọi trang (ADR-005 I6). Lối vào: menu admin và chữ "Phòng Cung Ứng" ở chân trang danh mục (link được giấu, ADR-009 U16''). |
 | P10 | Đây là cổng gom số tổng hợp, **không phải bảo mật dữ liệu**: danh mục công khai vẫn hiện số lượng (ADR-004 A1). |
 
 ## Cách làm
