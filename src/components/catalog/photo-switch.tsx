@@ -68,7 +68,7 @@ export function PhotoSwitch() {
         <span
           aria-hidden
           className={cn(
-            "absolute top-0.5 left-0.5 flex size-6 items-center justify-center rounded-full bg-white shadow transition-transform duration-200 motion-reduce:transition-none",
+            "absolute top-0.5 left-0.5 flex size-6 items-center justify-center rounded-full bg-white shadow transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none",
             on ? "text-gold-dark translate-x-6" : "text-ink-muted",
           )}
         >

@@ -21,7 +21,7 @@ export function BackToTop() {
       data-testid="back-to-top"
       aria-label="Lên đầu trang"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="animate-in fade-in zoom-in-50 bg-gold text-gold-fg hover:bg-gold-dark fixed right-4 bottom-4 z-30 flex size-12 items-center justify-center rounded-full shadow-lg hover:text-white md:right-6 md:bottom-6"
+      className="press animate-in fade-in zoom-in-50 bg-gold text-gold-fg hover:bg-gold-dark fixed right-4 bottom-4 z-30 flex size-12 items-center justify-center rounded-full shadow-lg hover:text-white md:right-6 md:bottom-6"
     >
       <ArrowUp className="size-6" aria-hidden />
     </button>

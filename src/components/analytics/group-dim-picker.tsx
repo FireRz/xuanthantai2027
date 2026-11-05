@@ -28,7 +28,7 @@ export function GroupDimPicker({ params, dim }: { params: CatalogParams; dim: Gr
                 data-testid="group-dim"
                 data-dim={d}
                 className={cn(
-                  "focus-visible:outline-brand inline-flex min-h-10 items-center rounded-full border px-4 font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2",
+                  "press focus-visible:outline-brand inline-flex min-h-10 items-center rounded-full border px-4 font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2",
                   active
                     ? "bg-brand border-brand text-white"
                     : "border-line text-navy hover:border-brand bg-white",

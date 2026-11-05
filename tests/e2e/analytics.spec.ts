@@ -196,4 +196,38 @@ test.describe("trang /phan-tich", () => {
     await link.click();
     await expect(page).toHaveURL(/\/phan-tich/);
   });
+
+  test("thanh % về / % bán và thanh trạng thái chạy dần (animation grow-x)", async ({ page }) => {
+    await openAnalytics(page);
+    const names = await page.evaluate(() => {
+      const anim = (el: Element | null) => (el ? getComputedStyle(el).animationName : "(thiếu)");
+      return {
+        rate: [...document.querySelectorAll('[data-testid="rate-bar"] > span')].map(anim),
+        segs: [...document.querySelectorAll('[data-testid="status-segment"]')].map(anim),
+      };
+    });
+    expect(names.rate.length).toBeGreaterThan(0);
+    expect(names.segs.length).toBeGreaterThan(0);
+    for (const n of [...names.rate, ...names.segs]) expect(n).toBe("grow-x");
+  });
+});
+
+test.describe("trang /phan-tich — giảm chuyển động", () => {
+  test.use({ reducedMotion: "reduce" });
+  test("giảm chuyển động: thanh không chạy, nút không có transition", async ({ page }) => {
+    await openAnalytics(page);
+    const r = await page.evaluate(() => {
+      const bar = document.querySelector('[data-testid="rate-bar"] > span');
+      const seg = document.querySelector('[data-testid="status-segment"]');
+      const btn = document.querySelector('[data-testid="group-dim"]');
+      return [
+        bar && getComputedStyle(bar).animationName,
+        seg && getComputedStyle(seg).animationName,
+        btn && getComputedStyle(btn).transitionProperty,
+      ];
+    });
+    expect(r[0]).toBe("none");
+    expect(r[1]).toBe("none");
+    expect(r[2]).toBe("none");
+  });
 });

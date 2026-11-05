@@ -166,7 +166,7 @@ export function StoreBar({
         <button
           type="submit"
           disabled={pending}
-          className="bg-gold text-gold-fg hover:bg-gold-dark focus-visible:outline-brand min-h-11 rounded-full px-5 font-semibold hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-70"
+          className="press bg-gold text-gold-fg hover:bg-gold-dark focus-visible:outline-brand min-h-11 rounded-full px-5 font-semibold hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-70"
         >
           Tìm
         </button>

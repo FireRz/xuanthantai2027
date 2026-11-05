@@ -243,7 +243,7 @@ export function SideNavButton({ dir }: { dir: Dir }) {
       type="button"
       aria-label={dir === "next" ? "Sản phẩm sau" : "Sản phẩm trước"}
       onClick={() => ctx.go(dir)}
-      className="text-ink focus-visible:outline-gold flex size-12 shrink-0 items-center justify-center rounded-full bg-white/90 shadow-lg transition hover:scale-105 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 max-md:hidden"
+      className="press text-ink focus-visible:outline-gold flex size-12 shrink-0 items-center justify-center rounded-full bg-white/90 shadow-lg hover:scale-105 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 max-md:hidden"
     >
       <Icon className="size-7" aria-hidden />
     </button>
@@ -251,7 +251,7 @@ export function SideNavButton({ dir }: { dir: Dir }) {
 }
 
 const miniButton =
-  "text-ink-muted hover:bg-gold-soft hover:text-ink flex size-10 items-center justify-center rounded-full disabled:opacity-30 md:hidden";
+  "press text-ink-muted hover:bg-gold-soft hover:text-ink flex size-10 items-center justify-center rounded-full disabled:opacity-30 md:hidden";
 
 /**
  * Dòng "‹ {vị trí} / {tổng} ›" cạnh mã SP; mũi tên chỉ hiện trên điện thoại (máy tính đã có nút hai bên).

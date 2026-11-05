@@ -28,6 +28,26 @@ test.describe("T04.5 FilterBar — máy tính", () => {
     test.skip(isMobile, "Chỉ máy tính");
   });
 
+  test("chip bộ lọc và nút Tìm có độ nảy khi nhấn (.press)", async ({ page }) => {
+    await page.goto("/");
+    const chip = page.getByRole("button", { name: /^Nhãn hàng/ });
+    const find = page.getByRole("button", { name: "Tìm", exact: true });
+    for (const el of [chip, find]) {
+      const fn = await el.evaluate((e) => getComputedStyle(e).transitionTimingFunction);
+      expect(fn).toContain("cubic-bezier(0.34, 1.56, 0.64, 1)");
+    }
+  });
+
+  test.describe("giảm chuyển động", () => {
+    test.use({ reducedMotion: "reduce" });
+    test("giảm chuyển động: nút không có transition", async ({ page }) => {
+      await page.goto("/");
+      const chip = page.getByRole("button", { name: /^Nhãn hàng/ });
+      const prop = await chip.evaluate((e) => getComputedStyle(e).transitionProperty);
+      expect(prop).toBe("none");
+    });
+  });
+
   test("chip Nhãn hàng chọn nhiều (HOẶC), có số đếm, Xóa lọc về toàn bộ", async ({ page }) => {
     await page.goto("/");
     await expect(scope(page)).toContainText("3.000 SP");

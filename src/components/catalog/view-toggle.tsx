@@ -25,7 +25,7 @@ export function ViewToggle({ params }: { params: CatalogParams }) {
           replace
           aria-current={params.view === view ? "true" : undefined}
           className={cn(
-            "inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5",
+            "press inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5",
             params.view === view ? "bg-brand text-white" : "text-ink-muted hover:text-ink",
           )}
         >

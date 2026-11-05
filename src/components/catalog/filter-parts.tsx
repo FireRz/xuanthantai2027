@@ -109,7 +109,7 @@ export function ActiveFilters({
           onClick={() => onRemove(c)}
           aria-label={`Bỏ lọc ${c.group}: ${c.name}`}
           className={cn(
-            "bg-gold-soft border-gold text-ink focus-visible:outline-brand inline-flex min-h-8 shrink-0 items-center gap-1 rounded-full border px-3 text-sm whitespace-nowrap focus-visible:outline-2",
+            "press bg-gold-soft border-gold text-ink focus-visible:outline-brand inline-flex min-h-8 shrink-0 items-center gap-1 rounded-full border px-3 text-sm whitespace-nowrap focus-visible:outline-2",
             c.className,
           )}
         >
@@ -122,7 +122,7 @@ export function ActiveFilters({
           type="button"
           data-testid={clearTestId}
           onClick={onClear}
-          className="text-brand focus-visible:outline-brand min-h-8 shrink-0 rounded-full px-2 text-sm font-semibold whitespace-nowrap underline-offset-2 hover:underline focus-visible:outline-2"
+          className="press text-brand focus-visible:outline-brand min-h-8 shrink-0 rounded-full px-2 text-sm font-semibold whitespace-nowrap underline-offset-2 hover:underline focus-visible:outline-2"
         >
           Xóa lọc
         </button>
@@ -240,7 +240,7 @@ export function FilterDropdown({
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "focus-visible:outline-brand inline-flex min-h-10 items-center gap-2 rounded-full border bg-white px-4 text-[15px] font-medium whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2",
+          "press focus-visible:outline-brand inline-flex min-h-10 items-center gap-2 rounded-full border bg-white px-4 text-[15px] font-medium whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2",
           selected.length > 0 ? "border-brand text-brand border-2" : "border-line text-ink",
         )}
       >
@@ -263,7 +263,7 @@ export function FilterDropdown({
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="bg-gold text-gold-fg hover:bg-gold-dark mt-2 min-h-10 w-full rounded-full font-semibold hover:text-white"
+            className="press bg-gold text-gold-fg hover:bg-gold-dark mt-2 min-h-10 w-full rounded-full font-semibold hover:text-white"
           >
             Xem {formatInt(total)} SP
           </button>

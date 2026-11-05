@@ -32,7 +32,10 @@ export function RateBar({
       className={track}
     >
       <span
-        className={cn("block h-full rounded-full", tone === "navy" ? "bg-navy" : "bg-brand")}
+        className={cn(
+          "anim-grow block h-full rounded-full",
+          tone === "navy" ? "bg-navy" : "bg-brand",
+        )}
         style={{ width: `${pct}%` }}
       />
     </span>

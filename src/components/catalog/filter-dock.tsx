@@ -135,7 +135,7 @@ export function FilterDock({
               type="button"
               onClick={onOpenSheet}
               aria-haspopup="dialog"
-              className="border-brand text-brand focus-visible:outline-brand inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border-2 bg-white px-4 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 md:hidden"
+              className="press border-brand text-brand focus-visible:outline-brand inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border-2 bg-white px-4 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 md:hidden"
             >
               <SlidersHorizontal className="size-4" aria-hidden />
               Lọc{groupCount > 0 && ` (${groupCount})`}
@@ -217,7 +217,7 @@ function FilterSidebar({
           <button
             type="button"
             onClick={onClear}
-            className="text-brand focus-visible:outline-brand min-h-8 shrink-0 rounded-full px-2 text-sm font-semibold underline-offset-2 hover:underline focus-visible:outline-2"
+            className="press text-brand focus-visible:outline-brand min-h-8 shrink-0 rounded-full px-2 text-sm font-semibold underline-offset-2 hover:underline focus-visible:outline-2"
           >
             Xóa lọc
           </button>

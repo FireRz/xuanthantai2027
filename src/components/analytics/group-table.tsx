@@ -119,7 +119,7 @@ export function GroupTable({
           data-testid="group-sort"
           data-key={key}
           className={cn(
-            "focus-visible:outline-brand inline-flex min-h-8 items-center gap-1 rounded whitespace-nowrap focus-visible:outline-2",
+            "press focus-visible:outline-brand inline-flex min-h-8 items-center gap-1 rounded whitespace-nowrap focus-visible:outline-2",
             active && "text-navy",
             key !== "name" && "flex-row-reverse",
           )}
@@ -295,7 +295,7 @@ function Row({
             aria-label={`Xem đủ số: ${label}`}
             data-testid="group-expand"
             onClick={onToggle}
-            className="focus-visible:outline-brand text-ink-muted grid size-9 place-items-center rounded-full focus-visible:outline-2"
+            className="press focus-visible:outline-brand text-ink-muted grid size-9 place-items-center rounded-full focus-visible:outline-2"
           >
             <ChevronDown className={cn("size-4 transition", open && "rotate-180")} aria-hidden />
           </button>

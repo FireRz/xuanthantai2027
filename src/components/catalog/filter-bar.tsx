@@ -80,7 +80,7 @@ export function FilterBar({
           onClick={() => setSheetOpen(true)}
           aria-haspopup="dialog"
           data-testid="open-filter-sheet"
-          className="border-brand text-brand focus-visible:outline-brand inline-flex min-h-11 items-center gap-2 rounded-full border-2 bg-white px-4 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 md:hidden"
+          className="press border-brand text-brand focus-visible:outline-brand inline-flex min-h-11 items-center gap-2 rounded-full border-2 bg-white px-4 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 md:hidden"
         >
           <SlidersHorizontal className="size-4" aria-hidden />
           Lọc{groupCount > 0 && <span data-testid="filter-count"> ({groupCount})</span>}
@@ -171,7 +171,7 @@ function TypeChips({
   if (options.length === 0) return null;
   const chip = (active: boolean, dim: boolean) =>
     cn(
-      "focus-visible:outline-brand inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-4 whitespace-nowrap focus-visible:outline-2",
+      "press focus-visible:outline-brand inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-4 whitespace-nowrap focus-visible:outline-2",
       active ? "bg-brand border-brand text-white" : "border-line bg-white",
       dim && !active && "opacity-55",
     );
@@ -264,7 +264,7 @@ function FilterSheet({
           type="button"
           onClick={onClose}
           aria-label="Đóng bộ lọc"
-          className="focus-visible:outline-brand grid size-11 place-items-center rounded-full focus-visible:outline-2"
+          className="press focus-visible:outline-brand grid size-11 place-items-center rounded-full focus-visible:outline-2"
         >
           <X className="size-5" aria-hidden />
         </button>
@@ -315,7 +315,7 @@ function FilterSheet({
           type="button"
           onClick={onClear}
           disabled={countGroupFilters(state) === 0}
-          className="border-line text-ink min-h-11 rounded-full border px-5 font-semibold disabled:opacity-45"
+          className="press border-line text-ink min-h-11 rounded-full border px-5 font-semibold disabled:opacity-45"
         >
           Xóa
         </button>
@@ -324,7 +324,7 @@ function FilterSheet({
           onClick={onClose}
           data-testid="sheet-apply"
           aria-live="polite"
-          className="bg-gold text-gold-fg hover:bg-gold-dark min-h-11 flex-1 rounded-full font-semibold hover:text-white"
+          className="press bg-gold text-gold-fg hover:bg-gold-dark min-h-11 flex-1 rounded-full font-semibold hover:text-white"
         >
           {pending ? "Đang lọc…" : `Xem ${formatInt(facets.total)} kết quả`}
         </button>
@@ -351,7 +351,7 @@ function SheetChip({
       onClick={onClick}
       data-testid="sheet-chip"
       className={cn(
-        "focus-visible:outline-brand inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 font-medium focus-visible:outline-2",
+        "press focus-visible:outline-brand inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 font-medium focus-visible:outline-2",
         selected ? "bg-brand border-brand text-white" : "border-line text-ink bg-white",
         count === 0 && !selected && "opacity-55",
       )}

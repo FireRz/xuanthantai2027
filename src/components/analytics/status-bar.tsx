@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { formatInt } from "@/lib/format";
 import { STATUS_LABEL, type StockStatus } from "@/lib/status";
 import { cn } from "@/lib/utils";
@@ -34,13 +35,15 @@ export function StatusBar({
   return (
     <div data-testid="status-bar" className="border-line space-y-3 rounded-xl border bg-white p-4">
       <div aria-hidden className="bg-line flex h-4 overflow-hidden rounded-full">
-        {ORDER.filter((s) => status[s] > 0).map((s) => (
+        {ORDER.filter((s) => status[s] > 0).map((s, i) => (
           <span
             key={s}
             data-testid="status-segment"
             data-status={s}
-            className={cn("h-full", SEGMENT[s])}
-            style={{ width: `${(status[s] / total) * 100}%` }}
+            className={cn("anim-grow h-full", SEGMENT[s])}
+            style={
+              { width: `${(status[s] / total) * 100}%`, "--d": `${i * 80}ms` } as CSSProperties
+            }
           />
         ))}
       </div>
