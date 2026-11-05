@@ -428,6 +428,63 @@ test.describe("chuyển SP trước/sau trong popup", () => {
     expect(await transformOf(page)).toBe("none");
   });
 
+  test("chế độ hình, mạng chậm: lớp ló ra (ảnh SP đích) to bằng ảnh thật trong popup", async ({
+    page,
+  }) => {
+    await page.goto("/?xem=hinh");
+    const [first, second] = [await skuAt(page, 0), await skuAt(page, 1)];
+    let release!: () => void;
+    const gate = new Promise<void>((res) => (release = res));
+    await page.route(
+      (u) => u.pathname === "/api/product-view" && u.searchParams.get("sp") === second,
+      async (r) => {
+        await gate;
+        await r.continue().catch(() => {});
+      },
+    );
+    await cards(page).first().click();
+    await expect(detail(page)).toHaveAttribute("data-sku", first);
+    await expect(page.locator("html")).not.toHaveAttribute("data-hero-morph");
+    const real = (await detail(page).locator("[data-hero]").boundingBox())!;
+    await nextButton(page).click();
+    await expect(peek(page)).toBeVisible();
+    const ghost = (await peek(page).locator(":scope > *").first().boundingBox())!;
+    release();
+    expect(Math.abs(ghost.width - real.width)).toBeLessThan(2);
+    await expect(detail(page)).toHaveAttribute("data-sku", second);
+  });
+
+  for (const outcome of ["ok", "error"] as const)
+    test(`đóng popup (Esc) khi đang chuyển SP, API về sau (${outcome}) → không ghi lại sp=, popup không mở lại`, async ({
+      page,
+    }) => {
+      await page.goto("/?sort=price_asc");
+      const [first, second] = [await skuAt(page, 0), await skuAt(page, 1)];
+      let release!: () => void;
+      const gate = new Promise<void>((res) => (release = res));
+      await page.route(
+        (u) => u.pathname === "/api/product-view" && u.searchParams.get("sp") === second,
+        async (r) => {
+          await gate;
+          if (outcome === "ok") await r.continue().catch(() => {});
+          else await r.fulfill({ status: 500, body: "lỗi" }).catch(() => {});
+        },
+      );
+      await cards(page).first().click();
+      await expect(detail(page)).toHaveAttribute("data-sku", first);
+      await expect(page.locator("html")).not.toHaveAttribute("data-hero-morph");
+      await nextButton(page).click();
+      await expect(content(page)).toHaveAttribute("data-motion", /./); // lần chuyển đã bắt đầu
+      await page.keyboard.press("Escape");
+      await expect(page.getByTestId("product-dialog")).toHaveCount(0);
+      await expect(page).not.toHaveURL(/sp=/);
+      release();
+      await page.waitForTimeout(1000);
+      await expect(page).not.toHaveURL(/sp=/);
+      await expect(page).toHaveURL(/sort=price_asc/);
+      await expect(page.getByTestId("product-dialog")).toHaveCount(0);
+    });
+
   /**
    * Gần cuối danh sách (tìm theo mã → ít kết quả): mở SP áp chót, API của SP cuối bị giữ lại,
    * bấm → 3 lần nhanh (2 lần sau xếp hàng chờ SP cuối, mà SP cuối không có SP sau)

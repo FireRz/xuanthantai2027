@@ -49,12 +49,15 @@ export function ProductSwipe({
   contentKey,
   motion,
   onMotionEnd,
+  photo = false,
   children,
 }: {
   /** Đổi khi sang SP khác → gắn lại nội dung để chạy hiệu ứng trượt vào. */
   contentKey: string;
   motion: SwipeMotion;
   onMotionEnd: () => void;
+  /** Chế độ Chỉ xem hình: ảnh trong popup không giới hạn 30vh trên điện thoại → lớp ló ra cũng vậy. */
+  photo?: boolean;
   children: React.ReactNode;
 }) {
   const ctx = useContext(Ctx);
@@ -220,7 +223,7 @@ export function ProductSwipe({
               thumbUrl={peekImage}
               alt=""
               priority
-              className="border-line aspect-square w-full max-w-[30vh] rounded-xl border md:w-[300px] md:max-w-none"
+              className={`border-line aspect-square w-full rounded-xl border md:w-[300px] md:max-w-none${photo ? "" : "max-w-[30vh]"}`}
             />
           </div>
         )}

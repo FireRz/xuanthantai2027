@@ -92,6 +92,17 @@ export function ProductViewer({ initial }: { initial: ProductView }) {
     if (!busy.current) aim.current = { promise: Promise.resolve(initial), data: initial };
   }, [initial]);
 
+  // Popup đóng giữa lúc đang chuyển SP: bỏ lần chuyển dở (hẹn giờ / dữ liệu về sau không được ghi lại
+  // ?sp= hay mở lại popup). StrictMode gắn-gỡ-gắn lại vẫn đúng vì mọi lần chuyển đều so `seq`.
+  useEffect(
+    () => () => {
+      seq.current++;
+      queued.current = [];
+      busy.current = false;
+    },
+    [],
+  );
+
   // Ghi dữ liệu đang xem vào bộ nhớ (quay lại SP vừa xem thì hiện ngay) và tải sẵn hai SP kế bên.
   useEffect(() => {
     const self = apiUrl(state, view.detail.sku);
@@ -190,6 +201,7 @@ export function ProductViewer({ initial }: { initial: ProductView }) {
         <ProductSwipe
           contentKey={detail.sku}
           motion={motion}
+          photo={state.photo}
           onMotionEnd={() =>
             setMotion((m) => (m.phase === "enter" || m.phase === "edge" ? IDLE : m))
           }
