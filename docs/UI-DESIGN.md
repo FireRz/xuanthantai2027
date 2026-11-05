@@ -25,7 +25,8 @@
 | `--accent` | `#F2A900` | Vàng cam (mai vàng): tiêu đề lớn trên banner đỏ, nút chính, thanh tiến độ, viền nhấn, họa tiết |
 | `--accent-dark` | `#C77F00` | Viền đồng xu, nét đậm của họa tiết vàng |
 | `--accent-soft` | `#FFF6E0` | Nền nhấn nhạt (tổng trong popup, dòng đang chọn) |
-| `--primary-dark` | `#8E1B16` | Chân trang |
+| `--primary-dark` | `#8E1B16` | Đầu trang Phân tích |
+| `--festive` | `#CC1208` | Đỏ Tết của ảnh banner: nền banner và chân trang |
 | `--accent-fg` | `#2B1A12` | Chữ trên nút vàng |
 | `--text` | `#2B1A12` | Chữ chính |
 | `--text-muted` | `#6B5A4E` | Chữ phụ (nhãn, chú thích) |
@@ -72,7 +73,7 @@ Ví dụ: Đặt 120, Về 90 → "Còn thiếu" (cam); Đặt 5, Về 7 → "Đ
 > 1. **Banner Tết** đỏ: thanh điều hướng (logo, tên web, liên kết Bộ sưu tập / Sản phẩm) → nhãn "XUÂN ĐINH MÙI · 2027", tiêu đề "Xuân Thần Tài" cỡ 72px màu vàng cam, câu chúc in nghiêng, đoạn mô tả, **ô Cửa hàng của bạn + Tìm mã SP + nút Xem hàng**; bên phải cành mai + đồng xu; viền lượn vàng ở đáy.
 > 2. ~~Bộ sưu tập mùa này~~ — đã bỏ (2026-11-03); lọc BST vẫn có trong hàng bộ lọc và hiện dải "Đang xem bộ sưu tập: X · N SP [Bỏ lọc ✕]".
 > 3. **Tất cả sản phẩm**: một hàng nút thả xuống Nhãn hàng / Dòng / BST / Chất liệu / Khung giá, Sắp xếp, chuyển Lưới/Bảng, Xuất Excel → lưới thẻ gọn (4 cột máy tính, 2 cột điện thoại) → "Xem thêm".
-> 4. **Chân trang** đỏ đậm.
+> 4. **Chân trang** cùng màu đỏ và viền lượn vàng với banner (ADR-009 U16').
 >
 > Khi đã chọn cửa hàng hoặc cuộn xuống, thanh đầu trang thu gọn (logo, tên web, ô Cửa hàng, ô tìm) và dính trên cùng.
 > Các sơ đồ 5.1–5.4 dưới đây là **phiên bản v1**, giữ lại để tham khảo; mockup v2 là chuẩn.

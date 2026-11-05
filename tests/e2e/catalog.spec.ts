@@ -191,4 +191,38 @@ test.describe("T03.14 chân trang", () => {
     const size = (l: typeof dept) => l.evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
     expect(await size(dept)).toBeLessThan(await size(branch));
   });
+
+  test("chân trang: cùng màu đỏ với banner, gọn, nút Lên đầu trang không che nội dung", async ({
+    page,
+  }, testInfo) => {
+    await page.goto("/");
+    const footer = page.locator("footer");
+    const background = (l: typeof footer) => l.evaluate((e) => getComputedStyle(e).backgroundColor);
+    expect(await background(footer)).toBe(await background(page.locator("header").first()));
+
+    const backToTop = page.getByTestId("back-to-top");
+    const isMobile = testInfo.project.name.startsWith("mobile");
+    // Điện thoại đo nhiều khổ: cách các dòng xuống hàng đổi theo chiều rộng.
+    for (const width of isMobile ? [360, 375, 430, 600] : [1280]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await expect(backToTop).toBeVisible();
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+
+      const { height } = (await footer.boundingBox())!;
+      expect(height, `cao ở khổ ${width}px`).toBeLessThanOrEqual(isMobile ? 200 : 120);
+
+      const b = (await backToTop.boundingBox())!;
+      for (const item of await footer.locator("a, time, b, img").all()) {
+        const r = await item.boundingBox();
+        if (!r) continue;
+        const overlaps =
+          r.x < b.x + b.width &&
+          r.x + r.width > b.x &&
+          r.y < b.y + b.height &&
+          r.y + r.height > b.y;
+        expect(overlaps, `${await item.innerText()} ở khổ ${width}px`).toBe(false);
+      }
+    }
+  });
 });

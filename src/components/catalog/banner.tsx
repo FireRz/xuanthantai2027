@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { BRANCH_FULL } from "@/lib/site";
 import { BannerFx } from "./banner-fx";
+import { WaveEdge } from "./wave-edge";
 
 /**
  * Banner Tết (ADR-009 U4', U14', U18'): ảnh tranh Tết làm nền toàn banner, chữ căn giữa trên
@@ -8,7 +9,7 @@ import { BannerFx } from "./banner-fx";
  */
 export function Banner() {
   return (
-    <header className="relative flex aspect-[2400/900] w-full flex-col overflow-hidden bg-[#cc1208] text-center text-white sm:aspect-auto sm:min-h-[420px] lg:aspect-[2400/900] lg:max-h-[640px] lg:min-h-0">
+    <header className="bg-festive relative flex aspect-[2400/900] w-full flex-col overflow-hidden text-center text-white sm:aspect-auto sm:min-h-[420px] lg:aspect-[2400/900] lg:max-h-[640px] lg:min-h-0">
       {/* Tranh ngang (WebP nén sẵn từ docs/brand/banner_tet_2400x900.png) phủ kín banner; `unoptimized` để dùng chung đúng file với BannerFx — chỉ tải một lần; điện thoại thu nhỏ đúng tỉ lệ 2400:900 (chữ co theo chiều rộng). */}
       <Image
         src="/brand/tet-banner-2400.webp"
@@ -45,23 +46,7 @@ export function Banner() {
           {BRANCH_FULL}
         </p>
       </div>
-      <svg
-        aria-hidden
-        viewBox="0 0 1440 40"
-        preserveAspectRatio="none"
-        className="absolute inset-x-0 bottom-[-1px] z-10 h-2 w-full sm:h-6 md:h-10"
-      >
-        <path
-          d="M0 40V22C120 6 240 6 360 20s240 16 360 4 240-18 360-6 240 18 360 6V40Z"
-          fill="#fbf6ec"
-        />
-        <path
-          d="M0 22C120 6 240 6 360 20s240 16 360 4 240-18 360-6 240 18 360 6"
-          fill="none"
-          stroke="#f2a900"
-          strokeWidth="3"
-        />
-      </svg>
+      <WaveEdge className="absolute inset-x-0 bottom-[-1px] z-10 h-2 w-full sm:h-6 md:h-10" />
     </header>
   );
 }

@@ -45,3 +45,8 @@ Góp ý của chủ dự án: mockup v1 "giống báo cáo hơn là một trang 
 | # | Thay đổi | Thay cho |
 |---|----------|----------|
 | U14'' | **Điện thoại:** khi đã cuộn qua banner, thanh "Cửa hàng của bạn" chỉ còn **hàng tìm mã SP** (hàng chọn cửa hàng lùi khuất phía trên, kéo lên đầu trang thì hiện lại) để phần dính không chiếm quá nhiều màn hình; cửa hàng đang xem vẫn ghi ở nhãn phạm vi trên danh sách. Máy tính giữ nguyên cả thanh | Thanh dính đủ hai hàng trên điện thoại ở U14' |
+
+## Sửa đổi khi dùng thử (2026-11-05)
+| # | Thay đổi | Thay cho |
+|---|----------|----------|
+| U16' | **Chân trang khớp banner và gọn hơn:** nền đỏ `--color-festive` `#CC1208` dùng chung với banner, viền lượn vàng ở mép trên; chiều cao giảm từ 334px xuống khoảng 186px trên điện thoại 375px, từ 148px xuống khoảng 104px trên máy tính (logo và tên cùng một hàng, link Phân tích chung hàng với nút Teams). Tên chi nhánh giữ màu trắng vì chữ vàng trên nền đỏ này chưa đạt tương phản 3:1 | Nền đỏ đậm `#8E1B16` ở U16 |
