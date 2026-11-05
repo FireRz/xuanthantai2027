@@ -4,6 +4,8 @@
 export const BRANCH_FULL = "CN PNJ Miền Tây";
 /** Tên chi nhánh ngắn (chân trang, tiêu đề tab). */
 export const BRANCH_SHORT = "CN Miền Tây";
+/** Đơn vị phụ trách web, dòng nhỏ dưới tên chi nhánh ở chân trang. */
+export const DEPARTMENT = "Phòng Cung Ứng";
 
 export const CONTACT = {
   name: "Phạm Hải Anh",

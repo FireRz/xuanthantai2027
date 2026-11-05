@@ -179,4 +179,16 @@ test.describe("T03.14 chân trang", () => {
     await expect(footer).toContainText(`${p.hour}:${p.minute} ${p.day}/${p.month}/${p.year}`);
     await expect(footer).toContainText("Dữ liệu cập nhật lần cuối");
   });
+
+  test("chân trang: 'Phòng Cung Ứng' ngay dưới tên chi nhánh, chữ nhỏ hơn", async ({ page }) => {
+    await page.goto("/");
+    const dept = page.getByTestId("footer-department");
+    await dept.scrollIntoViewIfNeeded();
+    await expect(dept).toHaveText("Phòng Cung Ứng");
+    const branch = page.getByText("CN Miền Tây", { exact: true });
+    const [b, d] = [(await branch.boundingBox())!, (await dept.boundingBox())!];
+    expect(d.y).toBeGreaterThan(b.y + b.height - 2);
+    const size = (l: typeof dept) => l.evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+    expect(await size(dept)).toBeLessThan(await size(branch));
+  });
 });
