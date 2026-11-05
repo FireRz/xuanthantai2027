@@ -428,31 +428,37 @@ test.describe("chuyển SP trước/sau trong popup", () => {
     expect(await transformOf(page)).toBe("none");
   });
 
-  test("chế độ hình, mạng chậm: lớp ló ra (ảnh SP đích) to bằng ảnh thật trong popup", async ({
-    page,
-  }) => {
-    await page.goto("/?xem=hinh");
-    const [first, second] = [await skuAt(page, 0), await skuAt(page, 1)];
-    let release!: () => void;
-    const gate = new Promise<void>((res) => (release = res));
-    await page.route(
-      (u) => u.pathname === "/api/product-view" && u.searchParams.get("sp") === second,
-      async (r) => {
-        await gate;
-        await r.continue().catch(() => {});
-      },
-    );
-    await cards(page).first().click();
-    await expect(detail(page)).toHaveAttribute("data-sku", first);
-    await expect(page.locator("html")).not.toHaveAttribute("data-hero-morph");
-    const real = (await detail(page).locator("[data-hero]").boundingBox())!;
-    await nextButton(page).click();
-    await expect(peek(page)).toBeVisible();
-    const ghost = (await peek(page).locator(":scope > *").first().boundingBox())!;
-    release();
-    expect(Math.abs(ghost.width - real.width)).toBeLessThan(2);
-    await expect(detail(page)).toHaveAttribute("data-sku", second);
-  });
+  for (const photo of [true, false])
+    test(`${photo ? "chế độ hình" : "chế độ thường"}, mạng chậm: lớp ló ra (ảnh SP đích) to bằng ảnh thật trong popup`, async ({
+      page,
+      isMobile,
+    }) => {
+      await page.goto(photo ? "/?xem=hinh" : "/");
+      const [first, second] = [await skuAt(page, 0), await skuAt(page, 1)];
+      let release!: () => void;
+      const gate = new Promise<void>((res) => (release = res));
+      await page.route(
+        (u) => u.pathname === "/api/product-view" && u.searchParams.get("sp") === second,
+        async (r) => {
+          await gate;
+          await r.continue().catch(() => {});
+        },
+      );
+      await cards(page).first().click();
+      await expect(detail(page)).toHaveAttribute("data-sku", first);
+      await expect(page.locator("html")).not.toHaveAttribute("data-hero-morph");
+      const real = (await detail(page).locator("[data-hero]").boundingBox())!;
+      await nextButton(page).click();
+      await expect(peek(page)).toBeVisible();
+      const ghost = (await peek(page).locator(":scope > *").first().boundingBox())!;
+      release();
+      expect(Math.abs(ghost.width - real.width)).toBeLessThan(2);
+      expect(Math.abs(ghost.height - real.height)).toBeLessThan(2);
+      if (isMobile && !photo && real.height <= page.viewportSize()!.height * 0.3 + 1)
+        // Ảnh thật bị giới hạn 30% chiều cao màn hình → lớp ló ra cũng vậy.
+        expect(ghost.height).toBeLessThanOrEqual(page.viewportSize()!.height * 0.3 + 1);
+      await expect(detail(page)).toHaveAttribute("data-sku", second);
+    });
 
   for (const outcome of ["ok", "error"] as const)
     test(`đóng popup (Esc) khi đang chuyển SP, API về sau (${outcome}) → không ghi lại sp=, popup không mở lại`, async ({

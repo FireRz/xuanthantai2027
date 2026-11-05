@@ -3,6 +3,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { formatInt } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import type { ProductNeighbors } from "@/server/services/product-neighbors";
 import { ProductImage } from "./product-image";
 import { EDGE_MS, prefersReducedMotion, SLOP, SPRING, swipeDecision } from "./swipe-motion";
@@ -223,7 +224,12 @@ export function ProductSwipe({
               thumbUrl={peekImage}
               alt=""
               priority
-              className={`border-line aspect-square w-full rounded-xl border md:w-[300px] md:max-w-none${photo ? "" : "max-w-[30vh]"}`}
+              className={cn(
+                "border-line aspect-square w-full rounded-xl border md:w-[300px] md:max-w-none",
+                // Giống ảnh thật trong popup: điện thoại giới hạn 30vh, trừ chế độ hình và SP chưa có ảnh
+                // (ImageZoom không có ảnh thì không bọc khung nên không áp giới hạn).
+                !photo && peekImage && "max-w-[30vh]",
+              )}
             />
           </div>
         )}
