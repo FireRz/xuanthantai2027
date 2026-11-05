@@ -1,0 +1,2 @@
+# Luôn lưu xuống dòng LF trên mọi máy (Prettier mặc định LF; CI kiểm tra bằng format:check).
+* text=auto eol=lf

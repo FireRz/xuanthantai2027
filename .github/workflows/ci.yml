@@ -33,6 +33,8 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/xtt_test
       DATABASE_URL_UNPOOLED: postgresql://postgres:postgres@localhost:5432/xtt_test
       TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/xtt_test
+      # Khóa giả chỉ dùng trong CI: test ký và đọc cookie xem phân tích cần có khóa.
+      AUTH_SECRET: ci-test-secret-not-used-in-production
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

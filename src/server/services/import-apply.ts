@@ -170,7 +170,10 @@ export async function applyImport(buffer: Buffer, opts: ApplyOptions = {}): Prom
       const rows = quantityWrites.map((w) => {
         const productId = w.productId ?? idByNewSku.get(w.newSku ?? "");
         if (!productId) throw new DomainError("IMPORT_INTERNAL", "Không xác định được sản phẩm");
-        return { productId, storeId: w.storeId, ordered: w.ordered,
+        return {
+          productId,
+          storeId: w.storeId,
+          ordered: w.ordered,
           received: w.received,
           sold: w.sold,
           stock: w.stock,

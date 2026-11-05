@@ -127,7 +127,9 @@ function guideLines(): string[][] {
     ["HƯỚNG DẪN NHẬP EXCEL — Xuân Thần Tài"],
     [""],
     ["Cách làm"],
-    ["1. Điền sheet SanPham (thông tin SP) và SoLuong (SL đặt / SL đã về / Bán / Tồn của từng cửa hàng)."],
+    [
+      "1. Điền sheet SanPham (thông tin SP) và SoLuong (SL đặt / SL đã về / Bán / Tồn của từng cửa hàng).",
+    ],
     ["2. Vào trang Nhập Excel, chọn file, xem trước kết quả. Chỉ khi hết lỗi mới bấm Áp dụng."],
     [
       "3. Không sửa tên sheet và dòng tiêu đề (dòng 1). Thứ tự cột có thể đổi nhưng nên giữ nguyên.",

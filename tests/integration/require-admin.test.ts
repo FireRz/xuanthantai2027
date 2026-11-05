@@ -88,19 +88,30 @@ describe("POST /api/blob-upload (T02.4)", () => {
   it("T07.3: đường dẫn ngoài thư mục cho phép → 400, đường dẫn ảnh SP → có token", async () => {
     const { session: s } = await makeAdminSession();
     session.current = s;
+    // Các file test chạy chung một tiến trình: phải trả lại token, nếu không blob.test.ts tưởng có store thật.
+    const savedToken = process.env.BLOB_READ_WRITE_TOKEN;
     process.env.BLOB_READ_WRITE_TOKEN ||= "vercel_blob_rw_teststore_secret123";
-    const req = (pathname: string) =>
-      new Request("http://localhost/api/blob-upload", {
-        method: "POST",
-        body: JSON.stringify({
-          type: "blob.generate-client-token",
-          payload: { pathname, callbackUrl: "http://localhost/api/blob-upload", multipart: false },
-        }),
-      });
-    expect((await POST(req("evil/x.webp"))).status).toBe(400);
-    const ok = await POST(req("products/NTT001/image.webp"));
-    expect(ok.status).toBe(200);
-    expect(await ok.json()).toMatchObject({ type: "blob.generate-client-token" });
+    try {
+      const req = (pathname: string) =>
+        new Request("http://localhost/api/blob-upload", {
+          method: "POST",
+          body: JSON.stringify({
+            type: "blob.generate-client-token",
+            payload: {
+              pathname,
+              callbackUrl: "http://localhost/api/blob-upload",
+              multipart: false,
+            },
+          }),
+        });
+      expect((await POST(req("evil/x.webp"))).status).toBe(400);
+      const ok = await POST(req("products/NTT001/image.webp"));
+      expect(ok.status).toBe(200);
+      expect(await ok.json()).toMatchObject({ type: "blob.generate-client-token" });
+    } finally {
+      if (savedToken === undefined) delete process.env.BLOB_READ_WRITE_TOKEN;
+      else process.env.BLOB_READ_WRITE_TOKEN = savedToken;
+    }
   });
 
   it("quản trị hợp lệ → qua cổng (không còn 401)", async () => {

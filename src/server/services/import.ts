@@ -50,7 +50,14 @@ export async function loadReference(file: WorkbookData, db: Db = prisma): Promis
       ? []
       : (
           await db.$queryRaw<
-            { product_id: string; store_id: string; qty_ordered: number; qty_received: number; qty_sold: number; qty_stock: number }[]
+            {
+              product_id: string;
+              store_id: string;
+              qty_ordered: number;
+              qty_received: number;
+              qty_sold: number;
+              qty_stock: number;
+            }[]
           >`SELECT product_id, store_id, qty_ordered, qty_received, qty_sold, qty_stock FROM store_product_qty
             WHERE product_id = ANY(${[...wantedIds]}::uuid[])`
         ).map((q) => ({
