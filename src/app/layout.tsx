@@ -3,9 +3,15 @@ import { beVietnam, playfair } from "@/lib/fonts";
 import { BRANCH_SHORT } from "@/lib/site";
 import "./globals.css";
 
+const title = `Xuân Thần Tài · ${BRANCH_SHORT}`;
+const description = "Bộ sưu tập trang sức mùa Xuân Thần Tài";
+
 export const metadata: Metadata = {
-  title: `Xuân Thần Tài · ${BRANCH_SHORT}`,
-  description: "Bộ sưu tập trang sức mùa Xuân Thần Tài",
+  title,
+  description,
+  // Thông tin khi gửi link qua Teams, Zalo...; ảnh lấy từ `opengraph-image.jpg` cùng thư mục (ADR-009 U21).
+  openGraph: { type: "website", locale: "vi_VN", siteName: "Xuân Thần Tài", title, description },
+  twitter: { card: "summary_large_image", title, description },
   // Không cho công cụ tìm kiếm lập chỉ mục bất kỳ trang nào (ADR-005 I6).
   robots: { index: false, follow: false },
 };
