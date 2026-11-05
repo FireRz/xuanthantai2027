@@ -14,6 +14,8 @@ const HINT_MS = 9000;
  * Công tắc gạt "Chỉ xem hình" (ADR-011) trên thanh cửa hàng: ẩn mọi số lượng/trạng thái, giữ nguyên bộ lọc.
  * Lần đầu vào trang hiện bong bóng gợi ý (tự tắt sau vài giây hoặc khi chạm bất kỳ đâu);
  * máy tính rê chuột / Tab vào công tắc cũng hiện lại. Bong bóng không nhận chuột để không che nút bên dưới.
+ * Bong bóng căn theo mép phải công tắc, nên công tắc phải luôn sát mép phải thanh (`ml-auto`, kể cả khi
+ * rớt xuống hàng riêng) — nếu không bong bóng tràn ra ngoài mép trái màn hình.
  */
 export function PhotoSwitch() {
   const { state, go } = useCatalogNav();
@@ -40,7 +42,7 @@ export function PhotoSwitch() {
   }, []);
 
   return (
-    <div className="group relative flex shrink-0 items-center gap-2">
+    <div className="group relative ml-auto flex shrink-0 items-center gap-2">
       <span
         aria-hidden
         className={cn(

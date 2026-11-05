@@ -44,6 +44,66 @@ test.describe("chế độ Chỉ xem hình", () => {
     await expect(page.getByTestId("photo-hint")).toBeHidden();
   });
 
+  /** Bong bóng nằm trọn trong khổ `width`, ngay dưới công tắc, mũi tên chỉ vào công tắc. */
+  async function expectHintFits(page: Page, width: number) {
+    const m = await page.evaluate(() => {
+      const hint = document.querySelector('[data-testid="photo-hint"]')!;
+      const h = hint.getBoundingClientRect();
+      const s = document.querySelector('[data-testid="photo-switch"]')!.getBoundingClientRect();
+      const arrow = getComputedStyle(hint, "::before");
+      const border = parseFloat(getComputedStyle(hint).borderRightWidth);
+      const arrowX = h.right - border - parseFloat(arrow.right) - parseFloat(arrow.width) / 2;
+      return {
+        hint: { left: h.left, right: h.right, top: h.top, bottom: h.bottom },
+        sw: { left: s.left, right: s.right, bottom: s.bottom },
+        arrowX,
+        innerHeight: window.innerHeight,
+      };
+    });
+    const at = `khổ ${width}px: ${JSON.stringify(m)}`;
+    expect(m.hint.left, at).toBeGreaterThanOrEqual(0);
+    expect(m.hint.right, at).toBeLessThanOrEqual(width);
+    expect(m.hint.top, at).toBeGreaterThanOrEqual(m.sw.bottom);
+    expect(m.hint.bottom, at).toBeLessThanOrEqual(m.innerHeight);
+    expect(m.arrowX, at).toBeGreaterThanOrEqual(m.sw.left);
+    expect(m.arrowX, at).toBeLessThanOrEqual(m.sw.right);
+  }
+
+  test("768×1024, đã cuộn xuống: bong bóng lần đầu nằm trọn trong màn hình, mũi tên chỉ công tắc", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 768, height: 1024 });
+    // Không chờ "load": máy chủ dev biên dịch lần đầu có thể lâu hơn lúc gợi ý tự tắt (9 giây).
+    await page.goto("/", { waitUntil: "commit" });
+    await expect(page.getByTestId("photo-hint")).toBeVisible({ timeout: 25_000 });
+    await page.evaluate(() => window.scrollTo(0, 800));
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+    await expect(page.getByTestId("photo-hint")).toBeVisible();
+    await expectHintFits(page, 768);
+  });
+
+  for (const [mode, url] of [
+    ["công tắc tắt", "/"],
+    ["công tắc bật", "/?xem=hinh"],
+  ] as const)
+    test(`mọi khổ 320–1920px (${mode}): bong bóng không tràn mép, mũi tên chỉ công tắc`, async ({
+      page,
+    }) => {
+      await page.goto(url);
+      await expect(page.getByTestId("photo-switch")).toBeVisible();
+      // Giữ bong bóng hiện suốt lúc đổi khổ (gợi ý thật tự tắt sau vài giây, rê chuột chỉ có từ md).
+      await page.addStyleTag({
+        content: '[data-testid="photo-hint"] { display: block !important; }',
+      });
+      await page.evaluate(() => window.scrollTo(0, 800));
+      for (let width = 320; width <= 1920; width += width < 1100 ? 20 : 100) {
+        await page.setViewportSize({ width, height: 900 });
+        await expectHintFits(page, width);
+      }
+      await page.setViewportSize({ width: 1920, height: 900 });
+      await expectHintFits(page, 1920);
+    });
+
   test("bấm Chỉ xem hình → URL có xem=hinh; lọc tìm mã vẫn giữ; bấm lại → mất xem=hinh", async ({
     page,
   }) => {
