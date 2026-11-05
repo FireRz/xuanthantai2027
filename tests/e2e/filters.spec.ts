@@ -589,6 +589,22 @@ test.describe("Điện thoại: hàng Lọc + Sắp xếp gọn", () => {
   });
 });
 
+test.describe("ADR-009 U19 cột lọc bên trái", () => {
+  test("khi lướt xuống mọi nhóm đều đóng, bấm mới mở", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Chỉ màn hình rộng");
+    await page.setViewportSize({ width: 1900, height: 1000 });
+    await page.goto("/");
+    await page.evaluate(() => window.scrollTo(0, 1600));
+    const sidebar = page.getByTestId("filter-sidebar");
+    await expect(sidebar).toBeVisible();
+    const groups = sidebar.locator("button[aria-expanded]");
+    await expect(groups.first()).toBeVisible();
+    await expect(sidebar.locator('button[aria-expanded="true"]')).toHaveCount(0);
+    await groups.first().click();
+    await expect(sidebar.locator('button[aria-expanded="true"]')).toHaveCount(1);
+  });
+});
+
 test.describe("Máy tính: hàng chip Chủng loại", () => {
   test("Tất cả + chip có số đếm, chọn nhiều loại cùng lúc, Tất cả bỏ lọc", async ({
     page,

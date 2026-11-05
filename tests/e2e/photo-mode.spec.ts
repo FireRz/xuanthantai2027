@@ -7,6 +7,12 @@ const cards = (page: Page) => page.getByTestId("product-card");
 const noHorizontalScroll = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
 const photoToggle = (page: Page) => page.getByRole("switch", { name: "Chỉ xem hình" });
+/** Bong bóng "Chỉ xem hình" đứng sau gợi ý cửa hàng và tìm mã trong hàng đợi: bỏ qua hai gợi ý đó. */
+const skipEarlierHints = (page: Page) =>
+  page.addInitScript(() => {
+    localStorage.setItem("xtt-hint-store", "1");
+    localStorage.setItem("xtt-hint-search", "1");
+  });
 
 test.afterAll(() => prisma.$disconnect());
 
@@ -28,6 +34,7 @@ test.describe("chế độ Chỉ xem hình", () => {
   test("lần đầu vào: bong bóng gợi ý cạnh công tắc, không che bấm; lần sau không tự hiện", async ({
     page,
   }) => {
+    await skipEarlierHints(page);
     await page.goto("/");
     const hint = page.getByTestId("photo-hint");
     await expect(hint).toBeVisible();
@@ -73,6 +80,7 @@ test.describe("chế độ Chỉ xem hình", () => {
     page,
   }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
+    await skipEarlierHints(page);
     // Không chờ "load": máy chủ dev biên dịch lần đầu có thể lâu hơn lúc gợi ý tự tắt (9 giây).
     await page.goto("/", { waitUntil: "commit" });
     await expect(page.getByTestId("photo-hint")).toBeVisible({ timeout: 25_000 });

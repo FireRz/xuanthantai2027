@@ -7,13 +7,13 @@ import { Logo } from "./logo";
 import { WaveEdge } from "./wave-edge";
 
 /**
- * Chân trang cùng màu đỏ và viền lượn với banner (ADR-009 U16'): tên web + chi nhánh bên trái (sát lề
+ * Chân trang đỏ đậm, viền lượn vàng giống banner (ADR-009 U16'''): tên web + chi nhánh bên trái (sát lề
  * trái, không bó trong khung giữa); bên phải là thời điểm cập nhật dữ liệu và người liên hệ qua Teams.
  */
 export async function SiteFooter() {
   const updatedAt = await getLastDataUpdate();
   return (
-    <footer className="bg-festive text-festive-text relative">
+    <footer className="bg-brand-dark text-festive-text relative">
       <WaveEdge className="absolute inset-x-0 top-[-1px] h-3 w-full -scale-y-100 md:h-6" />
       {/* Nút "Lên đầu trang" nằm góc dưới phải: máy tính đệm phải; điện thoại từ 360px các dòng căn giữa không chạm nút, hẹp hơn thì đệm dưới. */}
       <div className="flex flex-col items-center gap-3 px-4 pt-6 pb-16 text-center min-[360px]:pb-5 sm:px-6 md:flex-row md:justify-between md:gap-6 md:pt-8 md:pr-24 md:pb-4 md:text-left">

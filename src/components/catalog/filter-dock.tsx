@@ -191,8 +191,8 @@ function FilterSidebar({
   extra,
 }: DockProps & { extra?: React.ReactNode }) {
   const groups = nonEmptyGroups(facets);
-  // Mỗi lần mở một nhóm để cột không quá dài; nhóm đầu (Chủng loại, hay dùng nhất) mở sẵn.
-  const [open, setOpen] = useState<SheetKey | null>(groups[0]?.key ?? null);
+  // Mỗi lần mở một nhóm để cột không quá dài; ban đầu đóng hết cho gọn.
+  const [open, setOpen] = useState<SheetKey | null>(null);
   const baseId = useId();
   const hidden = !docked;
   return (

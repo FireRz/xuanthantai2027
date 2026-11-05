@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { formatInt } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { ProductNeighbors } from "@/server/services/product-neighbors";
+import { CoachHint } from "./coach-hints";
 import { ProductImage } from "./product-image";
 import { EDGE_MS, prefersReducedMotion, SLOP, SPRING, swipeDecision } from "./swipe-motion";
 
@@ -271,7 +272,18 @@ export function NeighborPosition() {
   const n = ctx?.neighbors;
   if (!ctx || !n) return null;
   return (
-    <span className="-my-2 flex shrink-0 items-center">
+    <span className="relative -my-2 flex shrink-0 items-center">
+      <CoachHint
+        id="popup"
+        title="Xem sản phẩm khác"
+        arrow="right"
+        className="top-full right-0 mt-1"
+      >
+        <span className="md:hidden">Vuốt ngang trên ảnh để sang sản phẩm trước, sau.</span>
+        <span className="max-md:hidden">
+          Dùng phím ← → hoặc hai nút bên cạnh để sang sản phẩm trước, sau.
+        </span>
+      </CoachHint>
       {n.prev && (
         <button
           type="button"

@@ -2,6 +2,7 @@ import { LayoutGrid, List } from "lucide-react";
 import Link from "next/link";
 import { buildCatalogQuery, type CatalogParams } from "@/lib/catalog-params";
 import { cn } from "@/lib/utils";
+import { CoachHint } from "./coach-hints";
 
 /** Nút chuyển Lưới/Bảng, đặt ngang dòng tiêu đề "Tất cả sản phẩm". */
 export function ViewToggle({ params }: { params: CatalogParams }) {
@@ -10,7 +11,7 @@ export function ViewToggle({ params }: { params: CatalogParams }) {
     <div
       role="group"
       aria-label="Kiểu hiển thị"
-      className="border-line inline-flex shrink-0 rounded-full border bg-white p-0.5 text-sm font-medium"
+      className="border-line relative inline-flex shrink-0 rounded-full border bg-white p-0.5 text-sm font-medium"
     >
       {(
         [
@@ -33,6 +34,15 @@ export function ViewToggle({ params }: { params: CatalogParams }) {
           {label}
         </Link>
       ))}
+      <CoachHint
+        id="view"
+        title="Xem dạng bảng"
+        enabled={params.view === "grid" && !params.photo}
+        arrow="right"
+        className="top-full right-0 mt-2.5"
+      >
+        Bấm Bảng để xem nhiều số cùng lúc trên một màn hình.
+      </CoachHint>
     </div>
   );
 }

@@ -41,6 +41,10 @@ Không cần đăng nhập. Mở đường link được gửi; dùng được t
 
 Bấm **Xuất Excel** để tải file chứa đúng danh sách đang lọc (kèm số lượng của cửa hàng bạn chọn, nếu có).
 
+### A4a. Gợi ý cho người mới
+
+Lần đầu vào web, các bong bóng gợi ý hiện lần lượt ở ô chọn cửa hàng, ô tìm mã, công tắc Ẩn số lượng, nút Lưới / Bảng và thẻ sản phẩm đầu tiên; lần đầu mở popup sản phẩm có thêm gợi ý chuyển sang sản phẩm khác. Mỗi gợi ý chỉ hiện một lần trên mỗi trình duyệt, tự tắt sau 9 giây hoặc khi chạm vào bất kỳ đâu. Muốn xem lại thì mở bằng cửa sổ ẩn danh.
+
 ### A4b. Chỉ xem hình — gửi link cho người chỉ cần xem mẫu
 
 Với người chỉ cần xem hình và thông tin sản phẩm (không cần số Đặt / Về / Thiếu / Bán / Tồn), gửi link có thêm `?xem=hinh`, ví dụ `https://<tên miền>/?xem=hinh`. Trang mở ra chỉ có ảnh, mã, tên, nhãn, dòng, BST, tuổi vàng, chủng loại và giá; không có thanh tiến độ, trạng thái, bảng số lượng theo cửa hàng, nút Xuất Excel hay kiểu sắp xếp theo thiếu / bán.

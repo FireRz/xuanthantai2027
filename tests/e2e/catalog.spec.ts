@@ -207,13 +207,12 @@ test.describe("T03.14 chân trang", () => {
     expect(await size(dept)).toBeLessThan(await size(branch));
   });
 
-  test("chân trang: cùng màu đỏ với banner, gọn, nút Lên đầu trang không che nội dung", async ({
+  test("chân trang: đỏ đậm, gọn, nút Lên đầu trang không che nội dung", async ({
     page,
   }, testInfo) => {
     await page.goto("/");
     const footer = page.locator("footer");
-    const background = (l: typeof footer) => l.evaluate((e) => getComputedStyle(e).backgroundColor);
-    expect(await background(footer)).toBe(await background(page.locator("header").first()));
+    await expect(footer).toHaveCSS("background-color", "rgb(142, 27, 22)");
 
     const backToTop = page.getByTestId("back-to-top");
     const isMobile = testInfo.project.name.startsWith("mobile");

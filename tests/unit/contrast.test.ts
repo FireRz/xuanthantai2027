@@ -29,8 +29,7 @@ describe("T03.9 — tương phản AA của bảng màu", () => {
     ["brand", "cream"], // liên kết, viền focus
     ["gold-fg", "gold"], // chữ nâu trên nút vàng
     ["festive-text", "brand"], // chữ nhỏ kem trên header đỏ
-    ["festive-text", "brand-dark"], // đầu trang Phân tích
-    ["festive-text", "festive"], // chân trang: cùng màu đỏ với banner
+    ["festive-text", "brand-dark"], // chân trang, đầu trang Phân tích
     ["status-full-fg", "status-full-soft"],
     ["status-short-fg", "status-short-soft"],
     ["status-none-fg", "status-none-soft"],

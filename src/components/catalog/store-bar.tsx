@@ -6,6 +6,7 @@ import type { CatalogParams } from "@/lib/catalog-params";
 import { regionLabel, sameRegion, sortRegions } from "@/lib/region";
 import { cn } from "@/lib/utils";
 import { useCatalogNav } from "./catalog-nav";
+import { CoachHint } from "./coach-hints";
 import { PhotoSwitch } from "./photo-switch";
 
 /** Thời gian chờ sau phím cuối trước khi lọc theo mã (ms). */
@@ -105,7 +106,16 @@ export function StoreBar({
         }}
         className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5 sm:px-6"
       >
-        <div className="flex w-full min-w-0 items-center gap-2 sm:w-auto sm:flex-none">
+        <div className="relative flex w-full min-w-0 items-center gap-2 sm:w-auto sm:flex-none">
+          {/* Trang phân tích không có công tắc và không cần các gợi ý này; chế độ hình không có số để xem. */}
+          <CoachHint
+            id="store"
+            title="Chọn cửa hàng của bạn"
+            enabled={showPhotoSwitch && !params.photo && !params.store}
+            className="top-full left-0 mt-2.5"
+          >
+            Để xem số đặt, về và còn thiếu của riêng cửa hàng mình.
+          </CoachHint>
           <Store className="text-brand size-5 shrink-0" aria-hidden />
           <span className="hidden font-semibold whitespace-nowrap lg:inline">Cửa hàng của bạn</span>
           {regions.length > 0 && (
@@ -162,6 +172,14 @@ export function StoreBar({
             onChange={(e) => setQ(e.target.value)}
             className="border-line focus-visible:outline-brand min-h-11 w-full rounded-lg border bg-white pr-3 pl-9 focus-visible:outline-2 focus-visible:outline-offset-2"
           />
+          <CoachHint
+            id="search"
+            title="Tìm nhanh theo mã"
+            enabled={showPhotoSwitch && !params.q}
+            className="top-full left-0 mt-2.5"
+          >
+            Nhập mã sản phẩm để tìm ngay, không cần lướt danh sách.
+          </CoachHint>
         </label>
         <button
           type="submit"
