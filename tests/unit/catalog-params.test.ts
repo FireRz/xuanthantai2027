@@ -18,6 +18,7 @@ describe("parseCatalogParams", () => {
       mat: [],
       typ: [],
       pr: [],
+      kv: null,
       store: null,
       all: false,
       q: "",
@@ -94,8 +95,14 @@ describe("buildCatalogQuery", () => {
     expect(buildCatalogQuery({ photo: true })).toBe("?xem=hinh");
     expect(buildCatalogQuery({ photo: false })).toBe("");
   });
-  it("all chỉ có nghĩa khi đã chọn cửa hàng", () => {
+  it("all chỉ có nghĩa khi đã chọn cửa hàng hoặc khu vực", () => {
     expect(buildCatalogQuery({ all: true })).toBe("");
+    expect(buildCatalogQuery({ kv: "1", all: true })).toBe("?kv=1&all=1");
+  });
+  it("khu vực: cắt khoảng trắng, rỗng → null, mã hóa ký tự đặc biệt", () => {
+    expect(parseCatalogParams({ kv: "  3 " }).kv).toBe("3");
+    expect(parseCatalogParams({ kv: "  " }).kv).toBeNull();
+    expect(buildCatalogQuery({ kv: "Cần Thơ" })).toBe("?kv=C%E1%BA%A7n+Th%C6%A1");
   });
 });
 
@@ -104,7 +111,7 @@ describe("T04.2 — bộ đọc/ghi URL cho đủ 5 bộ lọc", () => {
   const B2 = "22222222-2222-4222-8222-222222222222";
 
   it("quay vòng URL ↔ object với mọi tham số", () => {
-    const url = `?brand=${B1},${B2}&line=${ID}&col=${ID},none&mat=${B1}&typ=${ID},rác&pr=${B2},rác&store=CH01&all=1&q=ntt&sort=shortage&view=list&sp=NTT001&n=48`;
+    const url = `?brand=${B1},${B2}&line=${ID}&col=${ID},none&mat=${B1}&typ=${ID},rác&pr=${B2},rác&kv=2&store=CH01&all=1&q=ntt&sort=shortage&view=list&sp=NTT001&n=48`;
     const p = parseCatalogParams(Object.fromEntries(new URLSearchParams(url)));
     expect(p).toEqual({
       brand: [B1, B2],
@@ -113,6 +120,7 @@ describe("T04.2 — bộ đọc/ghi URL cho đủ 5 bộ lọc", () => {
       mat: [B1],
       typ: [ID],
       pr: [B2],
+      kv: "2",
       store: "CH01",
       all: true,
       q: "ntt",

@@ -5,6 +5,7 @@ describe("parseGroupDim", () => {
   it("giá trị hợp lệ giữ nguyên", () => {
     expect(parseGroupDim("line")).toBe("line");
     expect(parseGroupDim("store")).toBe("store");
+    expect(parseGroupDim("kv")).toBe("kv");
   });
   it("giá trị lạ hoặc thiếu → brand", () => {
     expect(parseGroupDim("x")).toBe("brand");

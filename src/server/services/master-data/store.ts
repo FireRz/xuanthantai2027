@@ -17,24 +17,37 @@ async function assertCodeFree(code: string, exceptId?: string) {
   }
 }
 
-export async function createStore(input: { code: string; name: string }) {
+/** Khu vực: gõ tự do, gộp khoảng trắng; trống → null (chưa gán). Tối đa 40 ký tự. */
+export function parseRegion(raw: string | null | undefined): string | null {
+  const v = (raw ?? "").replace(/\s+/g, " ").trim();
+  if (!v) return null;
+  if (v.length > 40) throw new DomainError("STORE_REGION_INVALID", "Khu vực tối đa 40 ký tự");
+  return v;
+}
+
+export async function createStore(input: { code: string; name: string; region?: string | null }) {
   const code = parseCode(input.code);
   const name = parseName(input.name);
+  const region = parseRegion(input.region);
   await assertCodeFree(code);
   return mapUnique(
-    () => prisma.store.create({ data: { code, name } }),
+    () => prisma.store.create({ data: { code, name, region } }),
     () => duplicateCode(code),
   );
 }
 
-export async function updateStore(id: string, input: { code?: string; name?: string }) {
+export async function updateStore(
+  id: string,
+  input: { code?: string; name?: string; region?: string | null },
+) {
   const current = await prisma.store.findUnique({ where: { id } });
   if (!current) throw new DomainError("STORE_NOT_FOUND", "Cửa hàng không tồn tại");
   const code = input.code === undefined ? current.code : parseCode(input.code);
   const name = input.name === undefined ? current.name : parseName(input.name);
+  const region = input.region === undefined ? current.region : parseRegion(input.region);
   await assertCodeFree(code, id);
   return mapUnique(
-    () => prisma.store.update({ where: { id }, data: { code, name } }),
+    () => prisma.store.update({ where: { id }, data: { code, name, region } }),
     () => duplicateCode(code),
   );
 }

@@ -1,4 +1,5 @@
 import { computeMetrics, totalMetrics, type QtyMetrics } from "@/lib/metrics";
+import { sameRegion } from "@/lib/region";
 import { prisma } from "@/server/db";
 import { visibleProductWhere } from "@/server/repositories/visibility";
 
@@ -28,6 +29,8 @@ export interface ProductDetail {
   total: QtyMetrics;
   totalSold: number;
   totalStock: number;
+  /** Đang lọc khu vực (có cửa hàng đang hiện): bảng và dòng tổng chỉ gồm cửa hàng của khu vực đó. */
+  region: string | null;
   /** Đang lọc một cửa hàng đang hoạt động: số liệu riêng của cửa hàng đó (popup hiện ở phần tóm tắt). */
   scope: (StoreQtyRow & { storeCode: string }) | null;
 }
@@ -40,6 +43,7 @@ export interface ProductDetail {
 export async function getProductDetail(
   sku: string,
   storeCode?: string | null,
+  regionCode?: string | null,
 ): Promise<ProductDetail | null> {
   const code = sku.trim();
   if (!code) return null;
@@ -65,14 +69,19 @@ export async function getProductDetail(
     }),
     prisma.store.findMany({
       where: { active: true },
-      select: { id: true, code: true, name: true },
+      select: { id: true, code: true, name: true, region: true },
       orderBy: { code: "asc" },
     }),
   ]);
   if (!product) return null;
+  const regionStores = regionCode?.trim()
+    ? stores.filter((s) => sameRegion(s.region, regionCode))
+    : [];
+  const region = regionStores.length > 0 ? regionStores[0]!.region!.trim() : null;
+  const shown = region ? regionStores : stores;
 
   const byStore = new Map(product.quantities.map((q) => [q.storeId, q]));
-  const rows = stores.map((s) => {
+  const rows = shown.map((s) => {
     const q = byStore.get(s.id);
     return {
       code: s.code,
@@ -109,6 +118,7 @@ export async function getProductDetail(
     total: totalMetrics(rows.map((r) => ({ ...r, storeActive: true }))),
     totalSold: rows.reduce((a, r) => a + r.sold, 0),
     totalStock: rows.reduce((a, r) => a + r.stock, 0),
+    region,
     scope: picked ? { ...picked, storeCode: picked.code } : null,
   };
 }

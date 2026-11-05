@@ -4,7 +4,7 @@ import { prisma } from "@/server/db";
 import { visibleProductJoinsSql } from "@/server/repositories/visibility";
 import {
   buildWhere,
-  findActiveStore,
+  findScope,
   qtyJoinSql,
   type FilterInput,
   type GroupFilter,
@@ -35,10 +35,12 @@ export interface FacetCounts {
   total: number;
   /** Số SP khi bỏ riêng bộ lọc chủng loại — số trên chip "Tất cả". */
   typTotal: number;
+  /** Phạm vi số liệu thực tế sau khi đối chiếu URL (cửa hàng/khu vực không có thì "total"). */
+  scope: "total" | "store" | "region";
 }
 
 export type FacetParams = Pick<CatalogParams, "store" | "all" | "q"> &
-  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "typ" | "pr">>;
+  Partial<Pick<CatalogParams, "kv" | "brand" | "line" | "col" | "mat" | "typ" | "pr">>;
 
 type CountRow = { id: string | null; n: number };
 const toMap = (rows: CountRow[]) => new Map<string | null, number>(rows.map((r) => [r.id, r.n]));
@@ -53,7 +55,7 @@ const toMap = (rows: CountRow[]) => new Map<string | null, number>(rows.map((r) 
  * Trả về cả lựa chọn có số đếm 0 để giao diện quyết định ẩn hay làm mờ.
  */
 export async function getFacetCounts(params: FacetParams): Promise<FacetCounts> {
-  const store = await findActiveStore(params.store);
+  const store = await findScope(params);
   const filters: FilterInput = {
     q: params.q,
     brand: params.brand,
@@ -189,5 +191,6 @@ export async function getFacetCounts(params: FacetParams): Promise<FacetCounts> 
     store: stores.map((o) => ({ id: o.code, name: o.name, count: cStore.get(o.id) ?? 0 })),
     total,
     typTotal,
+    scope: store?.kind ?? "total",
   };
 }

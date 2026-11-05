@@ -58,6 +58,7 @@ const MOBILE_COLS = 4;
 function drillState(state: CatalogParams, dim: GroupDim, id: string): CatalogParams {
   const base = { ...state, sp: null, n: PAGE_SIZE };
   if (dim === "store") return { ...base, store: id, all: false };
+  if (dim === "kv") return { ...base, kv: id, store: null, all: false };
   const list = state[dim];
   return { ...base, [dim]: list.includes(id) ? list : [...list, id] };
 }

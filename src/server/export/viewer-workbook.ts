@@ -1,4 +1,5 @@
 import type { Writable } from "node:stream";
+import { regionLabel } from "@/lib/region";
 import ExcelJS from "exceljs";
 import { EMPTY, formatDateTime, formatInt, orDash } from "@/lib/format";
 import type { ViewerExport } from "@/server/services/export";
@@ -25,7 +26,9 @@ export const VIEWER_COLUMNS = [
 
 /** Phạm vi số liệu ghi trên tiêu đề file. */
 export function scopeText(scope: ViewerExport["scope"]): string {
-  return scope.kind === "total" ? "Tổng hệ thống" : `Cửa hàng ${scope.name} (${scope.code})`;
+  if (scope.kind === "total") return "Tổng hệ thống";
+  if (scope.kind === "region") return `${regionLabel(scope.region)} (tổng các cửa hàng)`;
+  return `Cửa hàng ${scope.name} (${scope.code})`;
 }
 
 /** Phần trăm làm tròn xuống 1 chữ số thập phân như trên trang (99,96% không thành 100%). */
@@ -48,7 +51,12 @@ export function viewerFileName(scope: ViewerExport["scope"], at: Date): string {
       .formatToParts(at)
       .map((x) => [x.type, x.value]),
   );
-  const who = scope.kind === "total" ? "tong-he-thong" : scope.code.replace(/[^A-Za-z0-9_-]/g, "");
+  const who =
+    scope.kind === "total"
+      ? "tong-he-thong"
+      : scope.kind === "region"
+        ? `khu-vuc-${scope.region.normalize("NFD").replace(/[^A-Za-z0-9_-]/g, "")}`
+        : scope.code.replace(/[^A-Za-z0-9_-]/g, "");
   return `danh-sach-san-pham_${who}_${p.year}${p.month}${p.day}-${p.hour}${p.minute}.xlsx`;
 }
 

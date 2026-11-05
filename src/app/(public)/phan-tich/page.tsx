@@ -28,6 +28,7 @@ import {
   type RawSearchParams,
 } from "@/lib/catalog-params";
 import { hasViewerAccess, isViewerPasswordSet } from "@/server/auth/viewer-pass";
+import { regionLabel } from "@/lib/region";
 import { prisma } from "@/server/db";
 import {
   getAnalyticsSummary,
@@ -88,7 +89,7 @@ export default async function AnalyticsPage({
     listOwnedOptions(),
     prisma.store.findMany({
       where: { active: true },
-      select: { code: true, name: true },
+      select: { code: true, name: true, region: true },
       orderBy: { code: "asc" },
     }),
   ]);
@@ -102,10 +103,16 @@ export default async function AnalyticsPage({
   ]);
   // Công tắc "Xem tất cả SP" chỉ có nghĩa khi cửa hàng đang chọn có thật và đang hiện.
   const code = params.store?.toLowerCase();
-  const scopeStore = code ? facets.store.find((s) => s.id.toLowerCase() === code) : undefined;
-  const scope = scopeStore
-    ? `Cửa hàng ${scopeStore.id}${params.all ? " · tất cả SP" : " · SP có đặt"}`
-    : "Tất cả cửa hàng";
+  const storeFacet = code ? facets.store.find((s) => s.id.toLowerCase() === code) : undefined;
+  const region = facets.scope === "region" ? params.kv : null;
+  // Công tắc + nhãn phạm vi: cửa hàng hoặc khu vực đang chọn có thật và đang hiện.
+  const scopeStore = facets.scope !== "total";
+  const suffix = params.all ? " · tất cả SP" : " · SP có đặt";
+  const scope = storeFacet
+    ? `Cửa hàng ${storeFacet.id}${suffix}`
+    : region
+      ? `${regionLabel(region)}${suffix}`
+      : "Tất cả cửa hàng";
 
   return (
     <CatalogNavProvider

@@ -4,7 +4,8 @@ import { requireAdminPage } from "@/server/auth/require-admin";
 import { prisma } from "@/server/db";
 import { AddForm } from "./add-form";
 import { SetupGuide } from "./setup-guide";
-import { ItemRow } from "./item-row";
+import { ItemRow, STORE_REGIONS_LIST } from "./item-row";
+import { sortRegions } from "@/lib/region";
 
 export const metadata: Metadata = { title: "Danh mục" };
 export const dynamic = "force-dynamic";
@@ -282,6 +283,15 @@ async function StoresTab() {
           Thêm cửa hàng
         </h2>
         <AddForm kind="store" label="Thêm cửa hàng" />
+        <p className="mt-2 text-xs text-neutral-500">
+          Khu vực: gõ tự do (VD 1, 2, 3, 4) — dùng cho bộ lọc &quot;Khu vực&quot; trên trang xem. Để
+          trống nếu cửa hàng chưa thuộc khu vực nào.
+        </p>
+        <datalist id={STORE_REGIONS_LIST}>
+          {sortRegions(stores.map((s) => s.region)).map((r) => (
+            <option key={r} value={r} />
+          ))}
+        </datalist>
       </section>
       <section className={card} aria-label="Danh sách cửa hàng">
         {stores.length === 0 ? (
@@ -296,6 +306,7 @@ async function StoresTab() {
                   id: s.id,
                   code: s.code,
                   name: s.name,
+                  region: s.region,
                   active: s.active,
                   usage: s._count.quantities,
                 }}

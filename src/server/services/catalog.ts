@@ -5,19 +5,22 @@ import { prisma } from "@/server/db";
 import { visibleProductJoinsSql } from "@/server/repositories/visibility";
 import {
   buildWhere,
-  findActiveStore,
+  findScope,
   orderBySql,
   qtyJoinSql,
   type FilterInput,
   type ScopeStore,
 } from "./catalog-filter";
 
-export { findActiveStore } from "./catalog-filter";
+export { findActiveStore, findScope } from "./catalog-filter";
 export { getFacetCounts } from "./catalog-facets";
 export type { FacetCounts, FacetOption } from "./catalog-facets";
 
 /** Phạm vi số liệu: tổng hệ thống hoặc một cửa hàng (ADR-007). */
-export type Scope = { kind: "total" } | { kind: "store"; code: string; name: string };
+export type Scope =
+  | { kind: "total" }
+  | { kind: "store"; code: string; name: string }
+  | { kind: "region"; region: string };
 
 export interface ProductListItem {
   id: string;
@@ -61,7 +64,7 @@ type Row = {
 };
 
 type ListParams = Pick<CatalogParams, "store" | "all" | "q"> &
-  Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "typ" | "pr" | "sort">> & {
+  Partial<Pick<CatalogParams, "kv" | "brand" | "line" | "col" | "mat" | "typ" | "pr" | "sort">> & {
     /** Số SP lấy về (mặc định 24); `null` = không giới hạn (dùng khi xuất Excel). */
     limit?: number | null;
     offset?: number;
@@ -86,7 +89,7 @@ export function catalogFromSql(
  * Lọc nhiều bộ lọc (B1, B2, B6), tìm theo mã (B5) và sắp xếp (B8, mặc định Mã A→Z). Cửa hàng không tồn tại/đã ẩn → rơi về tổng hệ thống.
  */
 export async function listProducts(params: ListParams): Promise<ProductListResult> {
-  const store = await findActiveStore(params.store);
+  const store = await findScope(params);
   const limit = params.limit === null ? Prisma.sql`ALL` : (params.limit ?? 24);
   const offset = params.offset ?? 0;
 
@@ -121,7 +124,11 @@ export async function listProducts(params: ListParams): Promise<ProductListResul
       stock: r.qty_stock,
     })),
     total: Number(count[0]?.n ?? 0),
-    scope: store ? { kind: "store", code: store.code, name: store.name } : { kind: "total" },
+    scope: !store
+      ? { kind: "total" }
+      : store.kind === "store"
+        ? { kind: "store", code: store.code, name: store.name }
+        : { kind: "region", region: store.region },
   };
 }
 

@@ -30,6 +30,7 @@ export function AddForm({
       const r = await createItemAction(kind, {
         name: String(formData.get("name") ?? ""),
         code: kind === "store" ? String(formData.get("code") ?? "") : undefined,
+        region: kind === "store" ? String(formData.get("region") ?? "") : undefined,
         brandId,
       });
       if (r.ok) formRef.current?.reset();
@@ -56,6 +57,15 @@ export function AddForm({
           required
           className={`${inputClass} w-56`}
         />
+        {kind === "store" && (
+          <input
+            name="region"
+            placeholder="Khu vực (VD 1)"
+            aria-label="Khu vực"
+            list="store-regions"
+            className={`${inputClass} w-32`}
+          />
+        )}
         <Button type="submit" size="sm" disabled={pending}>
           {pending ? "Đang thêm…" : label}
         </Button>

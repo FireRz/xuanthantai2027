@@ -1,6 +1,6 @@
 /**
  * Tham số URL của trang xem (ARCHITECTURE §5.1):
- *   ?brand=a,b&line=…&col=…,none&mat=…&typ=…&pr=…&store=CH01&all=1&q=NTT&sort=…&view=grid|list&sp=NTT001&xem=hinh
+ *   ?brand=a,b&line=…&col=…,none&mat=…&typ=…&pr=…&kv=1&store=CH01&all=1&q=NTT&sort=…&view=grid|list&sp=NTT001&xem=hinh
  * Giá trị lạ hoặc không hợp lệ bị bỏ, không gây lỗi (ARCHITECTURE §5.1, T04.9).
  * Id nhãn/dòng/BST/tuổi vàng là UUID; cửa hàng theo mã.
  */
@@ -35,8 +35,10 @@ export interface CatalogParams {
   typ: string[];
   /** Id khung giá (ADR-010). */
   pr: string[];
+  /** Khu vực (ASM): số liệu = tổng các cửa hàng trong khu vực; có `store` thì `store` được ưu tiên. */
+  kv: string | null;
   store: string | null;
-  /** Công tắc "Xem tất cả SP" khi đã chọn cửa hàng (ADR-002 D6). */
+  /** Công tắc "Xem tất cả SP" khi đã chọn cửa hàng hoặc khu vực (ADR-002 D6). */
   all: boolean;
   q: string;
   sort: Sort;
@@ -74,6 +76,7 @@ const schema = z.object({
   mat: listOf(isId),
   typ: listOf(isId),
   pr: listOf(isId),
+  kv: single.transform((v) => v?.trim().slice(0, 40) || null),
   store: single.transform((v) => v?.trim() || null),
   all: single.transform((v) => v === "1"),
   q: single.transform((v) => (v ?? "").trim().slice(0, 100)),
@@ -103,8 +106,9 @@ export function buildCatalogQuery(p: Partial<CatalogParams>): string {
   if (p.mat?.length) u.set("mat", p.mat.join(","));
   if (p.typ?.length) u.set("typ", p.typ.join(","));
   if (p.pr?.length) u.set("pr", p.pr.join(","));
+  if (p.kv) u.set("kv", p.kv);
   if (p.store) u.set("store", p.store);
-  if (p.store && p.all) u.set("all", "1");
+  if ((p.store || p.kv) && p.all) u.set("all", "1");
   if (p.q) u.set("q", p.q);
   if (p.sort && p.sort !== "sku") u.set("sort", p.sort);
   if (p.view === "list") u.set("view", "list");
@@ -122,9 +126,9 @@ export function countGroupFilters(
   return p.brand.length + p.line.length + p.col.length + p.mat.length + p.typ.length + p.pr.length;
 }
 
-/** Có bộ lọc/tìm kiếm/cửa hàng nào đang áp dụng không (để hiện "Xóa lọc"). */
+/** Có bộ lọc/tìm kiếm/khu vực/cửa hàng nào đang áp dụng không (để hiện "Xóa lọc"). */
 export function hasActiveFilter(p: CatalogParams) {
-  return Boolean(p.store || p.q || countGroupFilters(p) > 0);
+  return Boolean(p.kv || p.store || p.q || countGroupFilters(p) > 0);
 }
 
 /** Dòng/BST thuộc nhãn nào — dùng để bỏ lựa chọn không còn hợp lệ khi đổi nhãn (B3, T04.9). */

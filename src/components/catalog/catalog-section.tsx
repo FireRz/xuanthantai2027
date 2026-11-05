@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import { regionLabel } from "@/lib/region";
 import Link from "next/link";
 import {
   buildCatalogQuery,
@@ -22,7 +23,11 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
   });
 
   const scopeLabel =
-    scope.kind === "total" ? "Tất cả cửa hàng" : `Cửa hàng: ${scope.name} (${scope.code})`;
+    scope.kind === "total"
+      ? "Tất cả cửa hàng"
+      : scope.kind === "region"
+        ? `${regionLabel(scope.region)} · tất cả cửa hàng`
+        : `Cửa hàng: ${scope.name} (${scope.code})`;
 
   const collectionNames = await selectedCollectionNames(params.col);
 
@@ -60,7 +65,7 @@ export async function CatalogSection({ params }: { params: CatalogParams }) {
         <EmptyState
           canClear={hasActiveFilter(params)}
           clearHref={`${buildCatalogQuery({ sort: params.sort, view: params.view, photo: params.photo })}#san-pham`}
-          storeOnly={Boolean(params.store && !params.all && scope.kind === "store")}
+          storeOnly={!params.all && scope.kind !== "total"}
           q={params.q}
         />
       ) : (
@@ -123,7 +128,7 @@ function EmptyState({
           : canClear
             ? "Hãy thử bỏ bớt điều kiện lọc."
             : "Danh mục hiện chưa có sản phẩm nào."}
-        {storeOnly && ' Bật "Xem tất cả SP" để xem cả sản phẩm cửa hàng này chưa đặt.'}
+        {storeOnly && ' Bật "Xem tất cả SP" để xem cả sản phẩm chưa đặt.'}
       </p>
       {canClear && (
         <Link

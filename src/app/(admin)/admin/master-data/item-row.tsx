@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { regionLabel } from "@/lib/region";
 import type { HideImpact, MasterKind } from "@/server/services/master-data";
 import {
   deleteItemAction,
@@ -16,6 +17,8 @@ export interface RowItem {
   name: string;
   /** Chỉ cửa hàng có mã. */
   code?: string;
+  /** Chỉ cửa hàng: khu vực (ASM), null = chưa gán. */
+  region?: string | null;
   active: boolean;
   /** Số SP (hoặc số dòng SL với cửa hàng) đang tham chiếu — hiển thị cho dễ hình dung. */
   usage: number;
@@ -31,6 +34,9 @@ const KIND_LABEL: Record<MasterKind, string> = {
   store: "cửa hàng",
 };
 
+/** id của <datalist> gợi ý các khu vực đã nhập (đặt một lần ở tab Cửa hàng). */
+export const STORE_REGIONS_LIST = "store-regions";
+
 type Dialog = { type: "hide"; impact: HideImpact } | { type: "delete" } | null;
 
 const inputClass =
@@ -40,6 +46,7 @@ export function ItemRow({ kind, item }: { kind: MasterKind; item: RowItem }) {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(item.name);
   const [code, setCode] = useState(item.code ?? "");
+  const [region, setRegion] = useState(item.region ?? "");
   const [dialog, setDialog] = useState<Dialog>(null);
   const [notice, setNotice] = useState<{ kind: "error" | "success"; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
@@ -52,6 +59,7 @@ export function ItemRow({ kind, item }: { kind: MasterKind; item: RowItem }) {
       const r = await updateItemAction(kind, item.id, {
         name,
         code: kind === "store" ? code : undefined,
+        region: kind === "store" ? region : undefined,
       });
       if (r.ok) {
         setEditing(false);
@@ -120,6 +128,16 @@ export function ItemRow({ kind, item }: { kind: MasterKind; item: RowItem }) {
               required
               autoFocus
             />
+            {kind === "store" && (
+              <input
+                aria-label="Khu vực"
+                placeholder="Khu vực"
+                list={STORE_REGIONS_LIST}
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                className={`${inputClass} w-28`}
+              />
+            )}
             <Button type="submit" size="sm" disabled={pending}>
               Lưu
             </Button>
@@ -131,6 +149,7 @@ export function ItemRow({ kind, item }: { kind: MasterKind; item: RowItem }) {
                 setEditing(false);
                 setName(item.name);
                 setCode(item.code ?? "");
+                setRegion(item.region ?? "");
                 setNotice(null);
               }}
             >
@@ -143,6 +162,18 @@ export function ItemRow({ kind, item }: { kind: MasterKind; item: RowItem }) {
               {item.code && <strong className="mr-2 font-semibold">{item.code}</strong>}
               {item.name}
             </span>
+            {kind === "store" && (
+              <span
+                data-testid="store-region"
+                className={
+                  item.region
+                    ? "rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900"
+                    : "text-xs text-neutral-400"
+                }
+              >
+                {item.region ? regionLabel(item.region) : "Chưa có khu vực"}
+              </span>
+            )}
             {!item.active && (
               <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-xs text-neutral-700">
                 Đã ẩn

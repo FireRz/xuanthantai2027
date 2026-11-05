@@ -1,7 +1,7 @@
 import type { CatalogParams } from "@/lib/catalog-params";
 import { prisma } from "@/server/db";
 import { catalogFromSql } from "./catalog";
-import { findActiveStore, orderBySql } from "./catalog-filter";
+import { findScope, orderBySql } from "./catalog-filter";
 
 export interface ProductNeighbors {
   prev: string | null;
@@ -33,7 +33,7 @@ export async function getProductNeighbors(
 ): Promise<ProductNeighbors | null> {
   const code = sku.trim();
   if (!code) return null;
-  const store = await findActiveStore(params.store);
+  const store = await findScope(params);
   const order = orderBySql(params.sort);
   const rows = await prisma.$queryRaw<Row[]>`
     SELECT prev, next, prev_image, next_image, pos, total FROM (

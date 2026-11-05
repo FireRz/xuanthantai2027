@@ -71,8 +71,8 @@ export function CatalogNavProvider({
 
   const go: CatalogNav["go"] = (patch, opts = {}) => {
     let next: CatalogParams = { ...state, ...patch, n: PAGE_SIZE };
-    // Đổi cửa hàng thì bỏ công tắc "xem tất cả" của cửa hàng cũ.
-    if (patch.store !== undefined) next.all = false;
+    // Đổi cửa hàng / khu vực thì bỏ công tắc "xem tất cả" của phạm vi cũ.
+    if (patch.store !== undefined || patch.kv !== undefined) next.all = false;
     if (patch.brand !== undefined && opts.owned) {
       next = pruneInvalidSelections(next, opts.owned.lines, opts.owned.cols);
     }

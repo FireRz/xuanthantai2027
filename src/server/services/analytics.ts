@@ -1,16 +1,19 @@
 import { Prisma } from "@prisma/client";
 import { computeMetrics, sellThrough } from "@/lib/metrics";
+import { regionLabel } from "@/lib/region";
 import type { GroupDim } from "@/lib/analytics-params";
 import type { CatalogParams } from "@/lib/catalog-params";
 import type { StockStatus } from "@/lib/status";
 import { prisma } from "@/server/db";
-import { catalogFromSql, findActiveStore } from "./catalog";
+import { storeInRegionSql } from "./catalog-filter";
+import { catalogFromSql, findScope } from "./catalog";
 
 /** Bộ lọc và phạm vi cửa hàng giống danh mục (không sắp xếp, phân trang). */
 export type AnalyticsParams = Pick<
   CatalogParams,
   "brand" | "line" | "col" | "mat" | "typ" | "pr" | "store" | "all" | "q"
->;
+> &
+  Partial<Pick<CatalogParams, "kv">>;
 
 export interface AnalyticsTotals {
   products: number;
@@ -88,7 +91,7 @@ type SummaryRow = TotalsRow & {
 
 /** Số tổng, số mã theo trạng thái và số mã hết hàng — một câu SQL trên đúng tập SP của danh mục. */
 export async function getAnalyticsSummary(params: AnalyticsParams): Promise<AnalyticsSummary> {
-  const store = await findActiveStore(params.store);
+  const store = await findScope(params);
   const from = catalogFromSql(params, store);
   // Thứ tự giống stockStatus: Đặt=0 → Về=0 → Thiếu=0 → còn lại.
   const rows = await prisma.$queryRaw<SummaryRow[]>`
@@ -127,7 +130,7 @@ export async function getTopProducts(
   kind: "sold" | "shortage",
   limit = 10,
 ): Promise<TopItem[]> {
-  const store = await findActiveStore(params.store);
+  const store = await findScope(params);
   const from = catalogFromSql(params, store);
   const value = kind === "sold" ? SOLD : Prisma.sql`GREATEST(${ORDERED} - ${RECEIVED}, 0)`;
   const rows = await prisma.$queryRaw<
@@ -151,7 +154,7 @@ export interface GroupRow extends AnalyticsTotals {
 
 /** Khóa ngoại trên bí danh p, bí danh bảng tên (đã JOIN trong catalogFromSql) và tên dòng rỗng. */
 const ATTR_DIMS: Record<
-  Exclude<GroupDim, "store">,
+  Exclude<GroupDim, "store" | "kv">,
   { fk: Prisma.Sql; label: Prisma.Sql; empty: string }
 > = {
   brand: { fk: Prisma.sql`p.brand_id`, label: Prisma.sql`b.name`, empty: "Chưa có nhãn" },
@@ -177,29 +180,70 @@ export async function getGroupBreakdown(
   params: AnalyticsParams,
   dim: GroupDim,
 ): Promise<GroupRow[]> {
-  const store = await findActiveStore(params.store);
+  const store = await findScope(params);
   const from = catalogFromSql(params, store);
 
   let rows: GroupSqlRow[];
-  if (dim === "store") {
+  if (dim === "store" || dim === "kv") {
     // Mỗi cặp (SP trong tập, cửa hàng đang hiện) có dòng SL. Số mã chỉ đếm cặp có đặt > 0;
     // cửa hàng có cặp nhưng toàn đặt = 0 vẫn có dòng (Số mã 0) để tổng Về/Bán/Tồn khớp số tổng.
     // Cửa hàng không có cặp nào trong tập thì không có dòng.
-    const onlyStore = store ? Prisma.sql`AND st.id = ${store.id}::uuid` : Prisma.empty;
-    rows = await prisma.$queryRaw<GroupSqlRow[]>`
-      WITH s AS (SELECT p.id ${from})
-      SELECT st.code AS id, st.name, NULL::text AS brand_name,
-        (COUNT(*) FILTER (WHERE q.qty_ordered > 0))::bigint AS products,
-        COALESCE(SUM(q.qty_ordered), 0)::bigint AS ordered,
-        COALESCE(SUM(q.qty_received), 0)::bigint AS received,
-        COALESCE(SUM(GREATEST(q.qty_ordered - q.qty_received, 0)), 0)::bigint AS shortage,
-        COALESCE(SUM(q.qty_sold), 0)::bigint AS sold,
-        COALESCE(SUM(q.qty_stock), 0)::bigint AS stock
-      FROM s
-      JOIN store_product_qty q ON q.product_id = s.id
-      JOIN store st ON st.id = q.store_id AND st.active ${onlyStore}
-      GROUP BY st.id, st.code, st.name
-      ORDER BY products DESC, st.name ASC, st.code ASC`;
+    const onlyStore = !store
+      ? Prisma.empty
+      : store.kind === "store"
+        ? Prisma.sql`AND st.id = ${store.id}::uuid`
+        : Prisma.sql`AND ${storeInRegionSql(store.region)}`;
+    if (dim === "store") {
+      rows = await prisma.$queryRaw<GroupSqlRow[]>`
+        WITH s AS (SELECT p.id ${from})
+        SELECT st.code AS id, st.name, NULL::text AS brand_name,
+          (COUNT(*) FILTER (WHERE q.qty_ordered > 0))::bigint AS products,
+          COALESCE(SUM(q.qty_ordered), 0)::bigint AS ordered,
+          COALESCE(SUM(q.qty_received), 0)::bigint AS received,
+          COALESCE(SUM(GREATEST(q.qty_ordered - q.qty_received, 0)), 0)::bigint AS shortage,
+          COALESCE(SUM(q.qty_sold), 0)::bigint AS sold,
+          COALESCE(SUM(q.qty_stock), 0)::bigint AS stock
+        FROM s
+        JOIN store_product_qty q ON q.product_id = s.id
+        JOIN store st ON st.id = q.store_id AND st.active ${onlyStore}
+        GROUP BY st.id, st.code, st.name
+        ORDER BY products DESC, st.name ASC, st.code ASC`;
+    } else {
+      // Khu vực: cộng SL từng SP trong khu vực trước (như danh mục khi lọc khu vực), rồi mới cộng theo khu vực —
+      // Số mã đếm SP một lần, Thiếu = Σ max(Đặt − Về, 0) trên số của cả khu vực. Không phân biệt hoa/thường;
+      // cửa hàng chưa có khu vực gộp một dòng (id null).
+      rows = await prisma.$queryRaw<GroupSqlRow[]>`
+        WITH s AS (SELECT p.id ${from}),
+        pk AS (
+          SELECT lower(NULLIF(btrim(st.region), '')) AS rk, MIN(NULLIF(btrim(st.region), '')) AS region,
+            SUM(q.qty_ordered) AS o, SUM(q.qty_received) AS r, SUM(q.qty_sold) AS so, SUM(q.qty_stock) AS sk
+          FROM s
+          JOIN store_product_qty q ON q.product_id = s.id
+          JOIN store st ON st.id = q.store_id AND st.active ${onlyStore}
+          GROUP BY s.id, 1
+        )
+        SELECT MIN(region) AS id, COALESCE(MIN(region), '') AS name, NULL::text AS brand_name,
+          (COUNT(*) FILTER (WHERE o > 0))::bigint AS products,
+          COALESCE(SUM(o), 0)::bigint AS ordered,
+          COALESCE(SUM(r), 0)::bigint AS received,
+          COALESCE(SUM(GREATEST(o - r, 0)), 0)::bigint AS shortage,
+          COALESCE(SUM(so), 0)::bigint AS sold,
+          COALESCE(SUM(sk), 0)::bigint AS stock
+        FROM pk
+        GROUP BY rk`;
+    }
+    if (dim === "kv")
+      rows = rows
+        .map((r) => ({ ...r, name: r.id ? regionLabel(r.id) : "Chưa có khu vực" }))
+        .sort(
+          (a, b) =>
+            Number(b.products) - Number(a.products) ||
+            (a.id === null
+              ? 1
+              : b.id === null
+                ? -1
+                : a.id.localeCompare(b.id, "vi", { numeric: true })),
+        );
   } else {
     const { fk, label, empty } = ATTR_DIMS[dim];
     // Khóa ngoại kép đảm bảo dòng/BST cùng nhãn với SP nên MAX(b.name) chính xác; dòng rỗng không có nhãn.

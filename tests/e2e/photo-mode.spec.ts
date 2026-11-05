@@ -244,6 +244,67 @@ test.describe("chuyển SP trước/sau trong popup", () => {
     await expect(cards(page).first()).toBeVisible();
   });
 
+  test("chuyển SP không dựng lại cả trang (chỉ gọi /api/product-view), mã kế bên được tải sẵn", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const [first, second, third] = [
+      await skuAt(page, 0),
+      await skuAt(page, 1),
+      await skuAt(page, 2),
+    ];
+    const pageRequests: string[] = [];
+    const apiRequests: string[] = [];
+    page.on("request", (r) => {
+      const u = new URL(r.url());
+      if (u.searchParams.has("_rsc") || r.headers()["rsc"] === "1") pageRequests.push(r.url());
+      if (u.pathname === "/api/product-view") apiRequests.push(u.searchParams.get("sp") ?? "");
+    });
+    await cards(page).first().click();
+    await expect(detail(page)).toHaveAttribute("data-sku", first);
+    // Mở popup: mã sau được tải sẵn ở chế độ nền.
+    await expect.poll(() => apiRequests).toContain(second);
+    pageRequests.length = 0;
+    await nextButton(page).click();
+    await expect(detail(page)).toHaveAttribute("data-sku", second);
+    await expect(page).toHaveURL(new RegExp(`sp=${second}`));
+    await expect.poll(() => apiRequests).toContain(third);
+    expect(pageRequests).toEqual([]);
+  });
+
+  test("máy tính: nút Sản phẩm trước/sau nằm ngoài khung popup, không đè lên ảnh", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "điện thoại: mũi tên nằm cạnh số thứ tự");
+    await page.goto("/");
+    await cards(page).nth(1).click();
+    await expect(detail(page)).toBeVisible();
+    const card = (await page.getByTestId("product-dialog-card").boundingBox())!;
+    const next = (await nextButton(page).boundingBox())!;
+    const prev = (await prevButton(page).boundingBox())!;
+    expect(next.x).toBeGreaterThanOrEqual(card.x + card.width);
+    expect(prev.x + prev.width).toBeLessThanOrEqual(card.x);
+    // Bấm vùng nền cạnh nút vẫn đóng popup.
+    await page.mouse.click(next.x + next.width / 2, card.y + card.height - 10);
+    await expect(page.getByTestId("product-dialog")).toHaveCount(0);
+  });
+
+  test("điện thoại: mũi tên trước/sau nằm cạnh số thứ tự, không nằm trên ảnh", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "chỉ điện thoại");
+    await page.goto("/");
+    await cards(page).nth(1).click();
+    await expect(detail(page)).toBeVisible();
+    const pos = (await page.getByTestId("product-position").boundingBox())!;
+    const next = (await nextButton(page).boundingBox())!;
+    const img = (await detail(page).getByRole("img").first().boundingBox())!;
+    expect(Math.abs(next.y + next.height / 2 - (pos.y + pos.height / 2))).toBeLessThan(6);
+    expect(next.y).toBeGreaterThanOrEqual(img.y + img.height - 1);
+  });
+
   test("SP đầu: không có nút Sản phẩm trước", async ({ page }) => {
     await page.goto("/");
     const first = await skuAt(page, 0);

@@ -9,9 +9,8 @@ export type GroupFilter = "brand" | "line" | "col" | "mat" | "typ" | "pr";
 export type FilterInput = Pick<CatalogParams, "q"> &
   Partial<Pick<CatalogParams, "brand" | "line" | "col" | "mat" | "typ" | "pr">>;
 
-export interface ScopeStore {
-  id: string;
-}
+/** Phạm vi số liệu: một cửa hàng (`id`) hoặc một khu vực (tổng các cửa hàng đang hiện trong khu vực). */
+export type ScopeStore = { id: string } | { region: string };
 
 function likeEscape(s: string) {
   return s.replace(/[\\%_]/g, (c) => `\\${c}`);
@@ -19,11 +18,24 @@ function likeEscape(s: string) {
 
 const uuids = (ids: string[]) => Prisma.join(ids.map((id) => Prisma.sql`${id}::uuid`));
 
-/** JOIN số liệu theo phạm vi: một cửa hàng hoặc view tổng (bí danh q). */
+/** Điều kiện "cửa hàng st thuộc khu vực" (không phân biệt hoa/thường). */
+export const storeInRegionSql = (region: string) =>
+  Prisma.sql`lower(btrim(st.region)) = lower(btrim(${region}))`;
+
+/** JOIN số liệu theo phạm vi: một cửa hàng, tổng một khu vực, hoặc view tổng (bí danh q). */
 export function qtyJoinSql(store: ScopeStore | null) {
-  return store
-    ? Prisma.sql`LEFT JOIN store_product_qty q ON q.product_id = p.id AND q.store_id = ${store.id}::uuid`
-    : Prisma.sql`LEFT JOIN product_totals q ON q.product_id = p.id`;
+  if (!store) return Prisma.sql`LEFT JOIN product_totals q ON q.product_id = p.id`;
+  if ("id" in store)
+    return Prisma.sql`LEFT JOIN store_product_qty q ON q.product_id = p.id AND q.store_id = ${store.id}::uuid`;
+  // Khu vực: cộng các cửa hàng đang hiện trong khu vực (cùng quy tắc với view tổng: CH ẩn không cộng).
+  return Prisma.sql`LEFT JOIN (
+      SELECT sq.product_id,
+        SUM(sq.qty_ordered)::int AS qty_ordered, SUM(sq.qty_received)::int AS qty_received,
+        SUM(sq.qty_sold)::int AS qty_sold, SUM(sq.qty_stock)::int AS qty_stock
+      FROM store_product_qty sq
+      JOIN store st ON st.id = sq.store_id AND st.active AND ${storeInRegionSql(store.region)}
+      GROUP BY sq.product_id
+    ) q ON q.product_id = p.id`;
 }
 
 /**
@@ -93,6 +105,28 @@ export function orderBySql(sort: Sort) {
     default:
       return Prisma.sql`p.sku ASC`;
   }
+}
+
+/**
+ * Phạm vi số liệu theo URL: cửa hàng (ưu tiên) → khu vực → null (tất cả cửa hàng).
+ * Cửa hàng không có/đã ẩn hoặc khu vực không có cửa hàng nào đang hiện → bỏ qua (rơi về mức rộng hơn).
+ */
+export async function findScope(p: { store: string | null; kv?: string | null }) {
+  const store = await findActiveStore(p.store);
+  if (store) return { kind: "store" as const, ...store };
+  const region = await findActiveRegion(p.kv ?? null);
+  return region ? { kind: "region" as const, region } : null;
+}
+
+/** Khu vực có ít nhất một cửa hàng đang hiện → tên khu vực như đã nhập; không có → null. */
+export async function findActiveRegion(kv: string | null) {
+  const v = kv?.trim();
+  if (!v) return null;
+  const s = await prisma.store.findFirst({
+    where: { active: true, region: { equals: v, mode: "insensitive" } },
+    select: { region: true },
+  });
+  return s?.region?.trim() ?? null;
 }
 
 /** Cửa hàng đang hiện theo mã (không phân biệt hoa/thường); không có → null. */

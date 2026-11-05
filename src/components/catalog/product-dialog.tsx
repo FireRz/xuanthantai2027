@@ -12,7 +12,18 @@ import { popupTrail } from "./product-link";
  * Đóng (nút ✕, Esc, bấm ngoài) = bỏ `sp` khỏi URL nhưng giữ nguyên các tham số lọc;
  * nút Back của trình duyệt tự đóng vì `sp` biến mất khỏi URL.
  */
-export function ProductDialog({ title, children }: { title: string; children: React.ReactNode }) {
+export function ProductDialog({
+  title,
+  prev,
+  next,
+  children,
+}: {
+  title: string;
+  /** Máy tính: nút Sản phẩm trước/sau đặt hai bên ngoài khung popup (trên nền mờ). */
+  prev?: React.ReactNode;
+  next?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   const ref = useRef<HTMLDialogElement>(null);
   const router = useRouter();
   const { state, hrefFor } = useCatalogNav();
@@ -49,30 +60,44 @@ export function ProductDialog({ title, children }: { title: string; children: Re
         close();
       }}
       onClick={(e) => {
-        // Bấm vùng nền mờ phía ngoài cửa sổ (sự kiện rơi vào chính thẻ dialog).
-        if (e.target === e.currentTarget) close();
+        // Bấm vùng nền mờ phía ngoài khung (sự kiện rơi vào thẻ dialog hoặc hàng chứa khung + nút hai bên).
+        const t = e.target as HTMLElement;
+        if (t === e.currentTarget || t.hasAttribute("data-dialog-gutter")) close();
       }}
-      className="animate-in fade-in zoom-in-95 max-md:slide-in-from-bottom-10 text-ink m-auto h-auto max-h-[92vh] w-[860px] max-w-[94vw] overflow-y-auto overscroll-contain rounded-2xl bg-white p-0 shadow-2xl duration-200 backdrop:bg-[rgba(43,26,18,.55)] motion-reduce:animate-none max-md:m-0 max-md:h-dvh max-md:max-h-none max-md:w-dvw max-md:max-w-none max-md:rounded-none md:overflow-hidden md:open:flex md:open:flex-col md:has-[[data-photo]]:h-fit"
+      // Thẻ dialog trong suốt; khung trắng là phần tử con, hai bên (máy tính) là nút chuyển SP.
+      className="animate-in fade-in zoom-in-95 max-md:slide-in-from-bottom-10 text-ink m-auto h-auto max-h-[92vh] max-w-[100vw] overflow-visible bg-transparent p-0 duration-200 backdrop:bg-[rgba(43,26,18,.55)] motion-reduce:animate-none max-md:m-0 max-md:h-dvh max-md:max-h-none max-md:w-dvw md:open:flex"
     >
-      <div className="border-line sticky top-0 z-10 flex shrink-0 items-center justify-between gap-3 border-b bg-white px-4 py-3 md:px-6 md:py-4">
-        <h2
-          id="product-dialog-title"
-          className="font-display text-xl font-semibold md:text-2xl"
-          data-testid="product-dialog-title"
+      <div
+        data-dialog-gutter
+        className="flex min-h-0 w-full items-center gap-4 max-md:h-full md:px-2"
+      >
+        {prev}
+        <div
+          data-testid="product-dialog-card"
+          className="flex max-h-[92vh] w-[860px] max-w-[calc(100vw-9rem)] min-w-0 flex-col overflow-y-auto overscroll-contain rounded-2xl bg-white shadow-2xl max-md:h-full max-md:max-h-none max-md:w-full max-md:max-w-none max-md:rounded-none md:overflow-hidden md:has-[[data-photo]]:h-fit"
         >
-          {title}
-        </h2>
-        <button
-          type="button"
-          onClick={close}
-          aria-label="Đóng"
-          data-testid="product-dialog-close"
-          className="text-ink-muted hover:bg-gold-soft hover:text-ink flex size-11 shrink-0 items-center justify-center rounded-full"
-        >
-          <X className="size-6" aria-hidden />
-        </button>
+          <div className="border-line sticky top-0 z-10 flex shrink-0 items-center justify-between gap-3 border-b bg-white px-4 py-3 md:px-6 md:py-4">
+            <h2
+              id="product-dialog-title"
+              className="font-display text-xl font-semibold md:text-2xl"
+              data-testid="product-dialog-title"
+            >
+              {title}
+            </h2>
+            <button
+              type="button"
+              onClick={close}
+              aria-label="Đóng"
+              data-testid="product-dialog-close"
+              className="text-ink-muted hover:bg-gold-soft hover:text-ink flex size-11 shrink-0 items-center justify-center rounded-full"
+            >
+              <X className="size-6" aria-hidden />
+            </button>
+          </div>
+          {children}
+        </div>
+        {next}
       </div>
-      {children}
     </dialog>
   );
 }

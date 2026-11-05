@@ -40,6 +40,7 @@ const idSchema = z.uuid();
 const inputSchema = z.object({
   name: z.string().optional(),
   code: z.string().optional(),
+  region: z.string().optional(),
   brandId: z.string().optional(),
 });
 export type ItemInput = z.infer<typeof inputSchema>;
@@ -94,7 +95,7 @@ export async function createItemAction(kind: MasterKind, raw: ItemInput) {
         await createPriceRange(input.name ?? "");
         break;
       case "store":
-        await createStore({ code: input.code ?? "", name: input.name ?? "" });
+        await createStore({ code: input.code ?? "", name: input.name ?? "", region: input.region });
         break;
     }
     return { message: "Đã thêm" };
@@ -126,7 +127,7 @@ export async function updateItemAction(kind: MasterKind, id: string, raw: ItemIn
         await renamePriceRange(itemId, input.name ?? "");
         break;
       case "store":
-        await updateStore(itemId, { code: input.code, name: input.name });
+        await updateStore(itemId, { code: input.code, name: input.name, region: input.region });
         break;
     }
     return { message: "Đã lưu" };

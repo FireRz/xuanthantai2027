@@ -21,6 +21,16 @@ Không cần đăng nhập. Mở đường link được gửi; dùng được t
 3. Muốn xem cả SP chưa đặt: bật **Xem tất cả SP**.
 4. Chọn **Tất cả cửa hàng (tổng hệ thống)** để quay về số tổng.
 
+### A2b. Xem theo khu vực (ASM)
+
+1. Ở ô **Khu vực** (đứng trước ô cửa hàng), chọn khu vực, ví dụ **Khu vực 2**.
+2. Danh sách chỉ còn SP mà các cửa hàng trong khu vực **có đặt**; các con số là **tổng của các cửa hàng trong khu vực**. Bật **Xem tất cả SP** để xem cả SP khu vực chưa đặt.
+3. Ô cửa hàng lúc này chỉ còn các cửa hàng của khu vực đó; chọn một cửa hàng để xem riêng cửa hàng ấy. Chọn **Mọi khu vực** để quay về tổng hệ thống.
+4. Chi tiết SP: bảng số lượng chỉ liệt kê cửa hàng của khu vực, dòng TỔNG là tổng khu vực.
+5. Gửi link cho ASM: link giữ khu vực đã chọn (có `kv=2` trên địa chỉ). Trang **Phân tích** cũng lọc được theo khu vực và có chiều so sánh **Khu vực**.
+
+Ô Khu vực chỉ hiện khi đã có ít nhất một cửa hàng được gán khu vực (xem B2).
+
 ### A3. Lọc, tìm, sắp xếp
 
 - **Bộ lọc**: Nhãn hàng, Dòng hàng, Bộ sưu tập (có mục "Không thuộc BST"), Tuổi vàng, Chủng loại, Khung giá. Chọn được nhiều giá trị; bên cạnh mỗi lựa chọn có số SP. Trên điện thoại bấm **Bộ lọc** để mở bảng lọc.
@@ -37,7 +47,7 @@ Với người chỉ cần xem hình và thông tin sản phẩm (không cần s
 
 - Bạn cũng có thể tự bật bằng công tắc **Ẩn số lượng / Chỉ xem hình** ở cuối thanh cửa hàng (cạnh nút Tìm, luôn thấy khi cuộn); chế độ giữ nguyên khi lọc, tìm mã, mở chi tiết, bấm Xem thêm.
 - Đây chỉ là cách hiển thị gọn, không phải phân quyền: người nhận vẫn có thể gạt lại công tắc để tắt và xem số lượng.
-- Trong chi tiết sản phẩm (cả hai chế độ): bấm ảnh để phóng to (Esc hoặc ✕ để thu lại), dùng nút mũi tên hai bên ảnh hoặc phím ← / → (vuốt trái / phải trên ảnh hoặc phần thông tin trên điện thoại) để sang sản phẩm trước / sau. Thứ tự đúng như danh sách đang xem (cùng bộ lọc, tìm mã, cửa hàng, sắp xếp), dòng `2 / 150` cạnh mã cho biết đang ở sản phẩm thứ mấy. Vuốt ngang trên bảng số lượng theo cửa hàng chỉ cuộn bảng. Chuyển sản phẩm không thêm lịch sử: bấm Back hoặc ✕ là đóng chi tiết luôn.
+- Trong chi tiết sản phẩm (cả hai chế độ): bấm ảnh để phóng to (Esc hoặc ✕ để thu lại), dùng nút mũi tên (máy tính: hai bên ngoài khung chi tiết; điện thoại: cạnh dòng `2 / 150`) hoặc phím ← / → (vuốt trái / phải trên ảnh hoặc phần thông tin trên điện thoại) để sang sản phẩm trước / sau. Thứ tự đúng như danh sách đang xem (cùng bộ lọc, tìm mã, cửa hàng, sắp xếp), dòng `2 / 150` cạnh mã cho biết đang ở sản phẩm thứ mấy. Vuốt ngang trên bảng số lượng theo cửa hàng chỉ cuộn bảng. Chuyển sản phẩm không thêm lịch sử: bấm Back hoặc ✕ là đóng chi tiết luôn.
 
 ### A5. Cách tính cần biết
 
@@ -86,6 +96,7 @@ Trang **Danh mục** có hướng dẫn từng bước và đánh dấu bước 
 
 - Thêm bằng ô "Thêm …" ở mỗi mục; sửa tên ngay trên dòng.
 - **Xóa** chỉ được khi chưa có SP hay số lượng nào dùng. Nếu đang dùng, hãy **Ẩn**.
+- **Khu vực của cửa hàng**: ở **Danh mục → Cửa hàng**, ô **Khu vực** khi thêm hoặc **Sửa** một cửa hàng. Gõ tự do (ví dụ `1`, `2`, `3`, `4` — trang xem hiện là "Khu vực 1"…); ô gợi ý các khu vực đã nhập để tránh gõ lệch. Để trống = chưa thuộc khu vực nào.
 - **Ẩn** nhãn / dòng / BST / tuổi vàng → các SP thuộc nó cũng ẩn khỏi trang xem (hộp thoại cho biết bao nhiêu SP bị ảnh hưởng). **Ẩn cửa hàng** → số của cửa hàng đó không còn cộng vào tổng. Hiện lại là trở về như cũ.
 - Hệ thống không xóa dữ liệu vĩnh viễn; SP cũng chỉ ẩn/hiện, và **mã SP không sửa được** sau khi tạo.
 

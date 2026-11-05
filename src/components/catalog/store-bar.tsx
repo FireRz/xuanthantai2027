@@ -3,6 +3,8 @@
 import { Search, Store } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { CatalogParams } from "@/lib/catalog-params";
+import { regionLabel, sameRegion, sortRegions } from "@/lib/region";
+import { cn } from "@/lib/utils";
 import { useCatalogNav } from "./catalog-nav";
 import { PhotoSwitch } from "./photo-switch";
 
@@ -12,10 +14,13 @@ export const SEARCH_DEBOUNCE_MS = 350;
 export interface StoreOption {
   code: string;
   name: string;
+  /** Khu vực (ASM); null = chưa gán. */
+  region?: string | null;
 }
 
 /**
- * Thanh "Cửa hàng của bạn" dính dưới banner (ADR-009 U14'): ô chọn cửa hàng (chọn một) + ô tìm mã SP.
+ * Thanh "Cửa hàng của bạn" dính dưới banner (ADR-009 U14'): ô chọn khu vực (khi đã có khu vực),
+ * ô chọn cửa hàng (chọn một; đã chọn khu vực thì chỉ còn cửa hàng của khu vực đó) + ô tìm mã SP.
  * Đổi cửa hàng áp dụng ngay; bấm "Tìm" áp dụng cả mã tìm và cuộn xuống danh sách.
  * Cuối hàng là công tắc "Chỉ xem hình" — thanh dính khi cuộn nên công tắc luôn trong tầm mắt.
  */
@@ -71,7 +76,19 @@ export function StoreBar({
 
   // Đổi cửa hàng thêm mục vào lịch sử; gõ tìm mã chỉ thay mục hiện tại (Back không phải lùi từng chữ).
   const go = (patch: Partial<CatalogParams>, hash = "") =>
-    navigate(patch, { hash, mode: patch.store !== undefined ? "push" : "replace" });
+    navigate(patch, {
+      hash,
+      mode: patch.store !== undefined || patch.kv !== undefined ? "push" : "replace",
+    });
+
+  const regions = sortRegions(stores.map((s) => s.region));
+  const kv = params.kv && regions.find((r) => sameRegion(r, params.kv)) ? params.kv : null;
+  // Đã chọn khu vực: chỉ còn cửa hàng của khu vực đó (giữ cửa hàng đang chọn nếu link cũ lệch khu vực).
+  const shownStores = kv
+    ? stores.filter(
+        (s) => sameRegion(s.region, kv) || s.code.toLowerCase() === params.store?.toLowerCase(),
+      )
+    : stores;
 
   return (
     <div
@@ -88,9 +105,36 @@ export function StoreBar({
         }}
         className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5 sm:px-6"
       >
-        <label className="flex w-full min-w-0 items-center gap-2 sm:w-auto sm:flex-none">
+        <div className="flex w-full min-w-0 items-center gap-2 sm:w-auto sm:flex-none">
           <Store className="text-brand size-5 shrink-0" aria-hidden />
           <span className="hidden font-semibold whitespace-nowrap lg:inline">Cửa hàng của bạn</span>
+          {regions.length > 0 && (
+            <select
+              aria-label="Khu vực"
+              data-testid="region-select"
+              value={kv ?? ""}
+              onChange={(e) => {
+                const next = e.target.value || null;
+                const current = stores.find(
+                  (s) => s.code.toLowerCase() === params.store?.toLowerCase(),
+                );
+                // Cửa hàng đang chọn không thuộc khu vực mới → bỏ chọn cửa hàng.
+                const keepStore = !next || (current && sameRegion(current.region, next));
+                go(keepStore ? { kv: next } : { kv: next, store: null });
+              }}
+              className={cn(
+                "border-brand text-ink focus-visible:outline-brand min-h-11 w-[7.5rem] shrink-0 rounded-lg border-2 px-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 sm:w-32",
+                kv ? "bg-gold-soft" : "bg-white",
+              )}
+            >
+              <option value="">Mọi khu vực</option>
+              {regions.map((r) => (
+                <option key={r} value={r}>
+                  {regionLabel(r)}
+                </option>
+              ))}
+            </select>
+          )}
           <select
             aria-label="Cửa hàng của bạn"
             value={params.store ?? ""}
@@ -98,13 +142,13 @@ export function StoreBar({
             className="border-brand bg-gold-soft text-ink focus-visible:outline-brand min-h-11 min-w-0 flex-1 rounded-lg border-2 px-3 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 sm:w-64 sm:flex-none"
           >
             <option value="">Tất cả cửa hàng</option>
-            {stores.map((s) => (
+            {shownStores.map((s) => (
               <option key={s.code} value={s.code}>
                 {s.code} — {s.name}
               </option>
             ))}
           </select>
-        </label>
+        </div>
         <label ref={searchRow} className="relative flex min-w-0 flex-1 basis-40 items-center">
           <Search
             className="text-ink-muted pointer-events-none absolute left-3 size-4"

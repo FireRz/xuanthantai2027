@@ -35,7 +35,7 @@ export default async function HomePage({
     listOwnedOptions(),
     prisma.store.findMany({
       where: { active: true },
-      select: { code: true, name: true },
+      select: { code: true, name: true, region: true },
       orderBy: { code: "asc" },
     }),
   ]);

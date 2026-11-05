@@ -19,6 +19,7 @@ const facets: FacetCounts = {
   store: [],
   total: 3,
   typTotal: 3,
+  scope: "total",
 };
 
 const html = (showSort?: boolean) =>
