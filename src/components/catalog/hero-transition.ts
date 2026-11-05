@@ -102,8 +102,9 @@ function run(update: () => Promise<boolean>, cleanup: () => void) {
   try {
     vt = start!(step);
   } catch {
-    done();
-    void update();
+    // Không chạy được chuyển cảnh: vẫn cập nhật trang, dọn tên/cờ SAU khi cập nhật xong
+    // (morphClose gán tên cho thẻ trong lúc cập nhật — dọn trước thì tên kẹt lại, lần bay sau bị trùng tên).
+    void update().finally(done);
     return;
   }
   // Lỗi của chuyển cảnh (bị bỏ qua, trùng tên…) không được thành lỗi chưa xử lý.
