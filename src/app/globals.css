@@ -344,3 +344,29 @@
     transition: none;
   }
 }
+
+/* Ảnh thẻ bay vào / ra popup (View Transitions — hero-transition.ts). */
+::view-transition-group(product-hero) {
+  animation-duration: 380ms; /* HERO_MS */
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Ảnh bay giữ bo góc như rounded-xl. */
+::view-transition-image-pair(product-hero) {
+  overflow: clip;
+  border-radius: var(--radius-xl, 0.75rem);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 250ms;
+}
+/* Đang bay: popup không chạy hiệu ứng mở riêng (phóng to + mờ dần) chồng lên. */
+[data-hero-morph] [data-testid="product-dialog"] {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}

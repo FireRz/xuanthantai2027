@@ -2,8 +2,10 @@
 
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { useCatalogNav } from "./catalog-nav";
+import { isMorphing, morphClose } from "./hero-transition";
 import { popupTrail } from "./product-link";
 
 /**
@@ -27,6 +29,9 @@ export function ProductDialog({
   const ref = useRef<HTMLDialogElement>(null);
   const router = useRouter();
   const { state, hrefFor } = useCatalogNav();
+  // Mở bằng ảnh bay (View Transitions) thì bỏ hiệu ứng mở riêng: nếu chỉ tắt bằng CSS trong lúc bay,
+  // hiệu ứng sẽ chạy lại từ đầu ngay khi bay xong.
+  const [plain] = useState(isMorphing);
 
   useEffect(() => {
     const dialog = ref.current;
@@ -42,12 +47,17 @@ export function ProductDialog({
   }, []);
 
   function close() {
-    if (popupTrail.openedInApp) {
-      popupTrail.openedInApp = false;
-      router.back();
-    } else {
-      router.replace(hrefFor({ ...state, sp: null }), { scroll: false });
-    }
+    // SP đang xem (đã lướt sang SP khác thì là SP đó) → ảnh bay về đúng thẻ của nó nếu thẻ đang hiện.
+    const sku =
+      ref.current?.querySelector("[data-testid=product-detail]")?.getAttribute("data-sku") ?? "";
+    morphClose(sku, () => {
+      if (popupTrail.openedInApp) {
+        popupTrail.openedInApp = false;
+        router.back();
+      } else {
+        router.replace(hrefFor({ ...state, sp: null }), { scroll: false });
+      }
+    });
   }
 
   return (
@@ -65,7 +75,10 @@ export function ProductDialog({
         if (t === e.currentTarget || t.hasAttribute("data-dialog-gutter")) close();
       }}
       // Thẻ dialog trong suốt; khung trắng là phần tử con, hai bên (máy tính) là nút chuyển SP.
-      className="animate-in fade-in zoom-in-95 max-md:slide-in-from-bottom-10 text-ink m-auto h-auto max-h-[92vh] max-w-[100vw] overflow-visible bg-transparent p-0 duration-200 backdrop:bg-[rgba(43,26,18,.55)] motion-reduce:animate-none max-md:m-0 max-md:h-dvh max-md:max-h-none max-md:w-dvw md:open:flex"
+      className={cn(
+        !plain && "animate-in fade-in zoom-in-95 max-md:slide-in-from-bottom-10 duration-200",
+        "text-ink m-auto h-auto max-h-[92vh] max-w-[100vw] overflow-visible bg-transparent p-0 backdrop:bg-[rgba(43,26,18,.55)] motion-reduce:animate-none max-md:m-0 max-md:h-dvh max-md:max-h-none max-md:w-dvw md:open:flex",
+      )}
     >
       <div
         data-dialog-gutter

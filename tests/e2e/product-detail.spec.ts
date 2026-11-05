@@ -147,6 +147,8 @@ test.describe("T05.5 ?sp= và đóng popup", () => {
     if (!isMobile) {
       await cards(page).first().click();
       await expect(dialog(page)).toBeVisible();
+      // Trong lúc ảnh bay (View Transitions) trình duyệt không chuyển cú bấm xuống trang: đợi bay xong.
+      await expect(page.locator("html")).not.toHaveAttribute("data-hero-morph");
       await page.mouse.click(5, 5); // vùng nền mờ ngoài cửa sổ
       await expect(dialog(page)).toHaveCount(0);
       await expect(page).toHaveURL(/sort=price_asc/);
@@ -176,5 +178,185 @@ test.describe("T05.6 không tìm thấy", () => {
     } finally {
       await prisma.product.update({ where: { id: p.id }, data: { active: true } });
     }
+  });
+});
+
+test.describe("ảnh bay vào popup", () => {
+  /** Ghi lại việc `<html data-hero-morph>` từng xuất hiện (cờ của ảnh bay) kể từ lần gọi gần nhất. */
+  const watchMorph = (page: Page) =>
+    page.evaluate(() => {
+      const w = window as unknown as { __morph: boolean; __morphObs?: MutationObserver };
+      w.__morph = false;
+      w.__morphObs?.disconnect();
+      w.__morphObs = new MutationObserver(() => {
+        if (document.documentElement.hasAttribute("data-hero-morph")) w.__morph = true;
+      });
+      w.__morphObs.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-hero-morph"],
+      });
+    });
+  const morphSeen = (page: Page) =>
+    page.evaluate(() => (window as unknown as { __morph: boolean }).__morph);
+  const html = (page: Page) => page.locator("html");
+
+  /** Lỗi trên console / lỗi trang (bỏ cảnh báo "unique key" có sẵn của bộ lọc và ảnh ngoài không tải được khi offline). */
+  function collectProblems(page: Page) {
+    const problems: string[] = [];
+    page.on("console", (m) => {
+      const t = m.text();
+      const known = /unique "key"|Failed to load resource/.test(t);
+      if (/view-transition/i.test(t) || (m.type() === "error" && !known))
+        problems.push(`${m.type()}: ${t}`);
+    });
+    page.on("pageerror", (e) => problems.push(`pageerror: ${e.message}`));
+    return problems;
+  }
+
+  test("bấm thẻ → có data-hero-morph trong lúc chuyển rồi gỡ; popup đúng SP; không lỗi console", async ({
+    page,
+  }) => {
+    const problems = collectProblems(page);
+    await page.goto("/");
+    await expect(dialog(page)).toHaveCount(0);
+    await watchMorph(page);
+    const card = cards(page).nth(1);
+    const sku = (await card.getAttribute("data-sku"))!;
+    await card.click();
+    await expect(page.getByTestId("product-detail")).toHaveAttribute("data-sku", sku);
+    await expect(dialog(page)).toBeVisible();
+    expect(await morphSeen(page)).toBe(true);
+    await expect(html(page)).not.toHaveAttribute("data-hero-morph");
+    await expect(page).toHaveURL(new RegExp(`sp=${sku}`));
+    expect(problems).toEqual([]);
+  });
+
+  test("đóng popup → ảnh bay về thẻ (data-hero-morph xuất hiện), thẻ còn đúng chỗ, không lỗi trùng view-transition-name", async ({
+    page,
+  }) => {
+    const problems = collectProblems(page);
+    await page.goto("/");
+    const card = cards(page).nth(2);
+    const sku = (await card.getAttribute("data-sku"))!;
+    await card.scrollIntoViewIfNeeded();
+    await card.click();
+    await expect(page.getByTestId("product-detail")).toHaveAttribute("data-sku", sku);
+    await expect(html(page)).not.toHaveAttribute("data-hero-morph");
+    // Đo khi popup đã mở (thẻ có hiệu ứng hiện dần khi vào khung nhìn — lúc này đã đứng yên).
+    const before = (await card.boundingBox())!;
+    await watchMorph(page);
+    await page.getByTestId("product-dialog-close").click();
+    await expect(dialog(page)).toHaveCount(0);
+    expect(await morphSeen(page)).toBe(true);
+    await expect(html(page)).not.toHaveAttribute("data-hero-morph");
+    const after = (await card.boundingBox())!;
+    expect(Math.abs(after.y - before.y)).toBeLessThan(2);
+    expect(Math.abs(after.x - before.x)).toBeLessThan(20); // máy tính: thanh cuộn hiện lại
+    // Tên chuyển cảnh chỉ gắn tạm: không còn phần tử nào mang tên sau khi xong.
+    const named = await page.evaluate(
+      () =>
+        [...document.querySelectorAll<HTMLElement>("[data-hero-src]")].filter(
+          (el) => el.style.viewTransitionName,
+        ).length,
+    );
+    expect(named).toBe(0);
+    expect(problems).toEqual([]);
+  });
+
+  test("Ctrl/Cmd + bấm thẻ → mở tab mới, trang hiện tại không mở popup", async ({
+    page,
+    context,
+  }) => {
+    await page.goto("/");
+    await watchMorph(page);
+    const card = cards(page).nth(1);
+    const sku = (await card.getAttribute("data-sku"))!;
+    const [tab] = await Promise.all([
+      context.waitForEvent("page"),
+      card.click({ modifiers: ["ControlOrMeta"] }),
+    ]);
+    await tab.waitForURL(new RegExp(`sp=${sku}`));
+    await expect(dialog(page)).toHaveCount(0);
+    await expect(page).not.toHaveURL(/sp=/);
+    expect(await morphSeen(page)).toBe(false);
+    await tab.close();
+  });
+
+  test("lướt sang SP chưa có thẻ trên trang rồi đóng → đóng bình thường, không lỗi", async ({
+    page,
+  }) => {
+    const problems = collectProblems(page);
+    await page.goto("/");
+    await expect(cards(page)).toHaveCount(24);
+    const last = cards(page).nth(23);
+    const sku = (await last.getAttribute("data-sku"))!;
+    await last.click();
+    await expect(page.getByTestId("product-detail")).toHaveAttribute("data-sku", sku);
+    await page.getByRole("button", { name: "Sản phẩm sau" }).click();
+    const detail = page.getByTestId("product-detail");
+    await expect(detail).not.toHaveAttribute("data-sku", sku);
+    const nextSku = (await detail.getAttribute("data-sku"))!;
+    await expect(page.locator(`[data-hero-src][data-sku="${nextSku}"]`)).toHaveCount(0);
+    await expect(html(page)).not.toHaveAttribute("data-hero-morph");
+    await watchMorph(page);
+    await page.getByTestId("product-dialog-close").click();
+    await expect(dialog(page)).toHaveCount(0);
+    expect(await morphSeen(page)).toBe(false); // không có thẻ để bay về → đóng thẳng
+    expect(problems.filter((p) => /view-transition/i.test(p))).toEqual([]);
+    expect(problems).toEqual([]);
+  });
+
+  // Review Focus 5 (thay kịch bản "?sp=<mã không tồn tại> rồi bấm thẻ khác" — popup modal chặn bấm thẻ).
+  test("yêu cầu tải popup treo: hết hạn chờ thì gỡ cờ ảnh bay trong 1,2 s, trang vẫn dùng được", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(cards(page).first()).toBeVisible();
+    // Giữ yêu cầu RSC của lần bấm thẻ không trả lời → popup không hiện trong hạn chờ.
+    await page.route(/[?&]_rsc=/, () => {});
+    await watchMorph(page);
+    await cards(page).nth(1).click();
+    const t0 = Date.now();
+    await expect.poll(() => morphSeen(page)).toBe(true);
+    await expect(html(page)).not.toHaveAttribute("data-hero-morph", { timeout: 1_200 });
+    expect(Date.now() - t0).toBeLessThan(1_200);
+    // Không đóng băng: ô tìm kiếm của thanh cửa hàng vẫn gõ được.
+    const search = page.getByTestId("store-bar").getByRole("searchbox");
+    await search.fill("AK");
+    await expect(search).toHaveValue("AK");
+    await page.unrouteAll({ behavior: "ignoreErrors" });
+  });
+
+  test("yêu cầu tải popup bị hủy: không kẹt cờ ảnh bay, popup vẫn mở (tải lại cả trang)", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(cards(page).first()).toBeVisible();
+    // RSC bị hủy → Next.js tự chuyển sang điều hướng thường (tải lại cả trang có ?sp=), nên thời điểm
+    // gỡ cờ phụ thuộc tốc độ tải trang; hạn 1,2 s của nhánh hết-hạn-chờ được kiểm ở test "treo" phía trên.
+    await page.route(/[?&]_rsc=/, (route) => route.abort());
+    const card = cards(page).nth(1);
+    const sku = (await card.getAttribute("data-sku"))!;
+    await card.click();
+    await expect(html(page)).not.toHaveAttribute("data-hero-morph");
+    await expect(page.getByTestId("product-detail")).toHaveAttribute("data-sku", sku);
+    await page.unrouteAll({ behavior: "ignoreErrors" });
+  });
+
+  test.describe("giảm chuyển động", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("giảm chuyển động: bấm thẻ mở popup ngay, không có data-hero-morph", async ({ page }) => {
+      await page.goto("/");
+      await watchMorph(page);
+      const card = cards(page).nth(1);
+      const sku = (await card.getAttribute("data-sku"))!;
+      await card.click();
+      await expect(page.getByTestId("product-detail")).toHaveAttribute("data-sku", sku);
+      await expect(dialog(page)).toBeVisible();
+      await page.getByTestId("product-dialog-close").click();
+      await expect(dialog(page)).toHaveCount(0);
+      expect(await morphSeen(page)).toBe(false);
+    });
   });
 });

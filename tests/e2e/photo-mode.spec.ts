@@ -288,7 +288,8 @@ test.describe("chuyển SP trước/sau trong popup", () => {
     const prev = (await prevButton(page).boundingBox())!;
     expect(next.x).toBeGreaterThanOrEqual(card.x + card.width);
     expect(prev.x + prev.width).toBeLessThanOrEqual(card.x);
-    // Bấm vùng nền cạnh nút vẫn đóng popup.
+    // Bấm vùng nền cạnh nút vẫn đóng popup (đợi ảnh bay xong: lúc đang bay cú bấm không tới trang).
+    await expect(page.locator("html")).not.toHaveAttribute("data-hero-morph");
     await page.mouse.click(next.x + next.width / 2, card.y + card.height - 10);
     await expect(page.getByTestId("product-dialog")).toHaveCount(0);
   });

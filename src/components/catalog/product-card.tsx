@@ -33,7 +33,11 @@ export function ProductCard({
       className="group border-line hover:border-gold flex flex-col overflow-hidden rounded-xl border bg-white transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <ProductLink sku={item.sku} className="flex flex-1 flex-col">
-        <div className="relative aspect-square overflow-hidden [&_img]:transition-transform [&_img]:duration-500 group-hover:[&_img]:scale-105">
+        <div
+          data-hero-src
+          data-sku={item.sku}
+          className="relative aspect-square overflow-hidden [&_img]:transition-transform [&_img]:duration-500 group-hover:[&_img]:scale-105"
+        >
           <ProductImage
             thumbUrl={item.thumbUrl}
             alt={item.name ?? item.sku}

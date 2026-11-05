@@ -4,6 +4,7 @@ import { stockStatus } from "@/lib/status";
 import { regionLabel } from "@/lib/region";
 import { cn } from "@/lib/utils";
 import type { ProductDetail } from "@/server/services/product-detail";
+import { HERO } from "./hero-transition";
 import { ImageZoom } from "./image-zoom";
 import { ProductImage } from "./product-image";
 import { NeighborPosition } from "./product-swipe";
@@ -57,12 +58,15 @@ export function DetailBody({
           alt={d.name ?? d.sku}
           className={cn("md:max-w-none", !photo && "max-w-[30vh]")}
         >
-          <ProductImage
-            thumbUrl={d.imageUrl ?? d.thumbUrl}
-            alt={d.name ?? d.sku}
-            priority
-            className="border-line aspect-square w-full rounded-xl border"
-          />
+          {/* Đích / nguồn của ảnh thẻ bay vào-ra popup (View Transitions). */}
+          <div data-hero style={{ viewTransitionName: HERO }}>
+            <ProductImage
+              thumbUrl={d.imageUrl ?? d.thumbUrl}
+              alt={d.name ?? d.sku}
+              priority
+              className="border-line aspect-square w-full rounded-xl border"
+            />
+          </div>
         </ImageZoom>
         <div className="min-w-0">
           <p className="flex items-baseline justify-between gap-3">

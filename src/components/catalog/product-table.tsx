@@ -102,11 +102,14 @@ export function ProductTable({
                 className="border-line hover:bg-gold-soft/60 cursor-pointer border-t"
               >
                 <td className="px-3 py-2 lg:px-2">
-                  <ProductImage
-                    thumbUrl={item.thumbUrl}
-                    alt={item.name ?? item.sku}
-                    className="border-line size-12 rounded-md border text-xs"
-                  />
+                  {/* Khung ảnh của dòng: nguồn / đích của ảnh bay vào-ra popup. */}
+                  <div data-hero-src data-sku={item.sku} className="size-12">
+                    <ProductImage
+                      thumbUrl={item.thumbUrl}
+                      alt={item.name ?? item.sku}
+                      className="border-line size-12 rounded-md border text-xs"
+                    />
+                  </div>
                 </td>
                 <td className="sticky left-0 bg-white px-3 py-2 font-medium tracking-wide whitespace-nowrap uppercase lg:static lg:px-2 lg:tracking-normal">
                   <ProductLink sku={item.sku} className="hover:underline">
